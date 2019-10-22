@@ -58,37 +58,68 @@ def download_data_for_interval(start_date, num_days, filename, sensor_id, sensor
 
 
 def download_pm(start_date, num_days):
-    for s_id in pm_sensor_id_list:
-        f_name = str(s_id) + SDS011 + '.csv'
-        download_data_for_interval(start_date, num_days, f_name, s_id, SDS011)
-        print(f_name)
+    try:
+        fh = open('downloaded_list.txt', "r")
+    except FileNotFoundError:
+        fh = open('downloaded_list.txt', "w")
+    fh.close()
+    with open('downloaded_list.txt', 'r+') as proc_file:
+        downloaded_files = proc_file.read().splitlines()
+        id_list = pm_sensor_id_list
+        for s_id in id_list:
+            f_name = str(s_id) + SDS011 + '.csv'
+            if f_name not in downloaded_files:
+                download_data_for_interval(start_date, num_days, f_name, s_id, SDS011)
+                print(f_name)
+                downloaded_files.append(f_name)
+                proc_file.write(f_name+'\n')
 
 
 def download_temp_bme(start_date, num_days):
-    for s_id in bme_temp_sensor_id_list:
-        f_name = str(s_id) + BME280 + '.csv'
-        download_data_for_interval(start_date, num_days, f_name, s_id, BME280)
-        print(f_name)
+    try:
+        fh = open('downloaded_list.txt', "r")
+    except FileNotFoundError:
+        fh = open('downloaded_list.txt', "w")
+    fh.close()
+    with open('downloaded_list.txt', 'r+') as proc_file:
+        downloaded_files = proc_file.read().splitlines()
+        id_list = bme_temp_sensor_id_list
+        for s_id in id_list:
+            f_name = str(s_id) + BME280 + '.csv'
+            if f_name not in downloaded_files:
+                download_data_for_interval(start_date, num_days, f_name, s_id, BME280)
+                print(f_name)
+                downloaded_files.append(f_name)
+                proc_file.write(f_name+'\n')
 
 
 def download_temp_dht(start_date, num_days):
-    for s_id in dht_temp_sensor_id_list:
-        f_name = str(s_id) + DHT22 + '.csv'
-        download_data_for_interval(start_date, num_days, f_name, s_id, DHT22)
-        print(f_name)
+    try:
+        fh = open('downloaded_list.txt', "r")
+    except FileNotFoundError:
+        fh = open('downloaded_list.txt', "w")
+    fh.close()
+    with open('downloaded_list.txt', 'r+') as proc_file:
+        downloaded_files = proc_file.read().splitlines()
+        id_list = dht_temp_sensor_id_list
+        for s_id in id_list:
+            f_name = str(s_id) + DHT22 + '.csv'
+            if f_name not in downloaded_files:
+                download_data_for_interval(start_date, num_days, f_name, s_id, DHT22)
+                print(f_name)
+                downloaded_files.append(f_name)
+                proc_file.write(f_name+'\n')
 
 
 if __name__ == '__main__':
-    d = datetime.date(2017, 10, 17)
-    n_days = 365*2
-    t = time.time()
-    th1 = Thread(target=download_pm, args=(d, n_days))
-    th2 = Thread(target=download_temp_bme, args=(d, n_days))
-    th3 = Thread(target=download_temp_dht, args=(d, n_days))
-    th1.start()
-    th2.start()
-    th3.start()
-    th3.join()
-    th2.join()
-    th1.join()
-    print(time.time()-t)
+    d = datetime.date(2018, 10, 17)
+    n_days = 365
+    while True:
+        try:
+            download_pm(d, n_days)
+            download_temp_bme(d, n_days)
+            download_temp_dht(d, n_days)
+            break
+        except requests.exceptions.ConnectionError:
+            print("Connection error")
+            time.sleep(10)
