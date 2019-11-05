@@ -123,7 +123,7 @@ def download_temp_dht(start_date, num_days):
 
 
 if __name__ == '__main__':
-    d = datetime.date(2018, 10, 17)
+    d = datetime.date(2018, 11, 4)
     n_days = 365
     while True:
         try:
