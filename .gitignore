@@ -2,3 +2,4 @@ DATA/
 .idea/
 .ipynb_checkpoints
 /DATA
+__pycache__/
