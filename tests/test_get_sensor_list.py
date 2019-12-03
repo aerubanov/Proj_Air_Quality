@@ -20,17 +20,17 @@ test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                     <a href="/">Parent Directory</a></td><td>&nbsp;</td>
                     <td align="right">  - </td><td>&nbsp;</td></tr>
                 <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
-                    <a href="csv1">2019-12-02_bme280_sensor_141.csv</a>
+                    <a href="2019-12-02_csv1">2019-12-02_bme280_sensor_141.csv</a>
                     </td><td align="right">2019-12-03 01:46  </td><td align="right"> 39K</td>
                     <td>&nbsp;</td></tr>
                 <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
-                     <a href="csv2">2019-12-02_bme280_sensor_163.csv</a>
+                     <a href="2019-12-02_csv2">2019-12-02_bme280_sensor_163.csv</a>
                      </td><td align="right">2019-12-03 01:46  </td><td align="right"> 41K</td>
                      <td>&nbsp;</td></tr>
                 <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
-                <a href="csv2">2019-12-02_bme280_sensor_250.csv</a>
-                </td><td align="right">2019-12-03 01:46  </td><td align="right"> 41K</td>
-                <td>&nbsp;</td></tr>
+                     <a href="2019-12-02_csv3">2019-12-02_bme280_sensor_250.csv</a>
+                    </td><td align="right">2019-12-03 01:46  </td><td align="right"> 41K</td>
+                    <td>&nbsp;</td></tr>
                 <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
                     <a href="measurements.txt">measurements.txt</a>
                     </td><td align="right">2019-12-03 01:47  </td>
@@ -50,8 +50,18 @@ def test_get_links(mocker, requests_mock):
     date = datetime.datetime(2019, 12, 2)
     requests_mock.get('http://archive.luftdaten.info/2019-12-02/',
                       text=test_html)
-    data = ''
+
+    data = ''  # no already seen files
     mock_open = mocker.mock_open(read_data=data)
     mocker.patch("builtins.open", mock_open)
     links = get_links(date.date())
-    print(links)
+    assert links ==['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
+                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
+
+    data = "2019-12-02_csv1"  # already seen first file
+    mock_open = mocker.mock_open(read_data=data)
+    mocker.patch("builtins.open", mock_open)
+    links = get_links(date.date())
+    assert links ==['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
