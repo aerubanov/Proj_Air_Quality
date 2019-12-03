@@ -1,0 +1,7 @@
+dvc
+bs4
+lxml
+pytest
+pandas
+pytest-mock
+requests-mock
