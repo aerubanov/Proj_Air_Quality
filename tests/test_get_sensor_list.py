@@ -46,22 +46,22 @@ test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                 '''
 
 
-def test_get_links(mocker, requests_mock):
+def test_get_links(tmpdir, requests_mock):
     date = datetime.datetime(2019, 12, 2)
     requests_mock.get('http://archive.luftdaten.info/2019-12-02/',
                       text=test_html)
-
+    p = tmpdir.mkdir("data").join("test_links.txt")
     data = ''  # no already seen files
-    mock_open = mocker.mock_open(read_data=data)
-    mocker.patch("builtins.open", mock_open)
-    links = get_links(date.date())
-    assert links ==['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
-                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
-                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
-
+    p.write(data)
+    print(p)
+    links = get_links(date.date(), p)
+    assert links == [
+        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
+        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3',
+    ]
     data = "2019-12-02_csv1"  # already seen first file
-    mock_open = mocker.mock_open(read_data=data)
-    mocker.patch("builtins.open", mock_open)
-    links = get_links(date.date())
-    assert links ==['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
-                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
+    p.write(data)
+    links = get_links(date.date(), p)
+    assert links == ['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+                     'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
