@@ -1,6 +1,7 @@
 import datetime
 
-from scripts.get_sensor_list import get_links, check_sensor_pos
+from scripts.get_sensor_list import get_links, check_sensor_pos, check_coordinate
+from scripts.config import MIN_LON, MAX_LON, MIN_LAT, MAX_LAT
 
 test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                 <html>
@@ -96,3 +97,11 @@ def test_check_sensor_pos(tmpdir, requests_mock):
     assert 'some_id' in id_file.read().splitlines()
     assert '_csv1' in id_file.read().splitlines()
     assert '_csv2' not in id_file.read().splitlines()
+
+
+def test_check_coordinate():
+    assert check_coordinate(MIN_LAT + (MAX_LAT - MIN_LAT)/2, MIN_LON + (MAX_LON - MIN_LON)/2)
+    assert not check_coordinate(MIN_LAT-1, MIN_LON + (MAX_LON - MIN_LON)/2)
+    assert not check_coordinate(MAX_LAT+1, MIN_LON + (MAX_LON - MIN_LON)/2)
+    assert not check_coordinate(MIN_LAT + (MAX_LAT - MIN_LAT) / 2, MIN_LON-1)
+    assert not check_coordinate(MIN_LAT + (MAX_LAT - MIN_LAT) / 2, MAX_LON+1)
