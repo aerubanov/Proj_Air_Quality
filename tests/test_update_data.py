@@ -20,6 +20,7 @@ def test_check_file(tmpdir):
     assert res == (False, None)
 
     f1 = d.join("empty.csv")
+    f1.write('')
     res = check_file(f1, data_folder=dir_name)
     assert res == (False, None)
 

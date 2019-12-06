@@ -12,8 +12,11 @@ def check_file(fname, data_folder=DATA_FOLDER):
     try:
         f = open(os.path.join(data_folder, fname), 'r')
         reader = csv.DictReader(f, delimiter=";")
+        row = None
         for row in reader:
             pass
+        if row is None:
+            return False, None
         dt = datetime.datetime.fromisoformat(row['timestamp'])
         f.close()
         return True, dt.date()
@@ -81,4 +84,5 @@ def main(sensor_file):
 
 
 if __name__ == '__main__':
-    main(SENSOR_ID_FILE)
+    #main(SENSOR_ID_FILE)
+    check_file('22094_sds011_sensor_.csv')
