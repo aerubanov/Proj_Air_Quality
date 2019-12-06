@@ -58,7 +58,7 @@ def check_sensor_pos(links, links_file, sensor_id_file):
 
 
 if __name__ == '__main__':
-    date = datetime.datetime(2019, 12, 4)
-    ln = get_links(date.date(), CHECKED_LINKS_FILE)
+    date = datetime.date.today() - datetime.timedelta(days=1)
+    ln = get_links(date, CHECKED_LINKS_FILE)
     sensor_list = check_sensor_pos(ln, CHECKED_LINKS_FILE, SENSOR_ID_FILE)
     print(sensor_list)

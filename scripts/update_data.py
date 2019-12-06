@@ -84,5 +84,4 @@ def main(sensor_file):
 
 
 if __name__ == '__main__':
-    #main(SENSOR_ID_FILE)
-    check_file('22094_sds011_sensor_.csv')
+    main(SENSOR_ID_FILE)
