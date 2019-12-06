@@ -5,7 +5,7 @@ import csv
 
 from scripts.config import SENSOR_ID_FILE, SERVER_URL, DATA_FOLDER
 
-DEFAULT_DATE = datetime.datetime(2019, 1, 1)
+DEFAULT_DATE = datetime.datetime(2019, 1, 1).date()
 
 
 def check_file(fname, data_folder=DATA_FOLDER):
@@ -77,6 +77,7 @@ def main(sensor_file):
                 date = DEFAULT_DATE
             yesterday = datetime.date.today() - datetime.timedelta(days=1)
             download_data_for_interval(date, yesterday, fname, sensor_id, sensor_type)
+            print(sensor)
 
 
 if __name__ == '__main__':
