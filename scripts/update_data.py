@@ -27,9 +27,10 @@ def construct_url(sensor_id, date, sensor_type):
     return url
 
 
-def download_data_for_interval(start_date, filename, sensor_id, sensor_type, data_folder=DATA_FOLDER):
+def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor_type, data_folder=DATA_FOLDER):
     """
     Download all data for time interval and save in one file
+    :param end_date:  end point of time interval
     :param data_folder: data to store result
     :param start_date: start point of time interval
     :param filename: filename to save results
@@ -37,9 +38,8 @@ def download_data_for_interval(start_date, filename, sensor_id, sensor_type, dat
     :param sensor_type: type of sensor
     :return: None
     """
-    yesterday = datetime.date.today() - datetime.timedelta(days=1)
-    delta = yesterday - start_date
-    num_days = delta.days
+    delta = end_date - start_date
+    num_days = delta.days + 1
     dates = [start_date + datetime.timedelta(days=1) * i for i in range(num_days)]
     header_writen = False
     try:
@@ -75,7 +75,8 @@ def main(sensor_file):
             file_exist, date = check_file(fname)
             if date is None:
                 date = DEFAULT_DATE
-            download_data_for_interval(date, fname, sensor_id, sensor_type)
+            yesterday = datetime.date.today() - datetime.timedelta(days=1)
+            download_data_for_interval(date, yesterday, fname, sensor_id, sensor_type)
 
 
 if __name__ == '__main__':
