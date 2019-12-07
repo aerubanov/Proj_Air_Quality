@@ -1,7 +1,7 @@
-import pytest
 import datetime
 
-from scripts.get_sensor_list import get_links
+from scripts.get_sensor_list import get_links, check_sensor_pos, check_coordinate
+from scripts.config import MIN_LON, MAX_LON, MIN_LAT, MAX_LAT
 
 test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                 <html>
@@ -46,22 +46,62 @@ test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                 '''
 
 
-def test_get_links(mocker, requests_mock):
+def test_get_links(tmpdir, requests_mock):
     date = datetime.datetime(2019, 12, 2)
     requests_mock.get('http://archive.luftdaten.info/2019-12-02/',
                       text=test_html)
-
+    p = tmpdir.mkdir("data").join("test_links.txt")
     data = ''  # no already seen files
-    mock_open = mocker.mock_open(read_data=data)
-    mocker.patch("builtins.open", mock_open)
-    links = get_links(date.date())
-    assert links ==['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
-                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
-                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
-
+    p.write(data)
+    print(p)
+    links = get_links(date.date(), p)
+    assert links == [
+        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
+        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3',
+    ]
     data = "2019-12-02_csv1"  # already seen first file
-    mock_open = mocker.mock_open(read_data=data)
-    mocker.patch("builtins.open", mock_open)
-    links = get_links(date.date())
-    assert links ==['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
-                    'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
+    p.write(data)
+    links = get_links(date.date(), p)
+    assert links == ['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+                     'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
+    assert p.read() == data
+
+
+def test_check_sensor_pos(tmpdir, requests_mock):
+    links = ['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
+             'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2']
+
+    appropriate_sensor = "sensor_id;sensor_type;location;lat;lon;timestamp;P1;durP1;ratioP1;P2;durP2;ratioP2 \n " \
+                         "19649;SDS011;9973;55.686;37.589;2019-01-10T19:05:56;15.77;;;7.95;;"
+    inappropriate_sensor = "sensor_id;sensor_type;location;lat;lon;timestamp;P1;durP1;ratioP1;P2;durP2;ratioP2 \n " \
+                           "19649;SDS011;9973;10.686;22.589;2019-01-10T19:05:56;15.77;;;7.95;;"
+
+    requests_mock.get('http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
+                      content=bytes(appropriate_sensor, 'utf-8'))
+    requests_mock.get('http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
+                      content=bytes(inappropriate_sensor, 'utf-8'))
+
+    d = tmpdir.mkdir("data")
+    link_file = d.join("test_links.txt")
+    id_file = d.join("sensor_id.txt")
+    link_file.write('some_link'+'\n')
+    id_file.write('some_id'+'\n')
+
+    check_sensor_pos(links, link_file, id_file)
+
+    assert 'some_link' in link_file.read().splitlines()
+    assert '2019-12-02_csv1' in link_file.read().splitlines()
+    assert '2019-12-02_csv2' in link_file.read().splitlines()
+
+    assert 'some_id' in id_file.read().splitlines()
+    assert '_csv1' in id_file.read().splitlines()
+    assert '_csv2' not in id_file.read().splitlines()
+
+
+def test_check_coordinate():
+    assert check_coordinate(MIN_LAT + (MAX_LAT - MIN_LAT)/2, MIN_LON + (MAX_LON - MIN_LON)/2)
+    assert not check_coordinate(MIN_LAT-1, MIN_LON + (MAX_LON - MIN_LON)/2)
+    assert not check_coordinate(MAX_LAT+1, MIN_LON + (MAX_LON - MIN_LON)/2)
+    assert not check_coordinate(MIN_LAT + (MAX_LAT - MIN_LAT) / 2, MIN_LON-1)
+    assert not check_coordinate(MIN_LAT + (MAX_LAT - MIN_LAT) / 2, MAX_LON+1)
