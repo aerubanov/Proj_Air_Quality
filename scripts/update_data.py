@@ -19,7 +19,7 @@ def check_file(fname, data_folder=DATA_FOLDER):
             return False, None
         dt = datetime.datetime.fromisoformat(row['timestamp'])
         f.close()
-        return True, dt.date()
+        return True, dt.date() + datetime.timedelta(days=1)
     except FileNotFoundError:
         return False, None
 
@@ -47,7 +47,8 @@ def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor
     header_writen = False
     try:
         fh = open(os.path.join(data_folder, filename), "r")
-        header_writen = True
+        if os.stat(os.path.join(data_folder, filename)).st_size > 0:
+            header_writen = True
     except FileNotFoundError:
         fh = open(os.path.join(data_folder, filename), "w")
     fh.close()
