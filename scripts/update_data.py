@@ -5,17 +5,16 @@ import csv
 
 from scripts.config import SENSOR_ID_FILE, SERVER_URL, DATA_FOLDER
 
-DEFAULT_DATE = datetime.datetime(2019, 1, 1).date()
+DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
 
 
 def check_file(fname, data_folder=DATA_FOLDER):
     try:
         f = open(os.path.join(data_folder, fname), 'r')
         reader = csv.DictReader(f, delimiter=";")
-        row = None
-        for row in reader:
-            pass
-        if row is None:
+        try:
+            row = next(reversed(list(reader)))
+        except StopIteration:
             return False, None
         dt = datetime.datetime.fromisoformat(row['timestamp'])
         f.close()

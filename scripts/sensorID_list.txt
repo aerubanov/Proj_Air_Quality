@@ -166,3 +166,10 @@ _sds011_sensor_35514.csv
 _sds011_sensor_35618.csv
 _bme280_sensor_35694.csv
 _sds011_sensor_35693.csv
+_bme280_sensor_24023.csv
+_bme280_sensor_24688.csv
+_bme280_sensor_35742.csv
+_sds011_sensor_20215.csv
+_sds011_sensor_24022.csv
+_sds011_sensor_24687.csv
+_sds011_sensor_35741.csv
