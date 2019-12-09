@@ -54,16 +54,19 @@ def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor
     with open(os.path.join(data_folder, filename), 'a') as f:
         for date in dates:
             url = construct_url(sensor_id, date, sensor_type)
-            resp = requests.get(url)
-            if resp.status_code == 200:
-                if header_writen:
-                    data = resp.content.decode().splitlines()[1:]
-                    f.write('\n'.join(data))
-                    f.write('\n')
-                else:
-                    data = resp.content.decode()
-                    f.write(data)
-                    header_writen = True
+            try:
+                resp = requests.get(url)
+                if resp.status_code == 200:
+                    if header_writen:
+                        data = resp.content.decode().splitlines()[1:]
+                        f.write('\n'.join(data))
+                        f.write('\n')
+                    else:
+                        data = resp.content.decode()
+                        f.write(data)
+                        header_writen = True
+            except requests.exceptions.ConnectionError as e:
+                print(str(e))
 
 
 def main(sensor_file):
@@ -79,6 +82,7 @@ def main(sensor_file):
             if date is None:
                 date = DEFAULT_DATE
             yesterday = datetime.date.today() - datetime.timedelta(days=1)
+            date = max(DEFAULT_DATE, date)
             download_data_for_interval(date, yesterday, fname, sensor_id, sensor_type)
             print(sensor)
 
