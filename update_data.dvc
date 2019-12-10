@@ -1,0 +1,7 @@
+md5: 1f544ed5d181a68b6f961aca1823a0c3
+cmd: python -m scripts.update_data
+deps:
+- md5: 60d5b6898cd259cfc673a79224af9900
+  path: scripts/update_data.py
+- md5: 67665f0df9219bf59c8fe6591d7acc69
+  path: processing_lists/sensorID_list.txt
