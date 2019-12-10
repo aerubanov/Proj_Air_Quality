@@ -1,0 +1,5 @@
+md5: e9f285b22beac24f903c3ca70b7ce52f
+cmd: python -m scripts.get_sensor_list
+deps:
+- md5: 0356bdbeecc171c7d259ffc8f93ce639
+  path: scripts/get_sensor_list.py

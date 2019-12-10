@@ -38,25 +38,22 @@ def check_sensor_pos(links, links_file, sensor_id_file):
     for url in links:
         with open(links_file, 'a') as l_file, requests.Session() as s,\
                 open(sensor_id_file, 'a') as s_file:
+            download = s.get(url)
+            decoded_content = download.content.decode('utf-8')
+            cr = csv.DictReader(decoded_content.splitlines(), delimiter=';')
+            row = next(cr)
+            print(row)
             try:
-                download = s.get(url)
-                decoded_content = download.content.decode('utf-8')
-                cr = csv.DictReader(decoded_content.splitlines(), delimiter=';')
-                row = next(cr)
-                print(row)
-                try:
-                    lat = float(row['lat'])
-                    lon = float(row['lon'])
-                    fname = url.split("/")[-1]
-                    l_file.write(fname+'\n')
-                    if check_coordinate(lat, lon):
-                        id_list.append(fname[10:])
-                        s_file.write(fname[10:]+'\n')
-                        print(fname[10:])
-                except ValueError:
-                    pass
-            except requests.exceptions.ConnectionError as e:
-                print(str(e))
+                lat = float(row['lat'])
+                lon = float(row['lon'])
+                fname = url.split("/")[-1]
+                l_file.write(fname+'\n')
+                if check_coordinate(lat, lon):
+                    id_list.append(fname[10:])
+                    s_file.write(fname[10:]+'\n')
+                    print(fname[10:])
+            except ValueError:
+                pass
     return id_list
 
 

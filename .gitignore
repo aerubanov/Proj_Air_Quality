@@ -4,3 +4,4 @@ DATA/
 /DATA
 __pycache__/
 .coverage
+/scripts.get_sensor_list
