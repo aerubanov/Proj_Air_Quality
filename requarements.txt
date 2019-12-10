@@ -5,3 +5,4 @@ pytest
 pandas
 requests-mock
 pytest-pep8
+pytest-cov
