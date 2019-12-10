@@ -5,4 +5,5 @@
 /state
 /lock
 /tmp
+/updater.lockgi
 /updater.lock

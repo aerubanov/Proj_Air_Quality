@@ -1,6 +1,0 @@
-dvc
-bs4
-lxml
-pytest
-pandas
-requests-mock
