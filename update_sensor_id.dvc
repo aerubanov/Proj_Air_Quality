@@ -1,6 +1,9 @@
-md5: 8bdfce1aceea513e3ae1ccf6e9426ba4
+md5: 482f2f55b5f09e564906c80ed40c2745
 cmd: python -m scripts.get_sensor_list
-deps:
-- md5: 0356bdbeecc171c7d259ffc8f93ce639
-  path: scripts/get_sensor_list.py
+outs:
+- md5: 91e46a8cdef5f5ed1cb0e63ba25fa785
+  path: last_data_update.txt
+  cache: true
+  metric: false
+  persist: false
 always_changed: true

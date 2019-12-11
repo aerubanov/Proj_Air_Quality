@@ -5,3 +5,4 @@ DATA/
 __pycache__/
 .coverage
 /scripts.get_sensor_list
+/last_data_update.txt

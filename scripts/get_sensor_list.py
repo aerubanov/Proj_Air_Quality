@@ -65,3 +65,5 @@ if __name__ == '__main__':
     ln = get_links(date, CHECKED_LINKS_FILE)
     sensor_list = check_sensor_pos(ln, CHECKED_LINKS_FILE, SENSOR_ID_FILE)
     print(sensor_list)
+    with open('last_data_update.txt', 'w') as f:
+        f.write(str(date))
