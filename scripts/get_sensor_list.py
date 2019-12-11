@@ -7,6 +7,12 @@ from scripts.config import MAX_LAT, MIN_LAT, MAX_LON, MIN_LON, CHECKED_LINKS_FIL
 
 
 def get_links(for_date, links_file):
+    """
+    Get all new available links on server
+    :param for_date: date for lock up
+    :param links_file: file with already checked links
+    :return: list of new links
+    """
     try:
         fh = open(links_file, "r")
     except FileNotFoundError:
@@ -25,10 +31,19 @@ def get_links(for_date, links_file):
 
 
 def check_coordinate(lat, lon):
+    """check that sensor coordinate is appropriate"""
     return MIN_LAT <= lat <= MAX_LAT and MIN_LON <= lon <= MAX_LON
 
 
 def check_sensor_pos(links, links_file, sensor_id_file):
+    """
+    for all new links extract first datastring and check file position
+    if true, save id to download data
+    :param links: new links for checking
+    :param links_file: file with already checked list
+    :param sensor_id_file: file with id of appropriate sensor s
+    :return: list of new id
+    """
     id_list = []
     try:
         fh = open(sensor_id_file, "r")

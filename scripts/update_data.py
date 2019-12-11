@@ -9,6 +9,13 @@ DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
 
 
 def check_file(fname, data_folder=DATA_FOLDER):
+    """
+    check data file
+    :param fname: file name
+    :param data_folder: folders with data
+    :return: (True, <last timestamp value in file>) if file exist and consist data
+             (False, None) otherwise
+    """
     try:
         f = open(os.path.join(data_folder, fname), 'r')
         reader = csv.DictReader(f, delimiter=";")
@@ -70,6 +77,7 @@ def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor
 
 
 def main(sensor_file):
+    """ for all sensor id try update data"""
     with open(sensor_file, 'r') as sensors:
         sensor_list = sensors.read().splitlines()
         for sensor in sensor_list:
