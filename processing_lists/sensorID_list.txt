@@ -177,3 +177,5 @@ _bme280_sensor_35986.csv
 _dht22_sensor_34508.csv
 _sds011_sensor_34507.csv
 _sds011_sensor_35985.csv
+_bme280_sensor_34706.csv
+_sds011_sensor_34705.csv
