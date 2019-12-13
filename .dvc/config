@@ -1,4 +1,6 @@
 ['remote "local"']
 url = ../DATA
 [core]
-remote = local
+remote = myremote
+['remote "myremote"']
+url = s3://ds-for-air/DATA
