@@ -1,9 +1,9 @@
-md5: b7f719051b625c4b894050714a514f12
+md5: 65a16a9049bb35fffee9ce2ad8be1d37
 cmd: python -m scripts.update_data
 deps:
-- md5: e38148b549b1b1a326452f9a26862911
+- md5: d714795165d5416a9d015983678fe46f
   path: processing_lists/links_list.txt
-- md5: 4e398a0dc2233e7e55936ee7febf6901
+- md5: a6297e5242357dc9bd46398461ab55ec
   path: processing_lists/sensorID_list.txt
-- md5: 91e46a8cdef5f5ed1cb0e63ba25fa785
+- md5: 3b5a0cca614f09cdd94d5846bca795fb
   path: last_data_update.txt

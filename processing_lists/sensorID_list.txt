@@ -179,3 +179,7 @@ _sds011_sensor_34507.csv
 _sds011_sensor_35985.csv
 _bme280_sensor_34706.csv
 _sds011_sensor_34705.csv
+_bme280_sensor_28287_indoor.csv
+_bme280_sensor_34973_indoor.csv
+_sds011_sensor_28286_indoor.csv
+_sds011_sensor_34972_indoor.csv
