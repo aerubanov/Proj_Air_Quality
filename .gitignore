@@ -6,3 +6,4 @@ __pycache__/
 .coverage
 /scripts.get_sensor_list
 /last_data_update.txt
+.vscode/
