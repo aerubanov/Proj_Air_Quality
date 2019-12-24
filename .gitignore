@@ -1,9 +1,9 @@
 DATA/
 .idea/
 .ipynb_checkpoints
-/DATA
 __pycache__/
 .coverage
 /scripts.get_sensor_list
 /last_data_update.txt
 .vscode/
+/DATA
