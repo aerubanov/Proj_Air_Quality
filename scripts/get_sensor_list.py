@@ -5,6 +5,9 @@ import csv
 
 from scripts.config import MAX_LAT, MIN_LAT, MAX_LON, MIN_LON, CHECKED_LINKS_FILE, SENSOR_ID_FILE, SERVER_URL
 
+# This script update list of available sensors. Script get all csv files links and check sensor lat and lon
+# in range [MIN_LAT, MAX_LAT], [MIN_LON, MAX_LON] respectively. See config.py for that values.
+
 
 def get_links(for_date, links_file):
     """
@@ -27,6 +30,7 @@ def get_links(for_date, links_file):
         links = [link.get('href') for link in soup.find_all('a')]
         links = [i for i in links if str(for_date) in i and i[10:] not in checked_links]
         links = [url+i for i in links]
+        links = [i for i in links if 'indoor' not in i]
     return links
 
 
