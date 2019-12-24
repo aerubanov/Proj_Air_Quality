@@ -7,4 +7,4 @@ CHECKED_LINKS_FILE = 'processing_lists/links_list.txt'
 SENSOR_ID_FILE = 'processing_lists/sensorID_list.txt'
 
 SERVER_URL = 'http://archive.luftdaten.info/'
-DATA_FOLDER = 'DATA/'
+DATA_FOLDER = 'DATA/raw/sensors/'
