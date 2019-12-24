@@ -7,7 +7,6 @@ _bme280_sensor_23516.csv
 _bme280_sensor_23643.csv
 _bme280_sensor_24027.csv
 _bme280_sensor_24029.csv
-_bme280_sensor_24324_indoor.csv
 _bme280_sensor_24578.csv
 _bme280_sensor_24620.csv
 _bme280_sensor_24998.csv
@@ -16,7 +15,6 @@ _bme280_sensor_26059.csv
 _bme280_sensor_26176.csv
 _bme280_sensor_26192.csv
 _bme280_sensor_26220.csv
-_bme280_sensor_26717_indoor.csv
 _bme280_sensor_27214.csv
 _bme280_sensor_28287.csv
 _bme280_sensor_28510.csv
@@ -43,7 +41,6 @@ _bme280_sensor_33496.csv
 _bme280_sensor_33510.csv
 _bme280_sensor_33627.csv
 _bme280_sensor_34151.csv
-_bme280_sensor_34370_indoor.csv
 _bme280_sensor_34374.csv
 _bme280_sensor_34668.csv
 _bme280_sensor_34670.csv
@@ -90,7 +87,6 @@ _sds011_sensor_24052.csv
 _sds011_sensor_24088.csv
 _sds011_sensor_24309.csv
 _sds011_sensor_24321.csv
-_sds011_sensor_24323_indoor.csv
 _sds011_sensor_24577.csv
 _sds011_sensor_24619.csv
 _sds011_sensor_24797.csv
@@ -104,7 +100,6 @@ _sds011_sensor_26175.csv
 _sds011_sensor_26191.csv
 _sds011_sensor_26219.csv
 _sds011_sensor_26251.csv
-_sds011_sensor_26716_indoor.csv
 _sds011_sensor_27213.csv
 _sds011_sensor_27418.csv
 _sds011_sensor_28286.csv
@@ -148,7 +143,6 @@ _sds011_sensor_33626.csv
 _sds011_sensor_34150.csv
 _sds011_sensor_34180.csv
 _sds011_sensor_34200.csv
-_sds011_sensor_34369_indoor.csv
 _sds011_sensor_34373.csv
 _sds011_sensor_34399.csv
 _sds011_sensor_34535.csv
@@ -179,7 +173,3 @@ _sds011_sensor_34507.csv
 _sds011_sensor_35985.csv
 _bme280_sensor_34706.csv
 _sds011_sensor_34705.csv
-_bme280_sensor_28287_indoor.csv
-_bme280_sensor_34973_indoor.csv
-_sds011_sensor_28286_indoor.csv
-_sds011_sensor_34972_indoor.csv
