@@ -1,0 +1,7 @@
+md5: dc368258eb088330dcbf830dbc825f92
+outs:
+- md5: 1f7d8e1a5e10a659ef70a9b705eb2396.dir
+  path: sensors
+  cache: true
+  metric: false
+  persist: false
