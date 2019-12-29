@@ -10,6 +10,11 @@ from scripts.config import SENSOR_ID_FILE, SERVER_URL, SENSOR_DATA_FOLDER
 # For exist file dates checked from last date with data if it later then yesterday - 30 days.
 
 
+# This script update data for all sensors in sensor list. If data file for some sensor exist, new data will be  added
+# to the file. Else, new file will be created. Default start date for checking for updates is yesterday - 30 days
+# For exist file dates checked from last date with data if it later then yesterday - 30 days.
+
+
 DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
 
 
