@@ -3,7 +3,7 @@ import requests
 import os
 import csv
 
-from scripts.config import SENSOR_ID_FILE, SERVER_URL, DATA_FOLDER
+from scripts.config import SENSOR_ID_FILE, SERVER_URL, SENSOR_DATA_FOLDER
 
 # This script update data for all sensors in sensor list. If data file for some sensor exist, new data will be  added
 # to the file. Else, new file will be created. Default start date for checking for updates is yesterday - 30 days
@@ -13,7 +13,7 @@ from scripts.config import SENSOR_ID_FILE, SERVER_URL, DATA_FOLDER
 DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
 
 
-def check_file(fname, data_folder=DATA_FOLDER):
+def check_file(fname, data_folder=SENSOR_DATA_FOLDER):
     """
     check data file
     :param fname: file name
@@ -41,7 +41,7 @@ def construct_url(sensor_id, date, sensor_type):
     return url
 
 
-def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor_type, data_folder=DATA_FOLDER):
+def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor_type, data_folder=SENSOR_DATA_FOLDER):
     """
     Download all data for time interval and save in one file
     :param end_date:  end point of time interval
