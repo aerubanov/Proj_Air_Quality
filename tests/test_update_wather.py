@@ -1,7 +1,7 @@
 import datetime
 
-
 from scripts.update_wather import check_file
+
 
 def test_check_file(tmpdir):
     dir_name = 'test_data'

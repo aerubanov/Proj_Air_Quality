@@ -1,5 +1,4 @@
 import datetime
-import requests
 import os
 import csv
 
