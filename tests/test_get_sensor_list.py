@@ -72,7 +72,6 @@ def test_get_links(tmpdir, requests_mock):
     assert p.read() == data
 
 
-
 def test_check_sensor_pos(tmpdir, requests_mock):
     links = ['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
              'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2']
