@@ -9,7 +9,8 @@ import re
 from scripts.config import WATHER_DATA_FOLDER
 from scripts.config import WATHER_URL1, WATHER_URL2
 
-DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
+# DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
+DEFAULT_DATE = datetime.date(2019, 4, 1)
 
 
 def check_file(fname, data_folder=WATHER_DATA_FOLDER):
@@ -21,8 +22,6 @@ def check_file(fname, data_folder=WATHER_DATA_FOLDER):
     """
     try:
         f = open(os.path.join(data_folder, fname), 'r')
-        for i in range(6):
-            f.readline()
         reader = csv.DictReader(f, delimiter=";")
         try:
             row = next(reader)
@@ -101,7 +100,21 @@ def download_data(link):
     return data
 
 
+def main(datafile: str):
+    file_exist, start_date = check_file(datafile)
+    if start_date is None:
+        start_date = DEFAULT_DATE
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    link = get_link(start_date, yesterday)
+    data = download_data(link).splitlines()
+    data = data[6:]  # skip header
+    if not file_exist:
+        with open(os.path.join(WATHER_DATA_FOLDER, datafile), "w") as f:
+            f.write(data[0])
+    with open(os.path.join(WATHER_DATA_FOLDER, datafile), 'a') as f:
+        for i in data[1:]:
+            f.write(i+'\n')
+
+
 if __name__ == '__main__':
-    url = get_link(datetime.date(2019, 12, 28), datetime.date(2019, 12, 31))
-    res = download_data(url)
-    print(res)
+    main('wather_centr.csv')
