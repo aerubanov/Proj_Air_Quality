@@ -1,7 +1,7 @@
-md5: 671d8c81d0bd2bb070f5ba7c8955cedb
+md5: 0ac18a13e8fcea0a569065a6fd1506fe
 cmd: python -m scripts.get_sensor_list
 outs:
-- md5: 3b5a0cca614f09cdd94d5846bca795fb
+- md5: 4c50a1ae664e6b13623a3da8252a8c9d
   path: last_data_update.txt
   cache: true
   metric: false
