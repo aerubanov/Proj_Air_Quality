@@ -24,7 +24,7 @@ def check_file(fname, data_folder=WATHER_DATA_FOLDER):
         f = open(os.path.join(data_folder, fname), 'r')
         reader = csv.DictReader(f, delimiter=";")
         try:
-            row = next(reader)
+            row = next(reversed(list(reader)))
         except StopIteration:
             return False, None
         t = row['Местное время в Москве (центр, Балчуг)']
@@ -33,7 +33,6 @@ def check_file(fname, data_folder=WATHER_DATA_FOLDER):
         month = int(t[1])
         year = int(t[2])
         dt = datetime.datetime(year, month, day)
-        print(t)
         f.close()
         return True, dt.date() + datetime.timedelta(days=1)
     except FileNotFoundError:
@@ -112,7 +111,7 @@ def main(datafile: str):
         with open(os.path.join(WATHER_DATA_FOLDER, datafile), "w") as f:
             f.write(data[0])
     with open(os.path.join(WATHER_DATA_FOLDER, datafile), 'a') as f:
-        for i in data[1:]:
+        for i in reversed(data[1:]):
             f.write(i+'\n')
 
 
