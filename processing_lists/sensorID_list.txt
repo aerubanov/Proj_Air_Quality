@@ -190,3 +190,5 @@ _sds011_sensor_36949.csv
 _sds011_sensor_37039.csv
 _sds011_sensor_37077.csv
 _sds011_sensor_37857.csv
+_bme280_sensor_38179.csv
+_sds011_sensor_38178.csv

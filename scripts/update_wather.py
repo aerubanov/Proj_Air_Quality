@@ -6,7 +6,7 @@ import gzip
 from bs4 import BeautifulSoup
 import re
 
-from scripts.config import WATHER_DATA_FOLDER
+from scripts.config import WATHER_DATA_FOLDER, WATHER_FILE
 from scripts.config import WATHER_URL1, WATHER_URL2
 
 # DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
@@ -116,4 +116,4 @@ def main(datafile: str):
 
 
 if __name__ == '__main__':
-    main('wather_centr.csv')
+    main(WATHER_FILE)
