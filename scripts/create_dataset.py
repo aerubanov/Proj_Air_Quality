@@ -15,8 +15,8 @@ def average_sensors(data_folder: str):
     files = os.listdir(data_folder)
     sds_files = [i for i in files if 'sds011' in i]
     bme_files = [i for i in files if 'bme280' in i]
-    with open(SENSOR_ID_FILE, 'r') as sensors:
-        sensor_list = sensors.read().splitlines()
+    with open(SENSOR_ID_FILE, 'r') as sf:
+        sensor_list = sf.read().splitlines()
         indoor_sensors = [i for i in sensor_list if 'indoor' in i]
     sds_files = [i for i in sds_files if i.split('_')[0] not in indoor_sensors]
     bme_files = [i for i in bme_files if i.split('_')[0] not in indoor_sensors]
@@ -69,7 +69,7 @@ def average_sensors(data_folder: str):
         except EmptyDataError:
             pass
 
-    sensors = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
+    sens = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
     p1_col = [i for i in sds_data.columns if 'P1_' in i]
     p2_col = [i for i in sds_data.columns if 'P2_' in i]
     temp_col = [i for i in bme_data.columns if 'temperature_' in i]
@@ -88,7 +88,7 @@ def average_sensors(data_folder: str):
     # avg_data['pressure_std'] = bme_data[pres_col].std(axis=1, skipna=True)
     # avg_data['temperature_std'] = bme_data[temp_col].std(axis=1, skipna=True)
     # avg_data['humidity_std'] = bme_data[hum_col].std(axis=1, skipna=True)
-    return avg_data, sensors
+    return avg_data, sens
 
 
 def get_wather_data(wather_file: str):
@@ -103,7 +103,7 @@ def get_wather_data(wather_file: str):
     data = data.set_index('date')
     sel_data = pd.DataFrame(index=data.index)
     sel_data['temp_meteo'] = data['T']
-    sel_data['pres_meteo'] = data.Po *133.322 # transfor mmHg in Pa
+    sel_data['pres_meteo'] = data.Po * 133.322  # transform mmHg in Pa
     sel_data['hum_meteo'] = data.U
     sel_data['wind_direction'] = data.DD
     sel_data['wind_speed'] = data.Ff
@@ -122,4 +122,3 @@ if __name__ == '__main__':
         avg_data[c] = meteo_data[c]
     avg_data.to_csv('dataset.csv')
     sensors.to_csv('sensors.csv')
-
