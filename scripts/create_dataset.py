@@ -130,5 +130,5 @@ if __name__ == '__main__':
     meteo_data = get_wather_data(os.path.join(WATHER_DATA_FOLDER, WATHER_FILE))
     for c in meteo_data.columns:
         avg_data[c] = meteo_data[c]
-    avg_data.to_csv('dataset.csv')
-    sensors.to_csv('sensors.csv')
+    avg_data.to_csv('DATA/processed/dataset.csv')
+    sensors.to_csv('DATA/processed/sensors.csv')
