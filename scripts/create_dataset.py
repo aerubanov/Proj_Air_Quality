@@ -1,16 +1,24 @@
 import pandas as pd
 import os
+import datetime
+import typing
 
 from scripts.config import SENSOR_ID_FILE, SENSOR_DATA_FOLDER, WATHER_FILE, WATHER_DATA_FOLDER
 
 # This script create dataset with sensor average data and wather data from raw downloaded data
 
+START_DATE = datetime.date(2019, 4, 1)  # start date for dataset creation
+END_DATE = datetime.date.today() - datetime.timedelta(days=1)  # end date for dataset reation
 
-def average_sensors(data_folder: str):
+
+def average_sensors(data_folder: str, start_date: datetime.date,
+                    end_date: datetime.date) -> typing.Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Average data from all sensors
+    :param start_date: dataset beginning
+    :param end_date: dataset end
     :param data_folder: path to folder with raw sensor data
-    :return: (average sensor data: pd.DataFrame, senors data: pd.DataFrame)
+    :return: (average sensor data, senors type and location)
     """
     files = os.listdir(data_folder)
     sds_files = [i for i in files if 'sds011' in i]
@@ -22,7 +30,7 @@ def average_sensors(data_folder: str):
     bme_files = [i for i in bme_files if i.split('_')[0] not in indoor_sensors]
 
     sensors_data = []
-    idx = pd.date_range('2019-04-01', '2019-12-08', freq='5T')
+    idx = pd.date_range(start_date, end_date, freq='5T')
     sds_data = pd.DataFrame(idx, columns=['date'])
     sds_data = sds_data.set_index('date')
     bme_data = pd.DataFrame(idx, columns=['date'])
@@ -91,11 +99,11 @@ def average_sensors(data_folder: str):
     return avg_data, sens
 
 
-def get_wather_data(wather_file: str):
+def get_wather_data(wather_file: str) -> pd.DataFrame:
     """
     Select and resample wather data
     :param wather_file: path to raw data file
-    :return: pd.DataFrame
+    :return: processed data
     """
     data = pd.read_csv(wather_file, delimiter=';', parse_dates=['Местное время в Москве (центр, Балчуг)'],
                        index_col=False)
@@ -116,7 +124,7 @@ def get_wather_data(wather_file: str):
 
 
 if __name__ == '__main__':
-    avg_data, sensors = average_sensors(SENSOR_DATA_FOLDER)
+    avg_data, sensors = average_sensors(SENSOR_DATA_FOLDER, START_DATE, END_DATE)
     meteo_data = get_wather_data(os.path.join(WATHER_DATA_FOLDER, WATHER_FILE))
     for c in meteo_data.columns:
         avg_data[c] = meteo_data[c]
