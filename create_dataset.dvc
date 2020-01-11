@@ -1,0 +1,20 @@
+md5: fb6242a9f7e2b3ffd03f8b128f5ba168
+cmd: python -m scripts.create_dataset
+deps:
+- md5: 54ce6b6e5a7f813f4ab837b4b0ff49a7
+  path: scripts/create_dataset.py
+- md5: f75a4e19c68b82e7816e1098320e18ef.dir
+  path: DATA/raw/sensors
+- md5: 8926ede4aca66ef4a57a24182bf44356.dir
+  path: DATA/raw/wather
+outs:
+- md5: 4442c09909b6bbfa1b84ca148a9991a1
+  path: DATA/processed/dataset.csv
+  cache: true
+  metric: false
+  persist: false
+- md5: 8036ea266c44fa441b4862597c4a5c95
+  path: DATA/processed/sensors.csv
+  cache: true
+  metric: false
+  persist: false

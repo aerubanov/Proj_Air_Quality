@@ -32,6 +32,10 @@ test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                     </td><td align="right">2019-12-03 01:46  </td><td align="right"> 41K</td>
                     <td>&nbsp;</td></tr>
                 <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
+                     <a href="2019-12-02_csv4_indoor">2019-12-02_bme280_sensor_250.csv</a>
+                    </td><td align="right">2019-12-03 01:46  </td><td align="right"> 41K</td>
+                    <td>&nbsp;</td></tr>
+                <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
                     <a href="measurements.txt">measurements.txt</a>
                     </td><td align="right">2019-12-03 01:47  </td>
                     <td align="right">  8 </td><td>&nbsp;</td></tr>
