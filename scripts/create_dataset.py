@@ -105,7 +105,9 @@ def get_wather_data(wather_file: str) -> pd.DataFrame:
     :param wather_file: path to raw data file
     :return: processed data
     """
+    def parser(date): return pd.to_datetime(date, format='%d.%m.%Y %H:%M')
     data = pd.read_csv(wather_file, delimiter=';', parse_dates=['Местное время в Москве (центр, Балчуг)'],
+                       date_parser=parser,
                        index_col=False)
     data = data.rename(columns={'Местное время в Москве (центр, Балчуг)': 'date'})
     data = data.set_index('date')
