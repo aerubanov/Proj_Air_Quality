@@ -3,7 +3,7 @@ import requests
 import os
 import csv
 
-from scripts.config import SENSOR_ID_FILE, SERVER_URL, SENSOR_DATA_FOLDER
+from src.data.config import SENSOR_ID_FILE, SERVER_URL, SENSOR_DATA_FOLDER
 
 # This script update data for all sensors in sensor list. If data file for some sensor exist, new data will be  added
 # to the file. Else, new file will be created. Default start date for checking for updates is yesterday - 30 days

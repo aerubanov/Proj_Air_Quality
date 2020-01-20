@@ -3,7 +3,7 @@ import datetime
 from bs4 import BeautifulSoup
 import csv
 
-from scripts.config import MAX_LAT, MIN_LAT, MAX_LON, MIN_LON, CHECKED_LINKS_FILE, SENSOR_ID_FILE, SERVER_URL
+from src.data.config import MAX_LAT, MIN_LAT, MAX_LON, MIN_LON, CHECKED_LINKS_FILE, SENSOR_ID_FILE, SERVER_URL
 
 # This script update list of available sensors. Script get all csv files links and check sensor lat and lon
 # in range [MIN_LAT, MAX_LAT], [MIN_LON, MAX_LON] respectively. See config.py for that values.

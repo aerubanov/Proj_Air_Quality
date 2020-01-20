@@ -3,7 +3,7 @@ import os
 import datetime
 import typing
 
-from scripts.config import SENSOR_ID_FILE, SENSOR_DATA_FOLDER, WATHER_FILE, WATHER_DATA_FOLDER
+from src.data.config import SENSOR_ID_FILE, SENSOR_DATA_FOLDER, WATHER_FILE, WATHER_DATA_FOLDER
 
 # This script create dataset with sensor average data and wather data from raw downloaded data
 

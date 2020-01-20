@@ -1,6 +1,0 @@
-md5: 8b7be1305550be6d98c40417020a7417
-cmd: python -m scripts.update_wather
-deps:
-- md5: 7dbf6c3698d102dbca479657f8ff647d
-  path: scripts/update_wather.py
-always_changed: true
