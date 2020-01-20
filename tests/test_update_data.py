@@ -1,7 +1,7 @@
 import datetime
 
-from scripts.config import SERVER_URL
-from scripts.update_data import construct_url, check_file, download_data_for_interval
+from src.data.config import SERVER_URL
+from src.data.update_data import construct_url, check_file, download_data_for_interval
 
 
 def test_construct_url():

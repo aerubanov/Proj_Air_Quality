@@ -1,7 +1,7 @@
 import numpy as np
 import datetime
 
-from scripts.create_dataset import average_sensors, get_wather_data
+from src.data.create_dataset import average_sensors, get_wather_data
 
 
 def test_average_sensor():

@@ -1,5 +1,5 @@
 md5: 485d458594f1cc48067fd3a01410d7b7
-cmd: python -m scripts.create_dataset
+cmd: python -m src.data.create_dataset
 deps:
 - md5: 54ce6b6e5a7f813f4ab837b4b0ff49a7
   path: scripts/create_dataset.py

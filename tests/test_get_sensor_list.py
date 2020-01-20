@@ -1,7 +1,7 @@
 import datetime
 
-from scripts.get_sensor_list import get_links, check_sensor_pos, check_coordinate
-from scripts.config import MIN_LON, MAX_LON, MIN_LAT, MAX_LAT
+from src.data.get_sensor_list import get_links, check_sensor_pos, check_coordinate
+from src.data.config import MIN_LON, MAX_LON, MIN_LAT, MAX_LAT
 
 test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                 <html>

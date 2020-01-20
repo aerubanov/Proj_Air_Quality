@@ -1,6 +1,6 @@
 import datetime
 
-from scripts.update_wather import check_file, get_link
+from src.data.update_wather import check_file, get_link
 import re
 
 

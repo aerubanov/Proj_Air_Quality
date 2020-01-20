@@ -6,8 +6,8 @@ import gzip
 from bs4 import BeautifulSoup
 import re
 
-from scripts.config import WATHER_DATA_FOLDER, WATHER_FILE
-from scripts.config import WATHER_URL1, WATHER_URL2
+from src.data.config import WATHER_DATA_FOLDER, WATHER_FILE
+from src.data.config import WATHER_URL1, WATHER_URL2
 
 # DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
 DEFAULT_DATE = datetime.date(2019, 4, 1)
