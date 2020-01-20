@@ -1,5 +1,6 @@
-md5: 6b6743deed8bb33fa88106d77ac5dcbe
+md5: e21e8cfd72be4280dd71c240450a0f6a
 cmd: python -m src.data.update_data
+wdir: ..
 deps:
 - md5: 7c8ddaf5cd1eb704720ae36f67d0cafa
   path: processing_lists/links_list.txt
