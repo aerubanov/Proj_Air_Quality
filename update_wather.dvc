@@ -1,6 +1,6 @@
-md5: 8b7be1305550be6d98c40417020a7417
+md5: a6d477b060460363bd77660c6895cd6a
 cmd: python -m src.data.update_wather
 deps:
-- md5: 7dbf6c3698d102dbca479657f8ff647d
-  path: scripts/update_wather.py
+- md5: 7189f8b48407237eed0e874de4634680
+  path: src/data/update_wather.py
 always_changed: true
