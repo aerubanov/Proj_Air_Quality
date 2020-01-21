@@ -11,38 +11,49 @@ import typing
 from src.features.preproc_anom import prepare_features
 
 
-def detect_anomalies(data: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
+def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
+    """
+    Anomaly detection by time-series decomposition.
+    :param time_series: to series for anomaly search
+    :param freq: frequency of decomposition
+    :param quant: al moment with decomposition residual above this quantile is anomaly
+    :return: list of anomaly series
+    """
+    time_series['P1'] = time_series.P1.interpolate()
+    time_series['P1'] = time_series.P1.rolling(4, min_periods=1).mean()
+    decomp = sm.tsa.seasonal_decompose(time_series.P1, model='additive', freq=freq, extrapolate_trend='freq')
+    q = decomp.resid.quantile(quant)
+
+    # find anomaly
+    time_series['trend'] = decomp.trend
+    time_series['seasonal'] = decomp.seasonal
+    time_series['resid'] = decomp.resid
+    time_series['anomaly'] = abs(time_series.resid) > q
+    anomaly = time_series[time_series['anomaly']]
+
+    # split anomaly on separate dataframe
+    anomaly['gap'] = (anomaly.index.to_series().diff()) > pd.Timedelta(10, 'm')
+    l_mod = pd.to_datetime(anomaly[anomaly.gap].index)
+    l_mod = l_mod.insert(0, anomaly.index[0])
+    l_mod = l_mod.insert(len(l_mod), anomaly.index[-1])
+    ls = [anomaly[l_mod[n]:l_mod[n + 1]] for n in range(0, len(l_mod) - 1, 1)]
+    ls = [i[:-1] for i in ls]
+    ls = [i for i in ls if len(i) > 12]
+    return ls
+
+
+def detect_anomalies(data: pd.DataFrame) -> typing.List[pd.DataFrame]:
     """
     Anomaly detection by time series decomposition
     :param data: preprocessed data (see src/features/prerpoc_anom.py)
-    :param quant: quantile, all data where decomposition residual is out of quantile range is anomaly
-    :param freq: frequency for decomposition
     :return: list of anomalies
     """
     weeks = [g for n, g in data.groupby(pd.Grouper(freq='7D'))]  # split dataset by 7 days series
     anom_list = []
+    # for each series detect anomalies separately
     for w in weeks[:-2]:
         # decomposition
-        w['P1'] = w.P1.interpolate()
-        w['P1'] = w.P1.rolling(4, min_periods=1).mean()
-        decomp = sm.tsa.seasonal_decompose(w.P1, model='additive', freq=freq, extrapolate_trend='freq')
-        q = decomp.resid.quantile(quant)
-
-        # find anomaly
-        w['trend'] = decomp.trend
-        w['seasonal'] = decomp.seasonal
-        w['resid'] = decomp.resid
-        w['anomaly'] = abs(w.resid) > q
-        anomaly = w[w['anomaly']]
-
-        # split anomaly on separate dataframe
-        anomaly['gap'] = (anomaly.index.to_series().diff()) > pd.Timedelta(10, 'm')
-        l_mod = pd.to_datetime(anomaly[anomaly.gap].index)
-        l_mod = l_mod.insert(0, anomaly.index[0])
-        l_mod = l_mod.insert(len(l_mod), anomaly.index[-1])
-        ls = [anomaly[l_mod[n]:l_mod[n + 1]] for n in range(0, len(l_mod) - 1, 1)]
-        ls = [i[:-1] for i in ls]
-        ls = [i for i in ls if len(i) > 12]
+        ls = anom_detector(w)
         anom_list = anom_list + ls
     return anom_list
 
@@ -85,7 +96,31 @@ def clustering(x: np.array, n_clusters=4, random_state=42) -> (KMeans, float, fl
     return km, score, silh_score
 
 
-def main(dataset_file: str, pca_file: str, km_file: str, metric_file: str):
+class AnomalyCluster:
+    """ Anomaly selection and cluster label prediction on test data"""
+
+    def __init__(self, kmean: KMeans, pca: PCA):
+        self.kmean = kmean
+        self.pca = pca
+        self.prepare_feture = prepare_features
+        self.anom_detector = anom_detector
+        self.get_anomaly_features = get_anomaly_features
+
+    def get_anomaly(self, data: pd.DataFrame) -> typing.List[pd.DataFrame]:
+        """Get time series (7-day length preferable, as used in train) and return list of anomaly dataframes"""
+        data = self.prepare_feture(data)
+        anomaly = self.anom_detector(data)
+        return anomaly
+
+    def get_clusters(self, anomlies: typing.List[pd.DataFrame]) -> typing.List[int]:
+        """Det list of anomaly dataframes and return list of cluster labels"""
+        anom_fetures = self.get_anomaly_features(anomlies)
+        x = self.pca.transform(anom_fetures)
+        clusters = self.kmean.predict(x)
+        return clusters
+
+
+def main(dataset_file: str, model_file: str, metric_file: str):
     data = pd.read_csv(dataset_file, parse_dates=['date'])
     data = data.set_index('date')
     data = prepare_features(data)
@@ -96,17 +131,15 @@ def main(dataset_file: str, pca_file: str, km_file: str, metric_file: str):
     print(f'PCA score: {pca_score}')
     print(f'KMean score: {score}')
     print(f'KMean silhouette_score: {silh_score}')
-    with open(pca_file, 'wb') as f:
-        pickle.dump(pca, f)
-    with open(km_file, 'wb') as f:
-        pickle.dump(km, f)
+    anomaly_cluster = AnomalyCluster(km, pca)
+    with open(model_file, 'wb') as f:
+        pickle.dump(anomaly_cluster, f)
     with open(metric_file, "w") as f:
         json.dump({'pca_score': pca_score, 'clustering_score': score, 'silhouette_score': silh_score}, f)
 
 
 if __name__ == '__main__':
     data_file = 'DATA/processed/dataset.csv'
-    pca_obj_file = "models/pca.obj"
-    km_obj_file = "models/kmean.obj"
+    model = "models/anom_model.obj"
     metric = 'DATA/metrics/clustering_metric.json'
-    main(data_file, pca_obj_file, km_obj_file, metric)
+    main(data_file, model, metric)
