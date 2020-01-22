@@ -67,4 +67,3 @@ def test_load_data(requests_mock):
     assert "humidity" in data[1]
     assert "pressure" in data[1]
     assert "temperature" in data[1]
-
