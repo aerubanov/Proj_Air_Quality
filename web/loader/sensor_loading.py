@@ -8,7 +8,7 @@ import numpy as np
 
 sensor_file = 'DATA/processed/sensors.csv'  # file with information about sensors to data downloading
 api_url = 'https://data.sensor.community/static/v2/data.json'
-time_interval = 0.5  # interval for api requests in minutes
+time_interval = 5  # interval for api requests in minutes
 
 
 def read_sensor_id(file: str) -> typing.Set:
@@ -49,7 +49,7 @@ def average_data(data: typing.List[typing.Dict]):
 def run_task():
     sensor_id = read_sensor_id(sensor_file)
     data = load_data(sensor_id)
-    print(avarage_data(data))
+    print(average_data(data))
 
 
 def main():
