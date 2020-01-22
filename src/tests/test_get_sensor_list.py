@@ -57,7 +57,6 @@ def test_get_links(tmpdir, requests_mock):
     p = tmpdir.mkdir("data").join("test_links.txt")
     data = ''  # no already seen files
     p.write(data)
-    print(p)
     links = get_links(date.date(), p)
     assert links == [
         'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
