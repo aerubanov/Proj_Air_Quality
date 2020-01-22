@@ -21,7 +21,7 @@ def read_sensor_id(file: str) -> typing.Set:
 def load_data(s_id: typing.Set, url=api_url) -> typing.List[typing.Dict]:
     resp = requests.get(url)
     raw_data = json.loads(resp.text)
-    data = [i for i in raw_data if i['sensor']['id'] in s_id]
+    data = [i for i in raw_data if i['sensor']['id'] in s_id and i['location']['indoor'] != 1]
     result = []
     for i in data:
         d = dict()
@@ -32,7 +32,7 @@ def load_data(s_id: typing.Set, url=api_url) -> typing.List[typing.Dict]:
     return result
 
 
-def avarage_data(data: typing.List[typing.Dict]):
+def average_data(data: typing.List[typing.Dict]):
     p1 = [float(i['P1']) for i in data if 'P1' in i]
     p2 = [float(i['P2']) for i in data if 'P2' in i]
     temp = [float(i['temperature']) for i in data if 'temperature' in i]
