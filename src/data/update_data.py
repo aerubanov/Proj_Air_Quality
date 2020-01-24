@@ -107,3 +107,5 @@ def main(sensor_file):
 
 if __name__ == '__main__':
     main(SENSOR_ID_FILE)
+    with open('last_data_update.txt', 'w') as f:
+        f.write(str(datetime.date.today()))

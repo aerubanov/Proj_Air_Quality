@@ -1,16 +1,21 @@
-md5: e7cba8cc7ce4d7fb30d3586255c5ecf3
+md5: 148f261fdac60ad6bcbcdeff6c2dbbb6
 cmd: python -m src.model.anom_clustering
 wdir: ..
 deps:
-- md5: 88c3584566dfc57dc4233530218f2c9b
+- md5: a88566692ca7baf8471e70e83eddf1d4
   path: DATA/processed/dataset.csv
-- md5: 4ff77732e2c5f70e39b2cdf8fad85d5b
-  path: src/features/preproc_anom.py
 - md5: 70f55c8863bef4a566e9fa222866d3b2
   path: src/model/anom_clustering.py
+- md5: 4ff77732e2c5f70e39b2cdf8fad85d5b
+  path: src/features/preproc_anom.py
 outs:
-- md5: abe819ca6e4bfc343cb4b5a8c6a650ba
+- md5: 0ad1499ecc520f6b1bd39385411d6a74
   path: models/anom_model.obj
   cache: true
   metric: false
+  persist: false
+- md5: e8f1a69a7775195984abae9921a4c57f
+  path: DATA/metrics/clustering_metric.json
+  cache: false
+  metric: true
   persist: false

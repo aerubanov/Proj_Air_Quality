@@ -5,3 +5,5 @@ __pycache__/
 /scripts.get_sensor_list
 /last_data_update.txt
 .vscode/
+/last_links_update.txt
+/last_wather_update.txt

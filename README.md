@@ -14,11 +14,26 @@
 for Machine Learning Projects"). Для получения данных после клонирования репозитория выполните
 ```
 pip install dvc
-dvc pull
 ```
+для загрузки данных с датчиков выполните
+```
+dvc repro dvs_stages/update_data.dvc
+```
+для загрузки даных погоды с метеостанции выполните
+```
+dvc repro dvc_stages/update_wather.dvc
+```
+Начальная дата для скачивания данных задается параметром DEFAULT_DATE в 
+файлах [update_data.py](src/data/update_data.py) и [update_wather.py](src/data/update_wather.py)
+Скачанные данные будут храниться в DATA/raw/sensors и DATA/raw/wather соответсвтенно. При повторном
+ запуске команд будут подгружены новые данные за прошедший промежуток времени без повторного скачивания. 
+
+
 ## Docs
 ### raw
 ### processed
+
+
 
 ## Notebooks
 Выделение и кластеризация аномалий в данных
