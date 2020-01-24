@@ -35,7 +35,7 @@ dvc repro dvc_stages/update_wather.dvc
 ### processed
 [dataset.rst](docs/data/dataset.rst)
 ### dvc-pipleine
-update_wather --------------------------->|
+update_wather -------------------------->|
 
 update_sensor_id -> update_data ->| -> create_dataset -> train_clustering
 
