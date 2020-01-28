@@ -139,7 +139,7 @@ def main(dataset_file: str, model_file: str, metric_file: str):
 
 
 if __name__ == '__main__':
-    data_file = 'DATA/processed/dataset.rst'
+    data_file = 'DATA/processed/dataset.csv'
     model = "models/anom_model.obj"
     metric = 'DATA/metrics/clustering_metric.json'
     main(data_file, model, metric)
