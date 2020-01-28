@@ -10,6 +10,8 @@ import typing
 
 from src.features.preproc_anom import prepare_features
 
+sel_columns = ['max_P1', 'min_P1', 'min_P2', 'max_P2', 'mean_hum', 'prec_amount',
+                       'max_w_speed', 'min_w_speed', 'change_hum']
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
     """
@@ -114,7 +116,7 @@ class AnomalyCluster:
 
     def get_clusters(self, anomlies: typing.List[pd.DataFrame]) -> typing.List[int]:
         """Det list of anomaly dataframes and return list of cluster labels"""
-        anom_fetures = self.get_anomaly_features(anomlies)
+        anom_fetures = self.get_anomaly_features(anomlies[sel_columns])
         x = self.pca.transform(anom_fetures)
         clusters = self.kmean.predict(x)
         return clusters
@@ -131,15 +133,19 @@ def main(dataset_file: str, model_file: str, metric_file: str):
     print(f'PCA score: {pca_score}')
     print(f'KMean score: {score}')
     print(f'KMean silhouette_score: {silh_score}')
-    anomaly_cluster = AnomalyCluster(km, pca)
-    with open(model_file, 'wb') as f:
-        pickle.dump(anomaly_cluster, f)
     with open(metric_file, "w") as f:
         json.dump({'pca_score': pca_score, 'clustering_score': score, 'silhouette_score': silh_score}, f)
+    return pca, km
 
 
 if __name__ == '__main__':
     data_file = 'DATA/processed/dataset.csv'
     model = "models/anom_model.obj"
     metric = 'DATA/metrics/clustering_metric.json'
-    main(data_file, model, metric)
+    pca, km = main(data_file, model, metric)
+    km_file = "models/kmean.obj"
+    pca_file = "models/pca.obj"
+    with open(km_file, 'wb') as f:
+        pickle.dump(km, f)
+    with open(pca_file, 'wb') as f:
+        pickle.dump(pca, f)
