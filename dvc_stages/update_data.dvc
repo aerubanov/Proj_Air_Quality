@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 md5: 902c972b032d09f8308d9d4c885ea78a
+=======
+md5: 446ec1231da213b371c086bcc367219c
+>>>>>>> change fillnan method
 cmd: python -m src.data.update_data
 wdir: ..
 deps:
