@@ -92,7 +92,7 @@ def dimension_reduction(anomdata: pd.DataFrame, sel_col=None) -> (PCA, np.array,
     return pca, x, score
 
 
-def clustering(x: np.array, n_clusters=5, random_state=42) -> (KMeans, float, float):
+def clustering(x: np.array, n_clusters=4, random_state=42) -> (KMeans, float, float):
     km = KMeans(n_clusters=n_clusters, random_state=random_state)
     km.fit(x)
     score = km.inertia_
