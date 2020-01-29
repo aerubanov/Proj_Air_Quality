@@ -10,8 +10,8 @@ import typing
 
 from src.features.preproc_anom import prepare_features
 
-sel_columns = ['max_P1', 'min_P1', 'min_P2', 'max_P2', 'mean_hum', 'prec_amount',
-               'max_w_speed', 'min_w_speed', 'change_hum']
+sel_columns = ['mean_hum', 'prec_amount',
+               'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid']
 
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
@@ -77,6 +77,8 @@ def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
     anomdata['w_dir_sin_mix'] = [np.min(np.sin(i.wind_direction)) for i in anom_list]
     anomdata['w_dir_cos_max'] = [np.max(np.cos(i.wind_direction)) for i in anom_list]
     anomdata['w_dir_cos_min'] = [np.min(np.cos(i.wind_direction)) for i in anom_list]
+    anomdata['max_resid'] = [np.max(i.resid) for i in anom_list]
+    anomdata['min_resid'] = [np.min(i.resid) for i in anom_list]
     return anomdata
 
 
@@ -90,7 +92,7 @@ def dimension_reduction(anomdata: pd.DataFrame, sel_col=None) -> (PCA, np.array,
     return pca, x, score
 
 
-def clustering(x: np.array, n_clusters=4, random_state=42) -> (KMeans, float, float):
+def clustering(x: np.array, n_clusters=5, random_state=42) -> (KMeans, float, float):
     km = KMeans(n_clusters=n_clusters, random_state=random_state)
     km.fit(x)
     score = km.inertia_
