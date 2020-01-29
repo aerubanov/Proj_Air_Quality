@@ -10,6 +10,8 @@ import typing
 
 from src.features.preproc_anom import prepare_features
 
+sel_columns = ['max_P1', 'min_P1', 'min_P2', 'max_P2', 'mean_hum', 'prec_amount',
+                       'max_w_speed', 'min_w_speed', 'change_hum']
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
     """
@@ -77,13 +79,12 @@ def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
     return anomdata
 
 
-def dimension_reduction(anomdata: pd.DataFrame, sel_columns=None) -> (PCA, np.array, float):
-    if sel_columns is None:
-        sel_columns = ['max_P1', 'min_P1', 'min_P2', 'max_P2', 'mean_hum', 'prec_amount',
-                       'max_w_speed', 'min_w_speed', 'change_hum']
+def dimension_reduction(anomdata: pd.DataFrame, sel_col=None) -> (PCA, np.array, float):
+    if sel_col is None:
+        sel_col = sel_columns
     pca = PCA(n_components=3)
-    pca.fit(anomdata[sel_columns])
-    x = pca.transform(anomdata[sel_columns])
+    pca.fit(anomdata[sel_col])
+    x = pca.transform(anomdata[sel_col])
     score = 1 - pca.explained_variance_ratio_[-1]
     return pca, x, score
 
@@ -115,12 +116,12 @@ class AnomalyCluster:
     def get_clusters(self, anomlies: typing.List[pd.DataFrame]) -> typing.List[int]:
         """Det list of anomaly dataframes and return list of cluster labels"""
         anom_fetures = self.get_anomaly_features(anomlies)
-        x = self.pca.transform(anom_fetures)
+        x = self.pca.transform(anom_fetures[sel_columns])
         clusters = self.kmean.predict(x)
         return clusters
 
 
-def main(dataset_file: str, model_file: str, metric_file: str):
+def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
     data = pd.read_csv(dataset_file, parse_dates=['date'])
     data = data.set_index('date')
     data = prepare_features(data)
@@ -131,9 +132,10 @@ def main(dataset_file: str, model_file: str, metric_file: str):
     print(f'PCA score: {pca_score}')
     print(f'KMean score: {score}')
     print(f'KMean silhouette_score: {silh_score}')
-    anomaly_cluster = AnomalyCluster(km, pca)
-    with open(model_file, 'wb') as f:
-        pickle.dump(anomaly_cluster, f)
+    with open(kmean_file, 'wb') as f:
+        pickle.dump(km, f)
+    with open(pca_file, 'wb') as f:
+        pickle.dump(pca, f)
     with open(metric_file, "w") as f:
         json.dump({'pca_score': pca_score, 'clustering_score': score, 'silhouette_score': silh_score}, f)
 
@@ -142,4 +144,6 @@ if __name__ == '__main__':
     data_file = 'DATA/processed/dataset.csv'
     model = "models/anom_model.obj"
     metric = 'DATA/metrics/clustering_metric.json'
-    main(data_file, model, metric)
+    kmean = 'models/kmean.obj'
+    pca = 'models/pca.obj'
+    main(data_file, kmean, pca, metric)

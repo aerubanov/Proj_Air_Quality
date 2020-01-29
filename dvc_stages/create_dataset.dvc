@@ -1,8 +1,8 @@
-md5: cd786e3327d7632c780dc27f880c984b
+md5: faf87f7e6cac6bd3f989dced4e8dff4a
 cmd: python -m src.data.create_dataset
 wdir: ..
 deps:
-- md5: 409fff5ed32b2887aa08f10560ce73d6.dir
+- md5: 53f654771cf7014e9f5086a5d4751766.dir
   path: DATA/raw/wather
 - md5: 06ead2df5d7be3a473a8f8fb54126c6f.dir
   path: DATA/raw/sensors
