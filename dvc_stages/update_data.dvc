@@ -1,15 +1,15 @@
-md5: fbf06ae046ff46eb3330eb9a2888506b
+md5: 902c972b032d09f8308d9d4c885ea78a
 cmd: python -m src.data.update_data
 wdir: ..
 deps:
-- md5: df34204edcf065ddfa7a4ebc77cd7253
+- md5: b171870129deacfbfad267a931051079
   path: processing_lists/links_list.txt
 - md5: 9d84b741d1cfcbe173f684b9aa9843a9
   path: processing_lists/sensorID_list.txt
-- md5: dc11ca836289b5d17669b766f01fe2a0
+- md5: 3354faa1483e406ca82aefa393b8e4e2
   path: last_links_update.txt
 outs:
-- md5: 3354faa1483e406ca82aefa393b8e4e2
+- md5: 082f80bccb3f9f0b1cc073a6f617b72f
   path: last_data_update.txt
   cache: true
   metric: false

@@ -24,9 +24,10 @@ wind_dir = {'Ветер, дующий с востока': 0,
 def prepare_features(data: pd.DataFrame) -> pd.DataFrame:
     """Features preparation for anomaly detection and clustering"""
     # textual values encoding
+    data['wind_direction'] = data.wind_direction.fillna(method='bfill')
     data['wind_direction'] = data.wind_direction.map(wind_dir)
-    data['wind_direction'] = data.wind_direction.fillna(method='pad')
-    data['prec_amount'] = data.prec_amount.fillna(value=0)
+
+    data['prec_amount'] = data.prec_amount.fillna(method='bfill')
     data.loc[data.prec_amount == 'Осадков нет', 'prec_amount'] = 0
     data.loc[data.prec_amount == 'Следы осадков', 'prec_amount'] = 0
     data['prec_amount'] = data.prec_amount.astype(float)
