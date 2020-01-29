@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 {"pca_score": 0.954221791417655, "clustering_score": 132078.2108666317, "silhouette_score": 0.3756626378845724}
 =======
 {"pca_score": 0.9540930616098383, "clustering_score": 131950.84369294625, "silhouette_score": 0.37575542957415625}
 >>>>>>> change fillnan method
+=======
+{"pca_score": 0.9540930616098383, "clustering_score": 131950.84369294625, "silhouette_score": 0.37575542957415625}
+>>>>>>> 5aa6750f61080b06986d9bcdcebc9d2c5dfdd674

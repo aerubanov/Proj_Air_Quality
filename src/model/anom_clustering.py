@@ -149,4 +149,3 @@ if __name__ == '__main__':
     kmean = 'models/kmean.obj'
     pca = 'models/pca.obj'
     main(data_file, kmean, pca, metric)
-
