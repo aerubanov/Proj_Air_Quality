@@ -104,6 +104,8 @@ def main(datafile: str):
     if start_date is None:
         start_date = DEFAULT_DATE
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    if start_date == yesterday:
+        return
     link = get_link(start_date, yesterday)
     data = download_data(link).splitlines()
     data = data[6:]  # skip header
