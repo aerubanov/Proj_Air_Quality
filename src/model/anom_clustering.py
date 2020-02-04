@@ -10,8 +10,8 @@ import typing
 
 from src.features.preproc_anom import prepare_features
 
-sel_columns = ['max_P1', 'min_P1', 'min_P2', 'max_P2', 'mean_hum', 'prec_amount',
-               'max_w_speed', 'min_w_speed', 'change_hum']
+sel_columns = ['mean_hum', 'prec_amount',
+               'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid']
 
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
@@ -77,6 +77,8 @@ def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
     anomdata['w_dir_sin_mix'] = [np.min(np.sin(i.wind_direction)) for i in anom_list]
     anomdata['w_dir_cos_max'] = [np.max(np.cos(i.wind_direction)) for i in anom_list]
     anomdata['w_dir_cos_min'] = [np.min(np.cos(i.wind_direction)) for i in anom_list]
+    anomdata['max_resid'] = [np.max(i.resid) for i in anom_list]
+    anomdata['min_resid'] = [np.min(i.resid) for i in anom_list]
     return anomdata
 
 
@@ -139,6 +141,7 @@ def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
         pickle.dump(pca, f)
     with open(metric_file, "w") as f:
         json.dump({'pca_score': pca_score, 'clustering_score': score, 'silhouette_score': silh_score}, f)
+    return pca, km
 
 
 if __name__ == '__main__':
