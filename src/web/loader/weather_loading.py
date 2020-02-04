@@ -27,10 +27,13 @@ def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
 def get_times(row: 'BeautifulSoup.Tag') -> typing.List[datetime.datetime]:
     cells = row.find_all('td')
     result = list()
+    days = 0
     for i in cells[1:]:
         h = int(i.text)
-        dt = datetime.datetime.combine(datetime.date.today(), datetime.time(h))
+        dt = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=1*days), datetime.time(h))
         result.append(dt)
+        if h == 23:
+            days += 1  # start next day
     return result
 
 
