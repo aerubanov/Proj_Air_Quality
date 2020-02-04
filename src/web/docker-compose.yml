@@ -1,0 +1,21 @@
+version: "2"
+services:
+  PostgreSQL:
+    restart: always
+    image: sameersbn/postgresql:10-2
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - DEBUG=false
+
+      - POSTGRES_USER=pguser
+      - POSTGRES_PASSWORD=pgpass
+      - POSTGRES_DB=pgdb
+    volumes:
+      - /srv/docker/postgresql:/database/postgres
+    networks:
+      - backend
+
+networks:
+  backend:
