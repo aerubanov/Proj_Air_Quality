@@ -8,18 +8,18 @@ weather_url = 'https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C
 
 time_row = 1
 prec_row = 3
-temp_row = 5
-press_row = 7
-wind_speed_row = 8
-wind_dir_row = 10
-hum_row = 11
+temp_row = 4
+press_row = 6
+wind_speed_row = 7
+wind_dir_row = 9
+hum_row = 10
 
 
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
 
-    table = soup.find("table", {"id": "forecastTable_3"})
+    table = soup.find("table", {"id": "forecastTable_1"})
     rows = table.find_all('tr')
     return rows
 
