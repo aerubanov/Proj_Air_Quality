@@ -2,13 +2,9 @@ import requests
 import csv
 import json
 import typing
-import schedule
-import time
 import numpy as np
 
-sensor_file = 'DATA/processed/sensors.csv'  # file with information about sensors to data downloading
-api_url = 'https://data.sensor.community/static/v2/data.json'
-time_interval = 5  # interval for api requests in minutes
+from src.web.loader.config import api_url
 
 
 def read_sensor_id(file: str) -> typing.Set:
@@ -44,20 +40,3 @@ def average_data(data: typing.List[typing.Dict]):
             'press': np.mean(press),
             'hum': np.mean(hum),
             }
-
-
-def run_task():
-    sensor_id = read_sensor_id(sensor_file)
-    data = load_data(sensor_id)
-    print(average_data(data))
-
-
-def main():
-    schedule.every(time_interval).minutes.do(run_task)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-if __name__ == '__main__':
-    main()

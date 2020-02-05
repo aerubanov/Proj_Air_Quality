@@ -24,9 +24,11 @@ services:
     container_name: loader
     networks:
       - backend
-    command: python -m src.web.loader.app
+    command: python -m src.web.loader.app -u
     depends_on:
             - PostgreSQL
+    volumes:
+      - "../../DATA/processed:/code/data"
 
 networks:
   backend:

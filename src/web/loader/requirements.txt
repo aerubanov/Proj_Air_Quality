@@ -2,3 +2,5 @@ bs4
 schedule
 sqlalchemy
 psycopg2
+requests
+numpy
