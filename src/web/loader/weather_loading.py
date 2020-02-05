@@ -65,8 +65,32 @@ def get_row_text(row: 'BeautifulSoup.Tag') -> typing.List[float]:
     return result
 
 
-def _parse_wather(r):
+def get_rows_numb(rows):
+    rows_nomb = {}
+    i = 0
+    for r in rows:
+        t = r.find('td').text
+        if 'Местное время' in t:
+            rows_nomb['time_row'] = i
+        if 'Явления погоды' in t:
+            rows_nomb['prec_row'] = i
+        if 'Температура' in t:
+            rows_nomb['temp_row'] = i
+        if 'Давление' in t:
+            rows_nomb['press_row'] = i
+        if 'Ветер' in t:
+            rows_nomb['wind_speed_row'] = i
+        if 'направление' in t:
+            rows_nomb['wind_dir_row'] = i
+        if 'Влажность' in t:
+            rows_nomb['hum_row'] = i
+        i += 1
+    return rows_nomb
+
+
+def parse_weather():
     rows = parse_page(weather_url)
+    r = get_rows_numb(rows)
     times = get_times(rows[r['time_row']])
     prec = get_prec(rows[r['prec_row']])
     temp = get_row_val(rows[r['temp_row']])
@@ -83,13 +107,6 @@ def _parse_wather(r):
         'wind_dir': wind_dir,
         'humidity': hum,
     }
-
-
-def parse_weather():
-    rows = parse_page(weather_url)
-    for r in rows:
-        print(r.find('td').text)
-
 
 
 if __name__ == '__main__':
