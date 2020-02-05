@@ -5,23 +5,6 @@ import typing
 
 from src.web.loader.config import weather_url
 
-rows_1 = {'time_row': 1,
-          'prec_row': 3,
-          'temp_row': 4,
-          'press_row': 6,
-          'wind_speed_row': 7,
-          'wind_dir_row': 9,
-          'hum_row': 10,
-          }
-
-rows_2 = {'time_row': 1,
-          'prec_row': 3,
-          'temp_row': 5,
-          'press_row': 7,
-          'wind_speed_row': 8,
-          'wind_dir_row': 10,
-          'hum_row': 11,
-          }
 
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
     resp = requests.get(url)
