@@ -2,20 +2,31 @@ version: "2"
 services:
   PostgreSQL:
     restart: always
-    image: sameersbn/postgresql:10-2
+    image: postgres
     container_name: postgres
     ports:
       - "5432:5432"
     environment:
       - DEBUG=false
 
-      - POSTGRES_USER=pguser
-      - POSTGRES_PASSWORD=pgpass
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=pgdb
     volumes:
-      - /srv/docker/postgresql:/database/postgres
+      - ./database:/database/postgres
     networks:
       - backend
+
+  loader:
+    build:
+      context: ../../src
+      dockerfile: ./web/loader/Dockerfile
+    container_name: loader
+    networks:
+      - backend
+    command: python -m src.web.loader.app
+    depends_on:
+            - PostgreSQL
 
 networks:
   backend:
