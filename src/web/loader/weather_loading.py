@@ -3,17 +3,25 @@ from bs4 import BeautifulSoup
 import datetime
 import typing
 
-weather_url = 'https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5' \
-      '_(%D1%86%D0%B5%D0%BD%D1%82%D1%80,_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3)'
+from src.web.loader.config import weather_url
 
-time_row = 1
-prec_row = 3
-temp_row = 4
-press_row = 6
-wind_speed_row = 7
-wind_dir_row = 9
-hum_row = 10
+rows_1 = {'time_row': 1,
+          'prec_row': 3,
+          'temp_row': 4,
+          'press_row': 6,
+          'wind_speed_row': 7,
+          'wind_dir_row': 9,
+          'hum_row': 10,
+          }
 
+rows_2 = {'time_row': 1,
+          'prec_row': 3,
+          'temp_row': 5,
+          'press_row': 7,
+          'wind_speed_row': 8,
+          'wind_dir_row': 10,
+          'hum_row': 11,
+          }
 
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
     resp = requests.get(url)
@@ -57,16 +65,16 @@ def get_row_text(row: 'BeautifulSoup.Tag') -> typing.List[float]:
     return result
 
 
-def parse_weather():
+def _parse_wather(r):
     rows = parse_page(weather_url)
-    times = get_times(rows[time_row])
-    prec = get_prec(rows[prec_row])
-    temp = get_row_val(rows[temp_row])
-    press = get_row_val(rows[press_row])
-    wind_speed = get_row_val(rows[wind_speed_row])
-    wind_dir = get_row_text(rows[wind_dir_row])
-    hum = get_row_val(rows[hum_row])
-    return{
+    times = get_times(rows[r['time_row']])
+    prec = get_prec(rows[r['prec_row']])
+    temp = get_row_val(rows[r['temp_row']])
+    press = get_row_val(rows[r['press_row']])
+    wind_speed = get_row_val(rows[r['wind_speed_row']])
+    wind_dir = get_row_text(rows[r['wind_dir_row']])
+    hum = get_row_val(rows[r['hum_row']])
+    return {
         'date': times,
         'prec': prec,
         'temp': temp,
@@ -75,6 +83,13 @@ def parse_weather():
         'wind_dir': wind_dir,
         'humidity': hum,
     }
+
+
+def parse_weather():
+    rows = parse_page(weather_url)
+    for r in rows:
+        print(r.find('td').text)
+
 
 
 if __name__ == '__main__':

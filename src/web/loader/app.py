@@ -6,7 +6,8 @@ import datetime
 
 from src.web.models.model import Base, Sensors, Weather
 from src.web.loader.sensor_loading import read_sensor_id, load_data, average_data
-from src.web.loader.config import sensor_file, sensor_time_interval
+from src.web.loader.config import sensor_file, sensor_time_interval, weather_time_interval
+from src.web.loader.weather_loading import parse_weather
 
 
 def sensor_task(session):
@@ -19,12 +20,19 @@ def sensor_task(session):
     session.commit()
 
 
+def weather_task(session):
+    data = parse_weather()
+    row = Weather(date=data['date'], temp=data['temp'], press=data['pressure'], prec=data['prec'],
+                  wind_speed=data['wind_speed'], wind_dir=data['wind_dir'], hum=data['humidity'])
+    session.add(row)
+    session.commit()
+
+
 def print_db(session):
-    result = session.query(Sensors)
+    result = session.query(Weather)
     result = result.order_by('date')
-    print("date | p1 | p2| temp| press | hum", flush=True)
     for i in result:
-        print(f'{i.date} | {i.p1} | {i.p2} | {i.temperature} | {i.pressure} | {i.humidity}', flush=True)
+        print(f'{i.date} | {i.temp} | {i.press} | {i.prec} | {i.wind_speed} | {i.wind_dir} | {i.hum}', flush=True)
 
 
 if __name__ == '__main__':
