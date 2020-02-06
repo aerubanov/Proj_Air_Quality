@@ -9,7 +9,7 @@ LOGGING_CONFIG = {
         },
     },
     'handlers': {
-        'default': {
+        'file_handler': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -17,10 +17,14 @@ LOGGING_CONFIG = {
             'maxBytes': 100000,
             'backupCount': 3,
         },
+        'db_handler': {
+            'level': 'INFO',
+            'class': 'src.web.loader.log_handler.LogDBHandler',
+        }
     },
     'loggers': {
         'LoaderLogger': {
-            'handlers': ['default'],
+            'handlers': ['file_handler', 'db_handler'],
             'level': 'INFO',
             'propagate': False
         },

@@ -5,7 +5,7 @@ import schedule
 import datetime
 import logging.config
 
-from src.web.models.model import Base, Sensors, Weather
+from src.web.models.model import Base, Sensors, Weather, LoaderLog
 from src.web.loader.sensor_loading import read_sensor_id, load_data, average_data
 from src.web.loader.config import sensor_file, sensor_time_interval, weather_time_interval
 from src.web.loader.weather_loading import parse_weather
@@ -59,10 +59,10 @@ def weather_task(session):
 
 
 def print_db(session):
-    result = session.query(Weather)
+    result = session.query(LoaderLog)
     result = result.order_by('date')
     for i in result:
-        print(f'{i.date} | {i.temp} | {i.press} | {i.prec} | {i.wind_speed} | {i.wind_dir} | {i.hum}', flush=True)
+        print(f'{i.date} | {i.level} | {i.name} | {i.message}', flush=True)
 
 
 if __name__ == '__main__':
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     sess = Session()
     schedule.every(sensor_time_interval).minutes.do(sensor_task, session=sess)
     schedule.every(weather_time_interval).minutes.do(weather_task, session=sess)
-    # schedule.every(0.2).minutes.do(print_db, session=sess)
+    schedule.every(0.1).minutes.do(print_db, session=sess)
     logger.info('%s', 'loader started')
 
     while True:

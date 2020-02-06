@@ -25,3 +25,12 @@ class Weather(Base):
     wind_speed = Column(Float)
     wind_dir = Column(String)
     hum = Column(Float)
+
+
+class LoaderLog(Base):
+    __tablename__ = 'loader_logs'
+
+    date = Column(DateTime, primary_key=True)
+    level = Column(String)
+    name = Column(String)
+    message = Column(String)
