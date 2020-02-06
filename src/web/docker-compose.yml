@@ -29,6 +29,7 @@ services:
             - PostgreSQL
     volumes:
       - "../../DATA/processed:/code/data"
+      - "./logs:/code/logs"
 
 networks:
   backend:
