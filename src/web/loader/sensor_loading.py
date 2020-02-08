@@ -4,7 +4,7 @@ import json
 import typing
 import numpy as np
 
-from src.web.loader.config import api_url
+from src.web.loader.config import api_url, sensor_file
 
 
 def read_sensor_id(file: str) -> typing.Set:
@@ -40,3 +40,10 @@ def average_data(data: typing.List[typing.Dict]):
             'press': np.mean(press),
             'hum': np.mean(hum),
             }
+
+
+def load_sensors():
+    sensor_id = read_sensor_id(sensor_file)
+    data = load_data(sensor_id)
+    avg_data = average_data(data)
+    return avg_data
