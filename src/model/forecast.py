@@ -4,6 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.base import clone
 from sklearn.metrics import mean_absolute_error
 from sklearn.linear_model import Lasso
+import pickle
+import json
 
 from src.features.preproc_forecast import prepare_features, generate_chunks, prepare_data_from_chunks
 
@@ -22,11 +24,11 @@ def train_models(model, x_train, y_train, y_columns):
     return models
 
 
-def get_mae(models, X_test, y_test, y_columns):
+def get_mae(models, x_test, y_test, y_columns):
     scores = []
     for i in range(len(y_columns)):
         local_model = models[i]
-        prediction = local_model.predict(X_test)
+        prediction = local_model.predict(x_test)
         mae = mean_absolute_error(y_test[y_columns[i]], prediction)
         scores.append(mae)
     return scores
@@ -38,6 +40,7 @@ def train_forecast(dataset_file: str, target_column: str):
     data = data.set_index('date')
     data = data[columns]
     data = prepare_features(data)
+    data = data.resample('1H').mean()
 
     # split chunks
     start_idx = data.index[0]
@@ -46,19 +49,34 @@ def train_forecast(dataset_file: str, target_column: str):
     df = prepare_data_from_chunks(chunks, target_column, columns)
 
     # prepare test and train
-    x_columns = [i for i in df.columns if 'P1_forec_' not in i]
-    y_columns = [i for i in df.columns if 'P1_forec_' in i]
-    X, y = df[x_columns], df[y_columns]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    x_columns = [i for i in df.columns if f'{target_column}_forec_' not in i]
+    y_columns = [i for i in df.columns if f'{target_column}_forec_' in i]
+    x, y = df[x_columns], df[y_columns]
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
 
     # train and evaluate models
     mod = Lasso(alpha=0.2, max_iter=2000)
-    models = train_models(mod, X_train, y_train, y_columns)
-    mae = get_mae(models, X_test, y_test, y_columns)
+    models = train_models(mod, x_train, y_train, y_columns)
+    mae = get_mae(models, x_test, y_test, y_columns)
     return models, mae
 
 
-if __name__ == '__main__':
+def main(p1_model_file: str, p2_model_file: str, metrics_file: str):
     data_file = 'DATA/processed/dataset.csv'
-    _, mae = train_forecast(data_file, 'P1')
-    print(mae)
+    p1_models, p1_mae = train_forecast(data_file, 'P1')
+    print('P1 mae: ', p1_mae)
+    with open(p1_model_file, 'wb') as f:
+        pickle.dump(p1_models, f)
+    p2_models, p2_mae = train_forecast(data_file, 'P2')
+    print('P2 mae: ', p2_mae)
+    with open(p2_model_file, 'wb') as f:
+        pickle.dump(p2_models, f)
+    with open(metrics_file, "w") as f:
+        json.dump({'p1_mae': p1_mae, 'p2_mae': p2_mae}, f)
+
+
+if __name__ == '__main__':
+    model_p1 = 'models/p1_forecast.obj'
+    model_p2 = 'models/p2_forecast.obj'
+    metrics = 'DATA/metrics/forecast_metrics.json'
+    main(model_p1, model_p2, metrics)
