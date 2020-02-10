@@ -9,3 +9,5 @@ pytest-cov
 boto3
 sklearn
 statsmodels
+schedule
+sqlalchemy
