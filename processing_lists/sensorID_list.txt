@@ -219,3 +219,11 @@ _pms5003_sensor_33159.csv
 _sds011_sensor_40579.csv
 _sds011_sensor_40597.csv
 _sds011_sensor_40609.csv
+_bme280_sensor_40726.csv
+_bme280_sensor_41016.csv
+_bme280_sensor_41098.csv
+_bme280_sensor_41216.csv
+_pms5003_sensor_40725.csv
+_sds011_sensor_41015.csv
+_sds011_sensor_41097.csv
+_sds011_sensor_41215.csv

@@ -1,6 +1,6 @@
-md5: b758c02fe0d732eee8ed76f6dc6812e6
+md5: 194d4fe3099d74df6cd2718e17c7782b
 outs:
-- md5: 20117ff6742e3075d6f9ecf61bc1f89e.dir
+- md5: b3a347c44820537fcb8f983ae3607ece.dir
   path: sensors
   cache: true
   metric: false
