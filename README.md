@@ -42,6 +42,8 @@ update_sensor_id -> update_data ->| -> create_dataset -> train_clustering
 ## Notebooks
 Выделение и кластеризация аномалий в данных
  
- [Anomaly detection.ipynb](notebooks/Anomaly%20detection.ipynb)\
+ [Anomaly detection.ipynb](notebooks/Anomaly%20detection.ipynb)
  
  [Linear forecast model on lag features](notebooks/forecasting_sensor_P1.ipynb)
+
+[EDA](notebooks/EDA.ipynb)
