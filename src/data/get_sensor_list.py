@@ -80,8 +80,12 @@ def check_sensor_pos(links, links_file, sensor_id_file):
 
 
 if __name__ == '__main__':
-    date = datetime.date.today() - datetime.timedelta(days=1)
-    ln = get_links(date, CHECKED_LINKS_FILE)
+    delta = 1
+    ln = []
+    while not ln and delta < 10:
+        date = datetime.date.today() - datetime.timedelta(days=delta)
+        ln = get_links(date, CHECKED_LINKS_FILE)
+        delta += 1
     sensor_list = check_sensor_pos(ln, CHECKED_LINKS_FILE, SENSOR_ID_FILE)
     print(sensor_list)
     with open('last_links_update.txt', 'w') as f:
