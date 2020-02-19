@@ -11,7 +11,7 @@ import typing
 from src.features.preproc_anom import prepare_features
 
 sel_columns = ['mean_hum', 'prec_amount',
-               'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid']
+               'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid', 'prec_time']
 
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
@@ -79,6 +79,7 @@ def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
     anomdata['w_dir_cos_min'] = [np.min(np.cos(i.wind_direction)) for i in anom_list]
     anomdata['max_resid'] = [np.max(i.resid) for i in anom_list]
     anomdata['min_resid'] = [np.min(i.resid) for i in anom_list]
+    anomdata['prec_time'] = [np.max(i.prec_time) for i in anom_list]
     return anomdata
 
 
