@@ -18,6 +18,6 @@ def test_average_sensor():
 def test_get_wather_data():
     data = get_wather_data('src/data/tests/data/wather/wather_centr.csv')
     assert set(data.columns) == {'temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_direction', 'wind_speed',
-                                 'precipitation', 'prec_amount', 'visibility', 'dew_point_temp'}
+                                 'precipitation', 'prec_amount', 'visibility', 'dew_point_temp', 'prec_time'}
     assert data.index.min().date() == datetime.date(2019, 4, 1)
     assert data.index.max().date() == datetime.date(2019, 5, 2)
