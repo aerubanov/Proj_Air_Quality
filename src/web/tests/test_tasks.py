@@ -1,22 +1,8 @@
-import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+
 import datetime
 
-from src.web.models.model import Base, Weather, Sensors
+from src.web.models.model import Weather, Sensors
 import src.web.loader.tasks as tasks
-
-
-@pytest.fixture()
-def database_session():
-    engine = create_engine('sqlite:///test_db.db')
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    sess = Session()
-
-    yield sess
-    sess.close()
-    Base.metadata.drop_all(engine)
 
 
 def test_sensor_task(monkeypatch, database_session):
