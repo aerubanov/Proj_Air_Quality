@@ -5,11 +5,6 @@ import pandas as pd
 
 from src.web.models.model import Base, Sensors
 
-engine = create_engine('postgresql://postgres:postgres@0.0.0.0/pgdb')
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-sess = Session()
-
 dataset = '../../../DATA/processed/dataset.csv'
 
 
@@ -32,19 +27,23 @@ def get_last_date(data: pd.DataFrame) -> datetime.datetime:
     return data.index[-1].to_pydatetime()
 
 
-def clear_database(end_date: datetime.datetime, session=sess):
+def clear_database(end_date: datetime.datetime, session):
     """remove all entries from database before end_date"""
     session.query(Sensors).filter(Sensors.date <= end_date).delete()
     session.commit()
 
 
-def write_data(data: pd.DataFrame, session=sess):
+def write_data(data: pd.DataFrame, session):
     eng = session.get_bind()
     data.to_sql('sensors', con=eng, if_exists='append')
 
 
 if __name__ == '__main__':
+    engine = create_engine('postgresql://postgres:postgres@0.0.0.0/pgdb')
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    sess = Session()
     data = load_data(dataset)
     end_date = get_last_date(data)
-    clear_database(end_date)
-    write_data(data)
+    clear_database(end_date, sess)
+    write_data(data, sess)
