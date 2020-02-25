@@ -1,25 +1,25 @@
-md5: 81382120443bf7bc898f4c6f2fb6687a
+md5: 3d98609d060a2a7f7494dfea26e95272
 cmd: python -m src.model.anom_clustering
 wdir: ..
 deps:
-- md5: d1cf8f2b99560eace0ce214a8488a5f6
+- md5: a103583928e7f9c045984aeb81ebdb8e
   path: DATA/processed/dataset.csv
 - md5: 3dc1d691a3726d6534918a413fb032f4
   path: src/features/preproc_anom.py
 - md5: 71cf9b59be1b82c435eba4457acc924d
   path: src/model/anom_clustering.py
 outs:
-- md5: e6955a00755df85342b8220c008cf5c5
+- md5: d79217baff357e0045fbcfbd3b8c7623
   path: models/kmean.obj
   cache: true
   metric: false
   persist: false
-- md5: 2b0843ce0c6328535fafa666b117b49e
+- md5: 1e4a7a258d5b2ed3180db2e52afd8aa7
   path: models/pca.obj
   cache: true
   metric: false
   persist: false
-- md5: a678dd9ab01d335f67c7bbe818b1fa09
+- md5: b80ac82080c7084b6b6d51f57a4c7196
   path: DATA/metrics/clustering_metric.json
   cache: false
   metric: true
