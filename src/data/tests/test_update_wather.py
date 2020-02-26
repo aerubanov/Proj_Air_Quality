@@ -34,17 +34,3 @@ def test_check_file(tmpdir):
              )
     res = check_file(f2, data_folder=dir_name)
     assert res == (True, datetime.datetime(2019, 12, 10).date())
-
-
-def test_get_link():
-    end_date = datetime.date.today()-datetime.timedelta(days=1)
-    start_date = end_date - datetime.timedelta(days=7)
-    link = get_link(start_date, end_date)
-    regex = re.compile(
-        r'^(?:http|ftp)s?://'  # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    assert re.match(regex, link) is not None

@@ -14,6 +14,10 @@ class Sensors(Base):
     humidity = Column(Float)
     pressure = Column(Float)
 
+    def __repr__(self):
+        return f'date: {self.date}|P1: {self.p1}|P2: {self.p2}|temp: {self.temperature}|hum:' \
+               f' {self.humidity}|press: {self.pressure}'
+
 
 class Weather(Base):
     __tablename__ = "weather"
@@ -26,6 +30,10 @@ class Weather(Base):
     wind_dir = Column(String)
     hum = Column(Float)
 
+    def __repr__(self):
+        return f'date: {self.date}|temp: {self.temp}|press: {self.press}|prec: {self.prec}|' \
+               f'wind_speed: {self.wind_speed}|wind_dir: {self.wind_dir}|hum: {self.hum}'
+
 
 class LoaderLog(Base):
     __tablename__ = 'loader_logs'
@@ -34,3 +42,6 @@ class LoaderLog(Base):
     level = Column(String)
     name = Column(String)
     message = Column(String)
+
+    def __repr__(self):
+        return f'date: {self.date}| level: {self.level}|name: {self.name}|message: {self.message}'
