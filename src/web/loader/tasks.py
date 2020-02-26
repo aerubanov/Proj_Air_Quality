@@ -5,9 +5,10 @@ from marshmallow import ValidationError
 from src.web.loader.sensor_loading import load_sensors
 from src.web.loader.weather_loading import parse_weather
 from src.web.models.model import Sensors, Weather
-from src.web.loader.validation import SensorSchema
+from src.web.loader.validation import SensorSchema, WeatherSchema
 
 sensor_schema = SensorSchema()
+weather_schema = WeatherSchema()
 
 
 def sensor_task(session, logger=None):
@@ -43,6 +44,12 @@ def weather_task(session, logger=None):
     # get data
     start_time = time.time()
     data = parse_weather()
+    try:
+        data = weather_schema.load(data)
+    except ValidationError as e:
+        if logger is not None:
+            logger.info(str(e))
+        return
     resp_time = (time.time() - start_time) * 1000  # time in milliseconds
     if logger is not None:
         logger.info('%s %s', 'weather forecast request', f'timing: {resp_time}')

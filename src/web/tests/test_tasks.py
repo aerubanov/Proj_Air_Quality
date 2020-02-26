@@ -99,3 +99,39 @@ def test_weather_task_correct_data(monkeypatch, database_session):
         assert r.wind_dir == wind_dir[i]
         assert r.hum == hum[i]
         i += 1
+
+
+def test_weather_task_incorrect_data(monkeypatch, database_session):
+    correct_data = {
+        'date': [datetime.datetime(2020, 1, 31), datetime.datetime(2020, 2, 1)],
+        'prec': ['prec_0', 'prec_1'],
+        'temp': [20.5, 21.0],
+        'pressure': [753, 752],
+        'wind_speed': [1, 2],
+        'wind_dir': ['Ю', 'С'],
+        'hum': [67.2, 80.1],
+    }
+    incorrect_data = {
+        'date': [datetime.datetime(2020, 1, 31), datetime.datetime(2020, 2, 1)],
+        'prec': ['prec_0', 'prec_1'],
+        'temp': [20.5, -100.0],
+        'pressure': [753, 900],
+        'wind_speed': [1, 55],
+        'wind_dir': ['fdf', 'С'],
+        'hum': [-1, 80.1],
+    }
+
+    for key in correct_data.keys():
+        data = correct_data.copy()
+        data[key] = incorrect_data[key]
+
+        def mockreturn():
+            return data
+
+        monkeypatch.setattr('src.web.loader.tasks.parse_weather', mockreturn)
+
+        tasks.weather_task(database_session)
+
+        result = database_session.query(Weather)
+        result = result.order_by('date').first()
+        assert result is None
