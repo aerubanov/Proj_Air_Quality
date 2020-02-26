@@ -1,16 +1,15 @@
-
 import datetime
 
 from src.web.models.model import Weather, Sensors
 import src.web.loader.tasks as tasks
 
 
-def test_sensor_task(monkeypatch, database_session):
+def test_sensor_task_correct_data(monkeypatch, database_session):
     # test data
     p1 = 5.6
     p2 = 7.3
     temp = 20.0
-    press = 10562.9
+    press = 99270.67
     hum = 68.9
 
     def mockreturn():
@@ -33,7 +32,37 @@ def test_sensor_task(monkeypatch, database_session):
     assert row.humidity == hum
 
 
-def test_weather_task(monkeypatch, database_session):
+def test_sensor_task_incorrect_data(monkeypatch, database_session):
+    test_data_correct = {'p1': 5.6,
+                         'p2': 7.3,
+                         'temp': 20.0,
+                         'press': 99270.67,
+                         'hum': 20.0,
+                         }
+    test_data_incorrect = {'p1': -5.6,
+                           'p2': -7.3,
+                           'temp': 100.0,
+                           'press': 500.0,
+                           'hum': 110.0,
+                           }
+
+    for key in test_data_correct.keys():
+        data = test_data_correct.copy()
+        data[key] = test_data_incorrect[key]
+
+        def mockreturn():
+            return data
+
+        monkeypatch.setattr('src.web.loader.tasks.load_sensors', mockreturn)
+
+        tasks.sensor_task(database_session)
+        row = database_session.query(Sensors).first()
+
+        print(key)
+        assert row is None
+
+
+def test_weather_task_correct_data(monkeypatch, database_session):
     # test data
     times = [datetime.datetime(2020, 1, 31), datetime.datetime(2020, 2, 1)]
     prec = ['prec_0', 'prec_1']
@@ -53,6 +82,7 @@ def test_weather_task(monkeypatch, database_session):
             'wind_dir': wind_dir,
             'humidity': hum,
         }
+
     monkeypatch.setattr('src.web.loader.tasks.parse_weather', mockreturn)
 
     tasks.weather_task(database_session)

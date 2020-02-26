@@ -1,9 +1,13 @@
 import time
 import datetime
+from marshmallow import ValidationError
 
 from src.web.loader.sensor_loading import load_sensors
 from src.web.loader.weather_loading import parse_weather
 from src.web.models.model import Sensors, Weather
+from src.web.loader.validation import SensorSchema
+
+sensor_schema = SensorSchema()
 
 
 def sensor_task(session, logger=None):
@@ -13,6 +17,13 @@ def sensor_task(session, logger=None):
     start_time = time.time()
     avg_data = load_sensors()
     resp_time = (time.time() - start_time) * 1000  # time in milliseconds
+    try:
+        avg_data = sensor_schema.load(avg_data)
+    except ValidationError as e:
+        if logger is not None:
+            logger.info(str(e))
+        return
+
     if logger is not None:
         logger.info('%s %s', 'sensors api request', f'timing: {resp_time}')
 
