@@ -7,3 +7,4 @@ __pycache__/
 .vscode/
 /last_links_update.txt
 /last_wather_update.txt
+test_db.db
