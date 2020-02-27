@@ -22,7 +22,7 @@ class Sensors(Base):
     def serialize(self):
         """Return object data in easily serializable format"""
         return {
-            'date': self.date,
+            'date': self.date.isoformat('T'),
             'p1': self.p1,
             'p2': self.p2,
             'temperature': self.temperature,

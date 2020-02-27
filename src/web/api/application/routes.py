@@ -27,11 +27,12 @@ def get_db():
 @app.route('/sensor_data', methods=['GET'])
 def get_sensor_data():
     try:
-        args = sensor_data_schema.loads(request.args)
+        args = sensor_data_schema.load(request.get_json())
         session = get_db()
-        res = session.query(Sensors).filter(args['start_time'] <= Sensors.date <= args['end_time']).all()
+        res = session.query(Sensors).filter(args['start_time'] <= Sensors.date)
+        res = res.filter(Sensors.date <= args['end_time'])
         res = res.order_by(Sensors.date)
-        data = [i.serialize for i in res]
+        data = [i.serialize for i in res.all()]
         return jsonify(data)
     except ValidationError as e:
         abort(400, str(e))

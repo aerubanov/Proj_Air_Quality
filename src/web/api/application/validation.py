@@ -3,8 +3,8 @@ from datetime import datetime
 
 
 class SensorDataSchema(Schema):
-    start_time = fields.DateTime(required=True, format='rfc')
-    end_time = fields.DateTime(required=True, format='rfc')
+    start_time = fields.DateTime(required=True, format='iso')
+    end_time = fields.DateTime(required=True, format='iso')
 
     @validates_schema
     def end_early_then_start(self, data, **kwargs):
