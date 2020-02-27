@@ -18,6 +18,18 @@ class Sensors(Base):
         return f'date: {self.date}|P1: {self.p1}|P2: {self.p2}|temp: {self.temperature}|hum:' \
                f' {self.humidity}|press: {self.pressure}'
 
+    @property
+    def serialize(self):
+        """Return object data in easily serializable format"""
+        return {
+            'date': self.date,
+            'p1': self.p1,
+            'p2': self.p2,
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+            'pressure': self.pressure,
+        }
+
 
 class Weather(Base):
     __tablename__ = "weather"
