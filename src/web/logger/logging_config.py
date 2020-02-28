@@ -9,22 +9,35 @@ LOGGING_CONFIG = {
         },
     },
     'handlers': {
-        'file_handler': {
+        'log_file_handler': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': logs_file,
-            'maxBytes': 100000,
+            'maxBytes': 1000000,
+            'backupCount': 3,
+        },
+        'api_file_handler': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/api_log.txt',
+            'maxBytes': 1000000,
             'backupCount': 3,
         },
         'db_handler': {
             'level': 'INFO',
-            'class': 'src.web.loader.log_handler.LogDBHandler',
+            'class': 'src.web.logger.log_handler.LogDBHandler',
         }
     },
     'loggers': {
         'LoaderLogger': {
-            'handlers': ['file_handler', 'db_handler'],
+            'handlers': ['log_file_handler', 'db_handler'],
+            'level': 'INFO',
+            'propagate': False
+        },
+        'ApiLogger': {
+            'handlers': ['api_file_handler', 'db_handler'],
             'level': 'INFO',
             'propagate': False
         },
