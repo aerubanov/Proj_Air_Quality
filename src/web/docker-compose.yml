@@ -31,5 +31,20 @@ services:
       - "../../DATA/processed:/code/data"
       - "./logs:/code/logs"
 
+  api:
+    build:
+      context: ../../src
+      dockerfile: ./web/api/Dockerfile
+    container_name: api
+    networks:
+      - backend
+    ports:
+      - "8080:8000"
+    depends_on:
+      - PostgreSQL
+    volumes:
+      - "./logs:/code/logs"
+    command: gunicorn src.web.api.run:app -b 0.0.0.0:8000
+
 networks:
   backend:

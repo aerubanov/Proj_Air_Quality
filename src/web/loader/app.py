@@ -4,9 +4,9 @@ import time
 import schedule
 import logging.config
 
-from src.web.models.model import Base, Sensors, Weather, LoaderLog
+from src.web.models.model import Base, LoaderLog
 from src.web.loader.config import sensor_time_interval, weather_time_interval
-from src.web.loader.logging_config import LOGGING_CONFIG
+from src.web.logger.logging_config import LOGGING_CONFIG
 from src.web.loader.tasks import sensor_task, weather_task
 
 logging.config.dictConfig(LOGGING_CONFIG)

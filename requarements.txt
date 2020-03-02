@@ -13,3 +13,5 @@ schedule
 sqlalchemy
 psycopg2-binary
 marshmallow
+flask
+codecov

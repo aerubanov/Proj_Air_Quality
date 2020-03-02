@@ -58,7 +58,6 @@ def test_sensor_task_incorrect_data(monkeypatch, database_session):
         tasks.sensor_task(database_session)
         row = database_session.query(Sensors).first()
 
-        print(key)
         assert row is None
 
 

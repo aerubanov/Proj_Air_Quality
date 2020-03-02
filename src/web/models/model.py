@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, String
+from sqlalchemy import Column, DateTime, Float, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -18,6 +18,18 @@ class Sensors(Base):
         return f'date: {self.date}|P1: {self.p1}|P2: {self.p2}|temp: {self.temperature}|hum:' \
                f' {self.humidity}|press: {self.pressure}'
 
+    @property
+    def serialize(self):
+        """Return object data in easily serializable format"""
+        return {
+            'date': self.date.isoformat('T'),
+            'p1': self.p1,
+            'p2': self.p2,
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+            'pressure': self.pressure,
+        }
+
 
 class Weather(Base):
     __tablename__ = "weather"
@@ -33,6 +45,23 @@ class Weather(Base):
     def __repr__(self):
         return f'date: {self.date}|temp: {self.temp}|press: {self.press}|prec: {self.prec}|' \
                f'wind_speed: {self.wind_speed}|wind_dir: {self.wind_dir}|hum: {self.hum}'
+
+
+class Anomaly(Base):
+    __tablename__ = 'anomalies'
+
+    start_date = Column(DateTime, primary_key=True)
+    end_date = Column(DateTime)
+    cluster = Column(Integer)
+
+
+class Forecast(Base):
+    __tablename__ = 'forecasts'
+
+    date = Column(DateTime, primary_key=True)
+    p1 = Column(Float)
+    p2 = Column(Float)
+    forward_time = Column(Integer)
 
 
 class LoaderLog(Base):
