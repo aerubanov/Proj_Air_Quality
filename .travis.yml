@@ -4,3 +4,5 @@ python:
 install: pip install -r requarements.txt
 script:
     - python -m pytest --pep8 && python -m pytest -v --cov=.
+after_success:
+  - codecov
