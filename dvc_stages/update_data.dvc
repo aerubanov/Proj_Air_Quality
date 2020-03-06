@@ -1,44 +1,15 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-md5: 63763155cc32271cc9c871cc24cfaed5
+md5: 0f6d3655bfe7ab71320171c2f75a1e82
 cmd: python -m src.data.update_data
 wdir: ..
 deps:
-- md5: 491e8f2c455aaaff650f015ae79a4519
-=======
-md5: 272d39c6f2b0c59f21f444532424ef60
-cmd: python -m src.data.update_data
-wdir: ..
-deps:
-- md5: ca0529bb63a73d5612904d4600ccdf29
->>>>>>> update data 19.02.2020
+- md5: df1a2af262d9f9faba78d7de1ff753a1
   path: processing_lists/links_list.txt
-- md5: 00705315d2191174863e8a05e208bd32
+- md5: 575d08d82fd0f45b455adf9e04c205f4
   path: processing_lists/sensorID_list.txt
-<<<<<<< HEAD
 - md5: 4510cf4b0d01597d99ab90416d15ace2
   path: last_links_update.txt
 outs:
 - md5: 5098d703f2b63df87653f070929ba3c4
-=======
-=======
-md5: 272d39c6f2b0c59f21f444532424ef60
-cmd: python -m src.data.update_data
-wdir: ..
-deps:
-- md5: ca0529bb63a73d5612904d4600ccdf29
-  path: processing_lists/links_list.txt
-- md5: 7886df24d381aa0ae673c1b1d06d06a2
-  path: processing_lists/sensorID_list.txt
->>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
-- md5: 36a0d56e8f37b79e4d798992a449ecfe
-  path: last_links_update.txt
-outs:
-- md5: e5a11803a90be4fa512419a0db4d22b7
-<<<<<<< HEAD
->>>>>>> update data 19.02.2020
-=======
->>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
   path: last_data_update.txt
   cache: true
   metric: false

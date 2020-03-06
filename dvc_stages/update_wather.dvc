@@ -1,27 +1,11 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 md5: fe7d6ead21b00b553ed19e6ee7d73f0d
-=======
-md5: 9934b5bf96acd381637d47e0addf301b
->>>>>>> update data 19.02.2020
-=======
-md5: 9934b5bf96acd381637d47e0addf301b
->>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
 cmd: python -m src.data.update_wather
 wdir: ..
 deps:
 - md5: 1cecba99466456ccc70c604e6db5de4f
   path: src/data/update_wather.py
 outs:
-<<<<<<< HEAD
-<<<<<<< HEAD
 - md5: 5098d703f2b63df87653f070929ba3c4
-=======
-- md5: e5a11803a90be4fa512419a0db4d22b7
->>>>>>> update data 19.02.2020
-=======
-- md5: e5a11803a90be4fa512419a0db4d22b7
->>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
   path: last_wather_update.txt
   cache: true
   metric: false

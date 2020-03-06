@@ -1,4 +1,4 @@
-gi_bme280_sensor_20228.csv
+_bme280_sensor_20228.csv
 _bme280_sensor_22045.csv
 _bme280_sensor_23201.csv
 _bme280_sensor_23295.csv
@@ -228,7 +228,6 @@ _sds011_sensor_41015.csv
 _sds011_sensor_41097.csv
 _sds011_sensor_41215.csv
 _sds011_sensor_41504.csv
-<<<<<<< HEAD
 _bme280_sensor_42189.csv
 _bme280_sensor_42607.csv
 _bme280_sensor_42671.csv
@@ -253,5 +252,3 @@ _sds011_sensor_42758.csv
 _sds011_sensor_42810.csv
 _sds011_sensor_42812.csv
 _sds011_sensor_42920.csv
-=======
->>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
