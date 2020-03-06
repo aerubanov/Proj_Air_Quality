@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 md5: 1c08d2a36a2554ed1c282769f4960de0
 cmd: python -m src.data.create_dataset
 wdir: ..
@@ -12,6 +13,22 @@ deps:
   path: last_wather_update.txt
 outs:
 - md5: 34ea68e06cf8aa2ce6952fcf7d358604
+=======
+md5: 81d5d425297e8815f873d6a3506b9f26
+cmd: python -m src.data.create_dataset
+wdir: ..
+deps:
+- md5: 429a0db85a72af53c7640a2a7a69b109.dir
+  path: DATA/raw/wather
+- md5: 7fc9e129eb45e18e6cf9cbfb23d8db52.dir
+  path: DATA/raw/sensors
+- md5: e5a11803a90be4fa512419a0db4d22b7
+  path: last_data_update.txt
+- md5: e5a11803a90be4fa512419a0db4d22b7
+  path: last_wather_update.txt
+outs:
+- md5: 28eb948dd7008b8d90a1bf6b8ff5acab
+>>>>>>> update data 19.02.2020
   path: DATA/processed/dataset.csv
   cache: true
   metric: false

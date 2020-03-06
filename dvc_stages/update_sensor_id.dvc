@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 md5: a52d4fb406c95fe0052f9d0d130436a1
 cmd: python -m src.data.get_sensor_list
 wdir: ..
 outs:
 - md5: 4510cf4b0d01597d99ab90416d15ace2
+=======
+md5: 3f0cde7f854d8009bd6f2a3a02734fbb
+cmd: python -m src.data.get_sensor_list
+wdir: ..
+outs:
+- md5: 36a0d56e8f37b79e4d798992a449ecfe
+>>>>>>> update data 19.02.2020
   path: last_links_update.txt
   cache: true
   metric: false
