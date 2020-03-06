@@ -31,6 +31,8 @@ def prepare_features(data: pd.DataFrame) -> pd.DataFrame:
     data.loc[data.prec_amount == 'Осадков нет', 'prec_amount'] = 0
     data.loc[data.prec_amount == 'Следы осадков', 'prec_amount'] = 0
     data['prec_amount'] = data.prec_amount.astype(float)
+    data['prec_time'] = data.prec_time.fillna(method='bfill')
+    data['prec_amount'] = data.prec_amount / data.prec_time
 
     data['dew_point_diff'] = data.temperature - data.dew_point_temp
 

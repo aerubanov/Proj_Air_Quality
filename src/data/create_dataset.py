@@ -119,6 +119,7 @@ def get_wather_data(wather_file: str) -> pd.DataFrame:
     sel_data['wind_speed'] = data.Ff
     sel_data['precipitation'] = data.W1
     sel_data['prec_amount'] = data.RRR
+    sel_data['prec_time'] = data.tR
     sel_data['visibility'] = data.VV
     sel_data['dew_point_temp'] = data.Td
     meteo_data = sel_data.resample('5T').bfill()
