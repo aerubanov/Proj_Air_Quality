@@ -7,8 +7,14 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import typing
+import warnings
 
 from src.features.preproc_anom import prepare_features
+
+pd.options.mode.chained_assignment = None  # prevent false positives SettingWithCopyWarning
+warnings.simplefilter(action='ignore', category=FutureWarning)  # prevent "FutureWarning: elementwise comparison failed;
+# returning scalar instead, but in the future will perform elementwise comparison"
+# from line 44: anomaly['gap'] = (anomaly.index.to_series().diff()) > pd.Timedelta(10, 'm')
 
 sel_columns = ['mean_hum', 'prec_amount',
                'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid', 'prec_time']
