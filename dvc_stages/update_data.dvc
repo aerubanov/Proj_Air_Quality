@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 md5: 63763155cc32271cc9c871cc24cfaed5
 cmd: python -m src.data.update_data
 wdir: ..
@@ -20,11 +21,24 @@ deps:
 outs:
 - md5: 5098d703f2b63df87653f070929ba3c4
 =======
+=======
+md5: 272d39c6f2b0c59f21f444532424ef60
+cmd: python -m src.data.update_data
+wdir: ..
+deps:
+- md5: ca0529bb63a73d5612904d4600ccdf29
+  path: processing_lists/links_list.txt
+- md5: 7886df24d381aa0ae673c1b1d06d06a2
+  path: processing_lists/sensorID_list.txt
+>>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
 - md5: 36a0d56e8f37b79e4d798992a449ecfe
   path: last_links_update.txt
 outs:
 - md5: e5a11803a90be4fa512419a0db4d22b7
+<<<<<<< HEAD
 >>>>>>> update data 19.02.2020
+=======
+>>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
   path: last_data_update.txt
   cache: true
   metric: false

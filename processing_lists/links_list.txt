@@ -25913,6 +25913,7 @@
 2020-02-10_sht35_sensor_41274.csv
 2020-02-10_sps30_sensor_41187.csv
 <<<<<<< HEAD
+<<<<<<< HEAD
 2020-02-23_bme280_sensor_3440.csv
 2020-02-23_bme280_sensor_5413.csv
 2020-02-23_bme280_sensor_6449.csv
@@ -27212,6 +27213,8 @@
 2020-03-05_sds011_sensor_43008.csv
 2020-03-05_sds011_sensor_43010.csv
 2020-03-05_sds011_sensor_43014.csv
+=======
+>>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
 2020-02-16_bme280_sensor_3440.csv
 2020-02-16_bme280_sensor_5413.csv
 2020-02-16_bme280_sensor_8160.csv

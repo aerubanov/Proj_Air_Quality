@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"pca_score": 0.9106524309150252, "clustering_score": 81316.45856861377, "silhouette_score": 0.3797141838401768}
+=======
+{"pca_score": 0.9096730976758185, "clustering_score": 80403.54196144565, "silhouette_score": 0.37636291129988153}
+>>>>>>> 0f26e2794682fea6f130e05df911fa4c57b6e1fc
