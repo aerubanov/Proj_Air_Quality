@@ -1,11 +1,11 @@
-md5: 6741588c34e3f7eb82a0e73d653635de
+md5: fe7d6ead21b00b553ed19e6ee7d73f0d
 cmd: python -m src.data.update_wather
 wdir: ..
 deps:
 - md5: 1cecba99466456ccc70c604e6db5de4f
   path: src/data/update_wather.py
 outs:
-- md5: e6c0ca62d154392667ed5f9ecd12a21d
+- md5: 5098d703f2b63df87653f070929ba3c4
   path: last_wather_update.txt
   cache: true
   metric: false
