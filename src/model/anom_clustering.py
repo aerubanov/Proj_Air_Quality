@@ -18,6 +18,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)  # prevent "Futur
 
 sel_columns = ['mean_hum', 'prec_amount',
                'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid', 'prec_time']
+PCA_n_components = 3
+num_clusters = 4
 
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
@@ -92,14 +94,14 @@ def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
 def dimension_reduction(anomdata: pd.DataFrame, sel_col=None) -> (PCA, np.array, float):
     if sel_col is None:
         sel_col = sel_columns
-    pca = PCA(n_components=3)
+    pca = PCA(n_components=PCA_n_components)
     pca.fit(anomdata[sel_col])
     x = pca.transform(anomdata[sel_col])
     score = 1 - pca.explained_variance_ratio_[-1]
     return pca, x, score
 
 
-def clustering(x: np.array, n_clusters=4, random_state=42) -> (KMeans, float, float):
+def clustering(x: np.array, n_clusters=num_clusters, random_state=42) -> (KMeans, float, float):
     km = KMeans(n_clusters=n_clusters, random_state=random_state)
     km.fit(x)
     score = km.inertia_
