@@ -15,5 +15,5 @@ def test_extract_anom_smoke():
         anomalies = extract_anom(test_data, pca, km)
         for anom in anomalies:
             assert anom['start_date'] < anom['end_date']
-            assert anom['cluster'] < 0
-            assert anom['cluster'] >= num_clusters
+            assert anom['cluster'] >= 0
+            assert anom['cluster'] < num_clusters

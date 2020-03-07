@@ -42,4 +42,6 @@ def prepare_features(data: pd.DataFrame) -> pd.DataFrame:
     data['pressure'] = data.pressure.interpolate()
     data['temperature'] = data.temperature.interpolate()
     data['humidity'] = data.humidity.interpolate()
+    for c in ['P1', 'P2', 'humidity', 'temperature', 'pressure']:
+        data[c].fillna(data[c].mean(), inplace=True)
     return data
