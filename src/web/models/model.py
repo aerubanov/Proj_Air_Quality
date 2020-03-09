@@ -61,7 +61,7 @@ class Forecast(Base):
     date = Column(DateTime, primary_key=True)
     p1 = Column(Float)
     p2 = Column(Float)
-    forward_time = Column(Integer)
+    forward_time = Column(Integer, primary_key=True)
 
 
 class LoaderLog(Base):

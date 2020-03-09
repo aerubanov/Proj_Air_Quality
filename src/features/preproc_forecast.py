@@ -53,3 +53,12 @@ def prepare_data_from_chunks(chunks: List[pd.DataFrame], target: str, col: List[
         for key, value in y.items():
             df.loc[i, key] = value
     return df
+
+
+def prepare_test_sample(chunk, columns, target_col='P1'):
+    d1 = chunk.iloc[:24]
+    x = pd.DataFrame(index=range(1))
+    for i in range(24):
+        for c in columns:
+            x[f'{c}_lag_{i}'] = d1[target_col][-(i + 1)]
+    return x
