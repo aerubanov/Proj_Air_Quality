@@ -75,6 +75,38 @@ def main(p1_model_file: str, p2_model_file: str, metrics_file: str):
         json.dump({'p1_mae': p1_mae, 'p2_mae': p2_mae}, f)
 
 
+class Forecast:
+    """forecast trained model evaluation"""
+
+    def __init__(self, models_p1, models_p2):
+        self.p1_models = models_p1
+        self.p2_models = models_p2
+
+    @staticmethod
+    def prepare_data(data: pd.DataFrame):
+        data = data.set_index('date')
+        data = data[columns]
+        data = prepare_features(data)
+        data = data.resample('1H').mean()
+        x1 = prepare_data_from_chunks([data], 'P1', columns)
+        x2 = prepare_data_from_chunks([data], 'P2', columns)
+        return x1, x2
+
+    def predict(self, x_test: pd.DataFrame):
+        x1, x2 = self.prepare_data(x_test)
+        p1_predictions = []
+        for i in range(len(self.p1_models)):
+            local_model = self.p1_models[i]
+            prediction = local_model.predict(x1)
+            p1_predictions.append(prediction)
+        p2_predictions = []
+        for i in range(len(self.p2_models)):
+            local_model = self.p2_models[i]
+            prediction = local_model.predict(x2)
+            p2_predictions.append(prediction)
+        return p1_predictions, p2_predictions
+
+
 if __name__ == '__main__':
     model_p1 = 'models/p1_forecast.obj'
     model_p2 = 'models/p2_forecast.obj'

@@ -46,11 +46,13 @@ def clear_anomalies_table(end_date: datetime.datetime, session):
 
 
 def write_data(data: pd.DataFrame, session, table):
+    """write data from dataframe to table"""
     eng = session.get_bind()
     data.to_sql(table, con=eng, if_exists='append')
 
 
 def fill_sensors(session):
+    """fill sensor table of database"""
     data = load_sensor_data(dataset)
     end_date = get_last_date_sensors(data)
     clear_sensors_table(end_date, session)
@@ -58,6 +60,7 @@ def fill_sensors(session):
 
 
 def fill_anomalies(session):
+    """fill anomalies table of database"""
     data = pd.read_csv(anomalies, parse_dates=['start_date', 'end_date'])
     end_date = get_last_date_anomalies(data)
     clear_anomalies_table(end_date, session)
