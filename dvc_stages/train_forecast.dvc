@@ -11,12 +11,12 @@ deps:
 outs:
 - md5: c5fd290ffa4844569d31708b91825080
   path: models/p1_forecast.obj
-  cache: true
+  cache: false
   metric: false
   persist: false
 - md5: ec5ed4a30037c569386e3ba4a562e2ab
   path: models/p2_forecast.obj
-  cache: true
+  cache: false
   metric: false
   persist: false
 - md5: 5c568eba41869cd7dfd386cf6c0459c2

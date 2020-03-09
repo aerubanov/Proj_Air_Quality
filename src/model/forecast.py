@@ -7,7 +7,8 @@ from sklearn.linear_model import Lasso
 import pickle
 import json
 
-from src.features.preproc_forecast import prepare_features, generate_chunks, prepare_data_from_chunks
+from src.features.preproc_forecast import prepare_features, generate_chunks, prepare_data_from_chunks,\
+    prepare_test_sample
 
 columns = [
     'P1', 'P2', 'pressure', 'temperature', 'humidity',
@@ -75,7 +76,7 @@ def main(p1_model_file: str, p2_model_file: str, metrics_file: str):
         json.dump({'p1_mae': p1_mae, 'p2_mae': p2_mae}, f)
 
 
-class Forecast:
+class ForecastModel:
     """forecast trained model evaluation"""
 
     def __init__(self, models_p1, models_p2):
@@ -88,8 +89,8 @@ class Forecast:
         data = data[columns]
         data = prepare_features(data)
         data = data.resample('1H').mean()
-        x1 = prepare_data_from_chunks([data], 'P1', columns)
-        x2 = prepare_data_from_chunks([data], 'P2', columns)
+        x1 = prepare_test_sample(data, columns, 'P1')
+        x2 = prepare_test_sample(data, columns, 'P2')
         return x1, x2
 
     def predict(self, x_test: pd.DataFrame):
