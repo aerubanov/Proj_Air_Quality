@@ -6,9 +6,10 @@ import pickle
 
 from src.web.models.model import Base, Sensors, Forecast
 from src.model.forecast import ForecastModel
+from src.web.config import P1_FORECAST_MODEL_OBJ, P2_FORECAST_MODEL_OBJ
 
-p1_file = "models/p1_forecast.obj"
-p2_file = "models/p2_forecast.obj"
+p1_file = P1_FORECAST_MODEL_OBJ
+p2_file = P2_FORECAST_MODEL_OBJ
 
 
 def perform_forecast(session, date):

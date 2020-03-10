@@ -4,13 +4,14 @@ from sqlalchemy.orm import sessionmaker
 import datetime
 
 from src.web.models.model import Base, LoaderLog
+from src.web.config import DATABASE
 
 
 class LogDBHandler(logging.Handler):
 
     def __init__(self):
         super().__init__()
-        engine = create_engine('postgresql://postgres:postgres@PostgreSQL/pgdb')
+        engine = create_engine(DATABASE)
         Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         self.session = Session()
