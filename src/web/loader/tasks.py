@@ -30,7 +30,7 @@ def sensor_task(session, logger=None):
 
     # write in database
     start_time = time.time()
-    row = Sensors(date=datetime.datetime.now(), p1=avg_data['p1'], p2=avg_data['p2'], temperature=avg_data['temp'],
+    row = Sensors(date=datetime.datetime.utcnow(), p1=avg_data['p1'], p2=avg_data['p2'], temperature=avg_data['temp'],
                   humidity=avg_data['hum'], pressure=avg_data['press'])
     session.add(row)
     session.commit()
