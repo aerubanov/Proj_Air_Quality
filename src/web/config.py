@@ -1,4 +1,4 @@
-DATABASE = 'postgresql://postgres:postgres@0.0.0.0/pgdb'  # For debug only !!!
+DATABASE = 'postgresql://postgres:postgres@PostgreSQL/pgdb'  # For debug only !!!
 
 P1_FORECAST_MODEL_OBJ = "models/p1_forecast.obj"
 
