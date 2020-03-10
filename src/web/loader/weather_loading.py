@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import typing
+import pytz
 
 from src.web.loader.config import weather_url
 
@@ -21,7 +22,9 @@ def get_times(row: 'BeautifulSoup.Tag') -> typing.List[datetime.datetime]:
     days = 0
     for i in cells[1:]:
         h = int(i.text)
-        dt = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=1*days), datetime.time(h))
+        dt = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=1*days), datetime.time(h),
+                                       tzinfo=pytz.timezone('Europe/Moscow'))
+        dt = dt.astimezone(pytz.utc)
         result.append(dt)
         if h == 23:
             days += 1  # start next day

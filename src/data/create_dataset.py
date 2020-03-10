@@ -96,6 +96,7 @@ def average_sensors(data_folder: str, start_date: datetime.date,
     # avg_data['pressure_std'] = bme_data[pres_col].std(axis=1, skipna=True)
     # avg_data['temperature_std'] = bme_data[temp_col].std(axis=1, skipna=True)
     # avg_data['humidity_std'] = bme_data[hum_col].std(axis=1, skipna=True)
+    avg_data.index = avg_data.index.tz_localize(tz="UTC")
     return avg_data, sens
 
 
@@ -111,6 +112,7 @@ def get_wather_data(wather_file: str) -> pd.DataFrame:
                        index_col=False)
     data = data.rename(columns={'Местное время в Москве (центр, Балчуг)': 'date'})
     data = data.set_index('date')
+    data.index = data.index.tz_localize(tz="Europe/Moscow").tz_convert('UTC')
     sel_data = pd.DataFrame(index=data.index)
     sel_data['temp_meteo'] = data['T']
     sel_data['pres_meteo'] = data.Po * 133.322  # transform mmHg in Pa

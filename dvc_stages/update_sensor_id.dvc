@@ -1,8 +1,8 @@
-md5: 2fdaa73f7ca50023759e5fae30134e14
+md5: 1f89b978e13d2f4d0f0c2ec5b3344ce5
 cmd: python -m src.data.get_sensor_list
 wdir: ..
 outs:
-- md5: eda5b25a1dc6eecc1340f0fca0214485
+- md5: 6f757cbe41e7eaf6c9188be98061f412
   path: last_links_update.txt
   cache: true
   metric: false
