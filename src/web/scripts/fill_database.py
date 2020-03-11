@@ -6,8 +6,8 @@ import pandas as pd
 from src.web.models.model import Base, Sensors, Anomaly
 from src.web.config import DATABASE_FOR_FILLING as database
 
-dataset = '../../../DATA/processed/dataset.csv'
-anomalies = '../../../DATA/processed/anomalies.csv'
+dataset = 'DATA/processed/dataset.csv'
+anomalies = 'DATA/processed/anomalies.csv'
 
 
 def load_sensor_data(file: str) -> pd.DataFrame:
