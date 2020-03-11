@@ -4,7 +4,6 @@ import datetime
 import pandas as pd
 
 from src.web.models.model import Base, Sensors, Anomaly
-from src.web.config import DATABASE
 
 dataset = '../../../DATA/processed/dataset.csv'
 anomalies = '../../../DATA/processed/anomalies.csv'
@@ -65,11 +64,12 @@ def fill_anomalies(session):
     data = pd.read_csv(anomalies, parse_dates=['start_date', 'end_date'])
     end_date = get_last_date_anomalies(data)
     clear_anomalies_table(end_date, session)
-    write_data(data, session, 'anomalies')
+    eng = session.get_bind()
+    data.to_sql('anomalies', con=eng, if_exists='append', index=False)
 
 
 if __name__ == '__main__':
-    engine = create_engine(DATABASE)
+    engine = create_engine('postgresql://postgres:postgres@0.0.0.0:5432/pgdb')
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     sess = Session()

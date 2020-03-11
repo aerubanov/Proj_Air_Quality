@@ -32,4 +32,4 @@ if __name__ == '__main__':
         pca = pickle.load(pca_f)
         anomalies = extract_anom(data_path, pca, km)
         df = pd.DataFrame(anomalies)
-        df.to_csv('DATA/processed/anomalies.csv')
+        df.to_csv('DATA/processed/anomalies.csv', index=False)
