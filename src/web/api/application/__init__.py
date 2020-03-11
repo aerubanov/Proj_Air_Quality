@@ -1,5 +1,8 @@
 from flask import Flask
-from src.web.config import DATABASE
+try:
+    from src.web.config import DATABASE
+except ModuleNotFoundError:
+    DATABASE = 'postgresql://postgres:postgres@PostgreSQL/pgdb'
 app = Flask(__name__)
 
 app.config['DATABASE'] = DATABASE
