@@ -68,8 +68,6 @@ def get_forecast():
         abort(400, str(e))
 
 
-
-
 @app.teardown_appcontext
 def teardown_db(args):
     db = g.pop('db', None)
