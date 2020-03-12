@@ -5,12 +5,12 @@ import pandas as pd
 
 from src.web.models.model import Base, Sensors, Anomaly
 try:
-    from src.web.config import DATABASE_FOR_FILLING as DATABASE
+    from src.web.config import DATABASE
 except ModuleNotFoundError:
     print("Missing config file!!!")
 
-dataset = 'DATA/processed/dataset.csv'
-anomalies = 'DATA/processed/anomalies.csv'
+dataset = 'data/dataset.csv'
+anomalies = 'data/anomalies.csv'
 
 
 def load_sensor_data(file: str) -> pd.DataFrame:

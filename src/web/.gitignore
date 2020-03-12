@@ -1,4 +1,3 @@
 database/
 logs/
 tests/test_db.db
-config.py
