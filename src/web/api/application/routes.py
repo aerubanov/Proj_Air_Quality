@@ -56,12 +56,13 @@ def get_forecast():
         args = forecast_schema.load(request.get_json())
         session = get_db()
         res = session.query(Forecast)
-        if args['start_date'] is not None:
+        if 'start_date' in args:
             res = res.filter(Forecast.date >= args['start_date'])
-        if args['end_date'] is not None:
+        if 'end_date' in args:
             res = res.filter(Forecast.date <= args['end_date'])
-        if args['start_date'] is None and args['end_date']:
-            res = res.order_by(Forecast.date.desc()).limit(1)
+        res = res.order_by(Forecast.date.desc())
+        if 'start_date' not in args and 'end_date' not in args:
+            res = res.limit(1)
         data = [i.serialize for i in res.all()]
         return jsonify(data)
     except ValidationError as e:

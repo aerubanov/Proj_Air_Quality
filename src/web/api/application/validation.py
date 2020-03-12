@@ -12,10 +12,10 @@ class SensorDataSchema(Schema):
 
 
 class ForecastRequestSchema(Schema):
-    start_date = fields.DateTime(required=False, format='iso')
-    end_date = fields.DateTime(required=False, format='iso')
+    start_date = fields.DateTime(allow_none=True, format='iso')
+    end_date = fields.DateTime(allow_none=True, format='iso')
 
     @validates_schema
     def end_early_then_start(self, data, **kwargs):
-        if data['start_date'] is not None and data['end_date'] is not None and data['start_date'] > data['end_date']:
+        if 'start_date' in data and 'end_date' in data and data['start_date'] > data['end_date']:
             raise ValidationError("Start date later then end date")

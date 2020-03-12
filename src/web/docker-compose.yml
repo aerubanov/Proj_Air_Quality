@@ -46,5 +46,19 @@ services:
       - "./logs:/code/logs"
     command: gunicorn src.web.api.run:app -b 0.0.0.0:8000
 
+  ml:
+    build:
+      context: ../../src
+      dockerfile: ./web/ml/Dockerfile
+    container_name: ml
+    networks:
+      - backend
+    command: python -m src.web.ml.run -u
+    depends_on:
+      - PostgreSQL
+    volumes:
+        - "../../models:/code/models"
+        - "./logs:/code/logs"
+
 networks:
   backend:

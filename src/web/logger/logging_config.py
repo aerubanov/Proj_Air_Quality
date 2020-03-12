@@ -25,6 +25,14 @@ LOGGING_CONFIG = {
             'maxBytes': 1000000,
             'backupCount': 3,
         },
+        'ml_file_handler': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/ml_log.txt',
+            'maxBytes': 1000000,
+            'backupCount': 3,
+        },
         'db_handler': {
             'level': 'INFO',
             'class': 'src.web.logger.log_handler.LogDBHandler',
@@ -38,6 +46,11 @@ LOGGING_CONFIG = {
         },
         'ApiLogger': {
             'handlers': ['api_file_handler', 'db_handler'],
+            'level': 'INFO',
+            'propagate': False
+        },
+        'MLLogger': {
+            'handlers': ['ml_file_handler', 'db_handler'],
             'level': 'INFO',
             'propagate': False
         },

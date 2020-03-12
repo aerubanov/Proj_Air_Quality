@@ -1,18 +1,18 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 import datetime
 import pandas as pd
 import pickle
 
-from src.web.models.model import Base, Sensors, Forecast
+from src.web.models.model import Sensors, Forecast
 from src.model.forecast import ForecastModel
 
 p1_file = "models/p1_forecast.obj"
 p2_file = "models/p2_forecast.obj"
 
 
-def perform_forecast(session, date):
+def perform_forecast(session, date=None, logger=None):
     """make forecast for date + 24 hours and write it in database"""
+    if date is None:
+        date = datetime.datetime.utcnow()
     result = session.query(Sensors).filter(Sensors.date >= date - datetime.timedelta(days=1))
     result = [i.serialize for i in result]
     data = pd.DataFrame(result)
@@ -28,10 +28,5 @@ def perform_forecast(session, date):
                              p2=p2_predictions[i], forward_time=i + 1)
             session.add(forec)
             session.commit()
-
-
-if __name__ == "main":
-    engine = create_engine('postgresql://postgres:postgres@0.0.0.0/pgdb')
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    sess = Session()
+        if logger is not None:
+            logger.info(f'Make forecast update')

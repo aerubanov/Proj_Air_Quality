@@ -66,7 +66,7 @@ class Forecast(Base):
     @property
     def serialize(self):
         return {
-            'date': self.date,
+            'date': self.date.isoformat('T'),
             'p1': self.p1,
             'p2': self.p2,
             'forward_time': self.forward_time,
