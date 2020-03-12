@@ -1,24 +1,24 @@
-md5: 5587fb7b6044baef25a11a5ef7b99c31
+md5: 74679f1a9ff503c5640a8497f1933990
 cmd: python -m src.data.create_dataset
 wdir: ..
 deps:
 - md5: 1abda77926ad0cd5e9946740183d1466.dir
   path: DATA/raw/wather
-- md5: e767421b8a078ad4e67a0b7e4a94784e.dir
+- md5: 6d431071d77271bc8919064654662ac3.dir
   path: DATA/raw/sensors
-- md5: 17b86f380a8f223a6334810532c111a8
+- md5: 2ef4ac2d220a25223bf2c8ee82329643
   path: last_data_update.txt
-- md5: 17b86f380a8f223a6334810532c111a8
+- md5: 2ef4ac2d220a25223bf2c8ee82329643
   path: last_wather_update.txt
 - md5: db8b6212563f2e72d89fd0691f31aaed
   path: src/data/create_dataset.py
 outs:
-- md5: 9b1634e481ad0124387ba47fd88cde5c
+- md5: 665c6cadd0d2a7b189a2ec7741bca35d
   path: DATA/processed/dataset.csv
   cache: true
   metric: false
   persist: false
-- md5: ba123f11bd814b2aeea2933a89e712c5
+- md5: 853de0655f1c30ec465a5f94e17b63b1
   path: DATA/processed/sensors.csv
   cache: true
   metric: false
