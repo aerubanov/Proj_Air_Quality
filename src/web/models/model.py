@@ -63,6 +63,18 @@ class Forecast(Base):
     p2 = Column(Float)
     forward_time = Column(Integer, primary_key=True)
 
+    @property
+    def serialize(self):
+        return {
+            'date': self.date.isoformat('T'),
+            'p1': self.p1,
+            'p2': self.p2,
+            'forward_time': self.forward_time,
+        }
+
+    def __repr__(self):
+        return f'date: {self.date}|forward: {self.forward_time}|p1: {self.p1}|p2: {self.p2}'
+
 
 class LoaderLog(Base):
     __tablename__ = 'loader_logs'

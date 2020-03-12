@@ -6,11 +6,12 @@ import logging.config
 import time
 
 from src.web.api.application import app
-from src.web.api.application.validation import SensorDataSchema
-from src.web.models.model import Base, Sensors
+from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema
+from src.web.models.model import Base, Sensors, Forecast
 from src.web.logger.logging_config import LOGGING_CONFIG
 
 sensor_data_schema = SensorDataSchema()
+forecast_schema = ForecastRequestSchema()
 
 
 def get_logger():
@@ -43,6 +44,25 @@ def get_sensor_data():
         res = session.query(Sensors).filter(args['start_time'] <= Sensors.date)
         res = res.filter(Sensors.date <= args['end_time'])
         res = res.order_by(Sensors.date)
+        data = [i.serialize for i in res.all()]
+        return jsonify(data)
+    except ValidationError as e:
+        abort(400, str(e))
+
+
+@app.route('/forecast', methods=['GET'])
+def get_forecast():
+    try:
+        args = forecast_schema.load(request.get_json())
+        session = get_db()
+        res = session.query(Forecast)
+        if 'start_date' in args:
+            res = res.filter(Forecast.date >= args['start_date'])
+        if 'end_date' in args:
+            res = res.filter(Forecast.date <= args['end_date'])
+        res = res.order_by(Forecast.date.desc())
+        if 'start_date' not in args and 'end_date' not in args:
+            res = res.limit(1)
         data = [i.serialize for i in res.all()]
         return jsonify(data)
     except ValidationError as e:

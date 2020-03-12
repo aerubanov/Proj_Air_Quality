@@ -1,0 +1,5 @@
+pandas
+schedule
+sqlalchemy
+sklearn
+psycopg2
