@@ -98,12 +98,12 @@ class ForecastModel:
         p1_predictions = []
         for i in range(len(self.p1_models)):
             local_model = self.p1_models[i]
-            prediction = local_model.predict(x1)
+            prediction = local_model.predict(x1)[0]
             p1_predictions.append(prediction)
         p2_predictions = []
         for i in range(len(self.p2_models)):
             local_model = self.p2_models[i]
-            prediction = local_model.predict(x2)
+            prediction = local_model.predict(x2)[0]
             p2_predictions.append(prediction)
         return p1_predictions, p2_predictions
 
