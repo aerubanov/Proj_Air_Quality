@@ -11,7 +11,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=pgdb
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./database:/var/lib/postgresql/data
     networks:
       - backend
 
