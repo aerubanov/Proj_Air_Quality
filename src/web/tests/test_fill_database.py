@@ -63,10 +63,12 @@ def test_clear_anomalies_table(database_session):
 
 
 def test_write_data(database_session):
-    entry = Sensors(date=datetime.datetime(2020, 2, 20))
+    entry = Sensors(date=datetime.datetime(2019, 4, 1, 3, 10, 15))
     database_session.add(entry)
     database_session.commit()
     data = load_sensor_data('src/web/tests/data/test_dataset_1.csv')
     write_data(data, database_session, 'sensors')
     res = database_session.query(Sensors).all()
     assert len(res) == len(data) + 1
+    res = database_session.query(Sensors).filter(Sensors.date == datetime.datetime(2019, 4, 1, 3, 10, 15)).first()
+    assert res.date == datetime.datetime(2019, 4, 1, 3, 10, 15)
