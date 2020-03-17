@@ -46,6 +46,18 @@ class Weather(Base):
         return f'date: {self.date}|temp: {self.temp}|press: {self.press}|prec: {self.prec}|' \
                f'wind_speed: {self.wind_speed}|wind_dir: {self.wind_dir}|hum: {self.hum}'
 
+    @property
+    def serialize(self):
+        return{
+            'date': self.date,
+            'temp': self.temp,
+            'press': self.press,
+            'prec': self.prec,
+            'wind_speed': self.wind_speed,
+            'wind_dir': self.wind_dir,
+            'hum': self.hum,
+        }
+
 
 class Anomaly(Base):
     __tablename__ = 'anomalies'
