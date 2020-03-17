@@ -1,7 +1,8 @@
 import datetime
+import pandas as pd
 
 from src.web.models.model import Sensors, Weather
-from src.web.ml.anomaly import get_sensor_data, get_weather_data
+from src.web.ml.anomaly import get_sensor_data, get_weather_data, combine_data
 
 
 def test_get_sensor_data(database_session):
@@ -50,3 +51,24 @@ def test_get_weather_data(database_session):
     assert 'wind_direction' in data.columns
     assert 'prec_amount' in data.columns
     assert 'prec_time' in data.columns
+    assert data.prec_amount.dtypes == float
+
+
+def test_combine_data():
+    dti_1 = pd.date_range('2020-03-17 00:00:00', periods=5, freq='5T')
+    dti_2 = pd.date_range('2020-03-17 00:10:00', periods=5, freq='5T')
+    sensor_data = pd.DataFrame(index=dti_1)
+    sensor_data['col_1'] = 1
+    sensor_data['col_2'] = 2
+    weather_data = pd.DataFrame(index=dti_2)
+    weather_data['col_3'] = 3
+    weather_data['col_4'] = 4
+    weather_data['col_5'] = 5
+    data = combine_data(sensor_data, weather_data)
+    assert data.index[0].to_pydatetime() == datetime.datetime(2020, 3, 17, 0, 10, 0)
+    assert data.index[-1].to_pydatetime() == datetime.datetime(2020, 3, 17, 0, 20, 0)
+    assert 'col_1' in data.columns
+    assert 'col_2' in data.columns
+    assert 'col_3' in data.columns
+    assert 'col_4' in data.columns
+    assert 'col_5' in data.columns
