@@ -17,7 +17,7 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     sess = Session()
-    schedule.every().hour.at(":01").do(perform_forecast, session=sess, logger=None)
+    schedule.every().hour.at(":01").do(perform_forecast, session=sess, logger=logger)
     while True:
         schedule.run_pending()
         time.sleep(1)
