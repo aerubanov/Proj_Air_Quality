@@ -64,7 +64,7 @@ def test_combine_data():
     weather_data['col_3'] = 3
     weather_data['col_4'] = 4
     weather_data['col_5'] = 5
-    data = combine_data(sensor_data, weather_data)
+    data, _, _ = combine_data(sensor_data, weather_data)
     assert data.index[0].to_pydatetime() == datetime.datetime(2020, 3, 17, 0, 10, 0)
     assert data.index[-1].to_pydatetime() == datetime.datetime(2020, 3, 17, 0, 20, 0)
     assert 'col_1' in data.columns

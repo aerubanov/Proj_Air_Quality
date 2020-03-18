@@ -56,13 +56,15 @@ def get_forecast():
         args = forecast_schema.load(request.get_json())
         session = get_db()
         res = session.query(Forecast)
-        if 'start_date' in args:
-            res = res.filter(Forecast.date >= args['start_date'])
-        if 'end_date' in args:
-            res = res.filter(Forecast.date <= args['end_date'])
+        if 'start_time' in args:
+            res = res.filter(Forecast.date >= args['start_time'])
+        if 'end_time' in args:
+            res = res.filter(Forecast.date <= args['end_time'])
         res = res.order_by(Forecast.date.desc())
-        if 'start_date' not in args and 'end_date' not in args:
+        if 'start_time' not in args and 'end_time' not in args:
             res = res.limit(1)
+            date = res.first().date  # get last available datetime for forecast
+            res = session.query(Forecast).filter(Forecast.date == date)
         data = [i.serialize for i in res.all()]
         return jsonify(data)
     except ValidationError as e:
