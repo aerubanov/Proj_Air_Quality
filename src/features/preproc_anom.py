@@ -26,15 +26,18 @@ def prepare_features(data: pd.DataFrame) -> pd.DataFrame:
     # textual values encoding
     data['wind_direction'] = data.wind_direction.fillna(method='bfill')
     data['wind_direction'] = data.wind_direction.map(wind_dir)
+    data['wind_direction'] = data.wind_direction.fillna(data.wind_direction.mean())
 
     data['prec_amount'] = data.prec_amount.fillna(method='bfill')
     data.loc[data.prec_amount == 'Осадков нет', 'prec_amount'] = 0
     data.loc[data.prec_amount == 'Следы осадков', 'prec_amount'] = 0
     data['prec_amount'] = data.prec_amount.astype(float)
+    data['prec_amount'] = data.prec_amount.fillna(data.prec_amount.mean())
     data['prec_time'] = data.prec_time.fillna(method='bfill')
+    data['prec_time'] = data.prec_time.fillna(data.prec_time.mean())
     data['prec_amount'] = data.prec_amount / data.prec_time
 
-    data['dew_point_diff'] = data.temperature - data.dew_point_temp
+    # data['dew_point_diff'] = data.temperature - data.dew_point_temp
 
     # fill missing value before PCA
     data['P1'] = data.P1.interpolate()

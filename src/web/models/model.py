@@ -49,7 +49,7 @@ class Weather(Base):
     @property
     def serialize(self):
         return{
-            'date': self.date,
+            'date': self.date.isoformat('T'),
             'temp': self.temp,
             'press': self.press,
             'prec': self.prec,
@@ -65,6 +65,14 @@ class Anomaly(Base):
     start_date = Column(DateTime, primary_key=True)
     end_date = Column(DateTime)
     cluster = Column(Integer)
+
+    @property
+    def serialize(self):
+        return {
+            'start_date': self.start_date.isoformat('T'),
+            'end_date': self.end_date.isoformat('T'),
+            'cluster': self.cluster,
+        }
 
 
 class Forecast(Base):
