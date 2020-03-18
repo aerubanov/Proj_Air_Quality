@@ -3,12 +3,21 @@ import pandas as pd
 import datetime
 import pickle
 
-
 from src.web.models.model import Sensors, Weather, Anomaly
 from src.model.anom_clustering import AnomalyCluster
 
 pca_model_file = 'models/pca.obj'
 kmean_model_file = 'models/kmean.obj'
+
+wind_dir = {'В': 'Ветер, дующий с востока',
+            'С-В': 'Ветер, дующий с северо-востока',
+            'С': 'Ветер, дующий с севера',
+            'С-З': 'Ветер, дующий с северо-запада',
+            'З': 'Ветер, дующий с запада',
+            'Ю-З': 'Ветер, дующий с юго-запада',
+            'Ю': 'Ветер, дующий с юга',
+            'Ю-В': 'Ветер, дующий с юго-востока',
+            }
 
 
 def get_sensor_data(session, date=datetime.datetime.utcnow()) -> pd.DataFrame:
@@ -34,6 +43,7 @@ def get_weather_data(session, date=datetime.datetime.utcnow()) -> pd.DataFrame:
                                 'wind_dir': 'wind_direction', 'hum': 'hum_meteo'})
     data['prec_amount'] = data.prec_amount.apply(lambda x: re.findall(r'\d*\.\d+|\d+', x)[0]).astype(float)
     data['prec_time'] = 3.0
+    data['wind_direction'] = data.wind_direction.map(wind_dir)
     data = data.set_index('date')
     data = data.resample('5T').bfill()
     return data
