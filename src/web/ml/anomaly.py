@@ -32,6 +32,14 @@ def get_sensor_data(session, date=datetime.datetime.utcnow()) -> pd.DataFrame:
     return data
 
 
+def transform_prec_amount(x):
+    numbers = re.findall(r'\d*\.\d+|\d+', x)
+    if len(numbers) > 0:
+        return numbers[0]
+    else:
+        return 0
+
+
 def get_weather_data(session, date=datetime.datetime.utcnow()) -> pd.DataFrame:
     """load weather data from database"""
     res = session.query(Weather).filter(Weather.date >= date - datetime.timedelta(days=7)).all()
@@ -41,9 +49,7 @@ def get_weather_data(session, date=datetime.datetime.utcnow()) -> pd.DataFrame:
     data = data.rename(columns={'temp': 'temp_meteo', 'press': 'pres_meteo',
                                 'prec': 'prec_amount', 'wind_speed': 'wind_speed',
                                 'wind_dir': 'wind_direction', 'hum': 'hum_meteo'})
-    data['prec_amount'] = data.prec_amount.apply(lambda x:
-                                                 0 if x == 'Явления погоды отсутствуют'
-                                                 else re.findall(r'\d*\.\d+|\d+', x)[0]).astype(float)
+    data['prec_amount'] = data.prec_amount.apply(transform_prec_amount).astype(float)
     data['prec_time'] = 3.0
     data['wind_direction'] = data.wind_direction.map(wind_dir)
     data = data.set_index('date')
