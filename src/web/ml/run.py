@@ -19,7 +19,7 @@ if __name__ == '__main__':
     Session = sessionmaker(bind=engine)
     sess = Session()
     schedule.every().hour.at(":01").do(perform_forecast, session=sess, logger=logger)
-    schedule.every().minute.at(":02").do(perform_anomaly_detection, session=sess, logger=logger)
+    schedule.every().hour.at(":02").do(perform_anomaly_detection, session=sess, logger=logger)
     logger.info("ml started")
     while True:
         schedule.run_pending()
