@@ -6,12 +6,13 @@ import logging.config
 import time
 
 from src.web.api.application import app
-from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema
-from src.web.models.model import Base, Sensors, Forecast
+from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
+from src.web.models.model import Base, Sensors, Forecast, Anomaly
 from src.web.logger.logging_config import LOGGING_CONFIG
 
 sensor_data_schema = SensorDataSchema()
 forecast_schema = ForecastRequestSchema()
+anomaly_schema = AnomalyRequestSchema()
 
 
 def get_logger():
@@ -65,6 +66,20 @@ def get_forecast():
             res = res.limit(1)
             date = res.first().date  # get last available datetime for forecast
             res = session.query(Forecast).filter(Forecast.date == date)
+        data = [i.serialize for i in res.all()]
+        return jsonify(data)
+    except ValidationError as e:
+        abort(400, str(e))
+
+
+@app.route('/anomaly', methods=['GET'])
+def get_anomaly():
+    try:
+        args = anomaly_schema.load(request.get_json())
+        session = get_db()
+        res = session.query(Anomaly).filter(Anomaly.end_date >= args['start_time']).\
+            filter(Anomaly.start_date <= args['end_time'])
+        res.order_by(Anomaly.start_date)
         data = [i.serialize for i in res.all()]
         return jsonify(data)
     except ValidationError as e:

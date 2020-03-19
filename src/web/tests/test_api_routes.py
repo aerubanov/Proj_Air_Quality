@@ -3,7 +3,7 @@ import datetime
 import json
 
 from src.web.api.application import app, routes
-from src.web.models.model import Sensors, Forecast
+from src.web.models.model import Sensors, Forecast, Anomaly
 
 
 @pytest.fixture()
@@ -149,4 +149,61 @@ def test_get_forecast_incorrect_request(database_session, api_test_client):
                                                   'start_time': "2020-03-01T11:00:00"},
                                content_type='application/json')
 
+    assert resp.status_code == 400
+
+
+def test_get_anomaly_correct(database_session, api_test_client):
+    a1 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 9, 0, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 9, 20, 0))
+    a2 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 9, 20, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 9, 40, 0))
+    a3 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 10, 0, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 10, 10, 0))
+    a4 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 10, 30, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 10, 40, 0))
+    a5 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 11, 0, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 12, 0, 0))
+    database_session.add(a1)
+    database_session.add(a2)
+    database_session.add(a3)
+    database_session.add(a4)
+    database_session.add(a5)
+    database_session.commit()
+    resp = api_test_client.get('/anomaly', json={'start_time': '2020-03-18T09:30:00',
+                                                 'end_time': "2020-03-18T10:35:00"},
+                               content_type='application/json')
+    assert resp.status_code == 200
+    data = json.loads(resp.data)
+    assert len(data) == 3
+    assert data[0]['start_date'] == datetime.datetime(2020, 3, 18, 9, 20, 0).isoformat('T')
+    assert data[1]['start_date'] == datetime.datetime(2020, 3, 18, 10, 00, 0).isoformat('T')
+    assert data[2]['start_date'] == datetime.datetime(2020, 3, 18, 10, 30, 0).isoformat('T')
+
+
+def test_get_anomaly_incorrect_request(database_session, api_test_client):
+    a1 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 9, 0, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 9, 20, 0))
+    a2 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 9, 20, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 9, 40, 0))
+    a3 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 10, 0, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 10, 10, 0))
+    a4 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 10, 30, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 10, 40, 0))
+    a5 = Anomaly(start_date=datetime.datetime(2020, 3, 18, 11, 0, 0),
+                 end_date=datetime.datetime(2020, 3, 18, 12, 0, 0))
+    database_session.add(a1)
+    database_session.add(a2)
+    database_session.add(a3)
+    database_session.add(a4)
+    database_session.add(a5)
+    database_session.commit()
+    resp = api_test_client.get('/anomaly', json={'end_time': '2020-03-18T09:30:00'},
+                               content_type='application/json')
+    assert resp.status_code == 400
+    resp = api_test_client.get('/anomaly', json={'start_time': "2020-03-18T10:35:00"},
+                               content_type='application/json')
+    assert resp.status_code == 400
+    resp = api_test_client.get('/anomaly', json={'end_time': '2020-03-18T09:30:00',
+                                                 'start_time': "2020-03-18T10:35:00"},
+                               content_type='application/json')
     assert resp.status_code == 400
