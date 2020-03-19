@@ -50,7 +50,7 @@ def test_get_weather_data(database_session):
     assert 'pres_meteo' in data.columns
     assert 'hum_meteo' in data.columns
     assert 'wind_speed' in data.columns
-    assert 'wind_direction' in data.columnsgit
+    assert 'wind_direction' in data.columns
     assert 'prec_amount' in data.columns
     assert 'prec_time' in data.columns
     assert data.prec_amount.dtypes == float
