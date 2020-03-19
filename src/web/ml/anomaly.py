@@ -41,7 +41,9 @@ def get_weather_data(session, date=datetime.datetime.utcnow()) -> pd.DataFrame:
     data = data.rename(columns={'temp': 'temp_meteo', 'press': 'pres_meteo',
                                 'prec': 'prec_amount', 'wind_speed': 'wind_speed',
                                 'wind_dir': 'wind_direction', 'hum': 'hum_meteo'})
-    data['prec_amount'] = data.prec_amount.apply(lambda x: re.findall(r'\d*\.\d+|\d+', x)[0]).astype(float)
+    data['prec_amount'] = data.prec_amount.apply(lambda x:
+                                                 0 if x == 'Явления погоды отсутствуют'
+                                                 else re.findall(r'\d*\.\d+|\d+', x)[0]).astype(float)
     data['prec_time'] = 3.0
     data['wind_direction'] = data.wind_direction.map(wind_dir)
     data = data.set_index('date')

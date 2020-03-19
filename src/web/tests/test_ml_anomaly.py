@@ -35,7 +35,7 @@ def test_get_weather_data(database_session):
                  prec='Обложной дождь (0.7 мм воды за 3 часа с 00:00 до 03:00)', wind_speed=2.1,
                  wind_dir='С-В', hum=61.0)
     w2 = Weather(date=date - datetime.timedelta(days=6, hours=4), temp=22.0, press=98654.30,
-                 prec='Обложной дождь (0.7 мм воды за 3 часа с 00:00 до 03:00)', wind_speed=2.1,
+                 prec='Явления погоды отсутствуют', wind_speed=2.1,
                  wind_dir='С-В', hum=61.0)
     w3 = Weather(date=date - datetime.timedelta(days=7, hours=4), temp=22.0, press=98654.30,
                  prec='Обложной дождь (0.7 мм воды за 3 часа с 00:00 до 03:00)', wind_speed=2.1,
@@ -50,7 +50,7 @@ def test_get_weather_data(database_session):
     assert 'pres_meteo' in data.columns
     assert 'hum_meteo' in data.columns
     assert 'wind_speed' in data.columns
-    assert 'wind_direction' in data.columns
+    assert 'wind_direction' in data.columnsgit
     assert 'prec_amount' in data.columns
     assert 'prec_time' in data.columns
     assert data.prec_amount.dtypes == float
