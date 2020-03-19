@@ -97,7 +97,7 @@ def clear_anomalies_table(start_date: datetime.datetime, end_date: datetime.date
 
 def write_data(session, anom_list):
     for anomaly in anom_list:
-        entry = Anomaly(start_date=anomaly['start_date'], end_date=anomaly['end_date'], cluster=anomaly['cluster'])
+        entry = Anomaly(start_date=anomaly['start_date'], end_date=anomaly['end_date'], cluster=int(anomaly['cluster']))
         session.add(entry)
         session.commit()
 
