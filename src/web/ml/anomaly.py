@@ -94,10 +94,12 @@ def write_data(session, anom_list):
         session.commit()
 
 
-def run(session):
+def perform_anomaly_detection(session, logger=None):
     weather_data = get_weather_data(session)
     sensor_data = get_sensor_data(session)
     data, start_date, end_date = combine_data(sensor_data, weather_data)
     anom_list = extract_anomalies(data)
     clear_anomalies_table(start_date, end_date, session)
     write_data(session, anom_list)
+    if logger is not None:
+        logger.info("Perform anomaly detection")
