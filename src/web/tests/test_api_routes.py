@@ -197,7 +197,7 @@ def test_get_anomaly_incorrect_request(database_session, api_test_client):
     database_session.add(a4)
     database_session.add(a5)
     database_session.commit()
-    resp = api_test_client.get('/anomaly', json={'end_time': '2020-03-18T09:30:00',},
+    resp = api_test_client.get('/anomaly', json={'end_time': '2020-03-18T09:30:00'},
                                content_type='application/json')
     assert resp.status_code == 400
     resp = api_test_client.get('/anomaly', json={'start_time': "2020-03-18T10:35:00"},
