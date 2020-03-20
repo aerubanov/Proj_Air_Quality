@@ -31,11 +31,13 @@ dvc repro dvc_stages/update_wather.dvc
 
 
 ## Docs
-### raw
+### data
 [raw_data.rst](docs/data/raw_data.rst)
-### processed
+
 [dataset.rst](docs/data/dataset.rst)
 
+### api
+[api.rst](docs/api/api.rst)
 ## Notebooks
 Выделение и кластеризация аномалий в данных
  
