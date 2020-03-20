@@ -21,7 +21,7 @@ API methods provide access to data. To use it, you should send http-request on
   optional: 'end_time': '<iso-format datetime>'
 
  Get latest available forecast for particles concentration P1 and P2. If start_time
-  and end_time arguments passed, all forecasts generated it this time interval return.
+ and end_time arguments passed, all forecasts generated it this time interval return.
 
 /anomaly, method: GET
 -----------------------
