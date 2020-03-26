@@ -16,3 +16,4 @@ marshmallow
 flask
 codecov
 pytz
+altair
