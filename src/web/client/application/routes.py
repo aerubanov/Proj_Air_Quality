@@ -31,7 +31,7 @@ def sensors_graph():
     df = pd.DataFrame(data)
     df = df[['date', 'p1', 'p2']]
     df['date'] = pd.to_datetime(df.date, utc=True)
-    df = df.set_index('date')
+    '''df = df.set_index('date')
     df = df.reset_index().melt('date', var_name='series', value_name='y')
 
     line = alt.Chart(
@@ -42,4 +42,9 @@ def sensors_graph():
         color='series:N'
     ).interactive()
 
-    return line.to_json()
+    return line.to_json()'''
+    base = alt.Chart(df.reset_index(), height=HEIGHT,
+                     width=WIDTH).encode(x='date')
+
+    return alt.layer(base.mark_line(color='blue').encode(y='p1'),
+                     base.mark_line(color='red').encode(y='p2')).to_json()
