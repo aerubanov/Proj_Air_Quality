@@ -31,20 +31,56 @@ def sensors_graph():
     df = pd.DataFrame(data)
     df = df[['date', 'p1', 'p2']]
     df['date'] = pd.to_datetime(df.date, utc=True)
-    '''df = df.set_index('date')
+    df = df.set_index('date')
     df = df.reset_index().melt('date', var_name='series', value_name='y')
 
+    '''
     line = alt.Chart(
         data=df, height=HEIGHT,
         width=WIDTH).mark_line().encode(
         alt.X('date:T', axis=alt.Axis(title='Date')),
         alt.Y('y:Q', axis=alt.Axis(title='Concentration [g/m^3]')),
         color='series:N'
-    ).interactive()
+    ).interactive()'''
 
-    return line.to_json()'''
+    nearest = alt.selection(type='single', nearest=True, on='mouseover',
+                            fields=['date'], empty='none')
+
+    line = alt.Chart().mark_line(interpolate='basis').encode(
+        alt.X('date:T', axis=alt.Axis(title='Date')),
+        alt.Y('y:Q', axis=alt.Axis(title='Concentration [g/m^3]')),
+        color='series:N'
+    )
+
+    selectors = alt.Chart().mark_point().encode(
+        x='date:T',
+        opacity=alt.value(0),
+    ).add_selection(
+        nearest
+    )
+
+    points = line.mark_point().encode(
+        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+    )
+
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(
+        text=alt.condition(nearest, 'y:Q', alt.value(' '))
+    )
+
+    rules = alt.Chart().mark_rule(color='gray').encode(
+        x='date:T',
+    ).transform_filter(
+        nearest
+    )
+
+    conc_chart = alt.layer(line, selectors, points, rules, text,
+                           data=df,
+                           width=600, height=300, title='Stock History')
+    '''
     base = alt.Chart(df.reset_index(), height=HEIGHT,
                      width=WIDTH).encode(x='date')
 
     return alt.layer(base.mark_line(color='blue').encode(y='p1'),
-                     base.mark_line(color='red').encode(y='p2')).to_json()
+                     base.mark_line(color='red').encode(y='p2')).interactive().to_json()
+    '''
+    return conc_chart.to_json()
