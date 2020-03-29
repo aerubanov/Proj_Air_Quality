@@ -1,4 +1,4 @@
-from flask import request, render_template
+from flask import render_template
 import altair as alt
 import datetime
 import requests
@@ -13,7 +13,7 @@ from src.web.client.application import app
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('test.html')
+    return render_template('index.html')
 
 
 # -------- helper function -----------
@@ -49,12 +49,30 @@ def pm25_to_aqius(pm):
         i_high = 500
         c_low = 250.4
         c_high = 500.4
-    return (i_high - i_low)/(c_high - c_low)*(pm - c_low) + i_low
+    return (i_high - i_low) / (c_high - c_low) * (pm - c_low) + i_low
+
+
+def aqi_level(aqi):
+    if aqi <= 50:
+        return 'good'
+    if 50 < aqi <= 100:
+        return 'moderate'
+    if 100 < aqi <= 150:
+        return 'Unhealthy for sens. groups'
+    if 150 < aqi <= 200:
+        return 'Unhealthy'
+    if 200 < aqi <= 300:
+        return 'Very Unhealthy'
+    if aqi > 300:
+        return 'Hazardous'
 
 
 # -------- Graphs --------------------
 WIDTH = 900
 HEIGHT = 400
+
+nearest = alt.selection(type='single', nearest=True, on='mouseover',
+                        fields=['date'], empty='none')
 
 
 @app.route('/graph/sensors')
@@ -78,9 +96,6 @@ def sensors_graph():
         alt.Y('y:Q', axis=alt.Axis(title='Concentration [g/m^3]')),
         color='series:N'
     ).interactive()'''
-
-    nearest = alt.selection(type='single', nearest=True, on='mouseover',
-                            fields=['date'], empty='none')
 
     line = alt.Chart().mark_line(interpolate='basis').encode(
         alt.X('date:T', axis=alt.Axis(title='Date')),
@@ -132,6 +147,17 @@ def aqius_graph():
     df = pd.DataFrame(data)
     df = df[['date', 'p1']]
     df['date'] = pd.to_datetime(df.date, utc=True)
-    df = df.set_index('date')
     df['aqi'] = df.p1.apply(pm25_to_aqius)
+    df['level'] = df.aqi.apply(aqi_level)
 
+    domain = ['good', 'moderate', 'Unhealthy for sens. groups', 'Unhealthy', 'Very Unhealthy', 'Hazardous']
+    range_ = ['green', '#e6ed13', 'orange', 'red', 'purple', 'brown']
+
+    line = alt.Chart(
+        data=df, height=HEIGHT,
+        width=WIDTH).mark_circle(size=50).encode(
+        x=alt.X('date:T', axis=alt.Axis(title='Date')),
+        y=alt.Y('aqi:Q', axis=alt.Axis(title='AQI US index')),
+        color=alt.Color('level', scale=alt.Scale(domain=domain, range=range_))
+    ).interactive()
+    return line.to_json()
