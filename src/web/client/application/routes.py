@@ -155,7 +155,7 @@ def aqius_graph():
 
     line = alt.Chart(
         data=df, height=HEIGHT,
-        width=WIDTH).mark_circle(size=50).encode(
+        width=WIDTH).mark_bar().encode(
         x=alt.X('date:T', axis=alt.Axis(title='Date')),
         y=alt.Y('aqi:Q', axis=alt.Axis(title='AQI US index')),
         color=alt.Color('level', scale=alt.Scale(domain=domain, range=range_))
