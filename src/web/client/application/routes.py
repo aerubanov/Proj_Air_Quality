@@ -22,6 +22,7 @@ def forecast():
 
 # -------- helper function -----------
 
+
 def pm25_to_aqius(pm):
     if pm <= 12:
         i_low = 0
