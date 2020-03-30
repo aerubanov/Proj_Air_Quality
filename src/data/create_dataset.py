@@ -57,7 +57,7 @@ def average_sensors(data_folder: str, start_date: datetime.date,
             bme_data['humidity_' + str(s_id)] = new_data.humidity
         except EmptyDataError:
             pass
-    from pandas.errors import EmptyDataError
+    from pandas.errors import EmptyDataError, ParserError
     for f in sds_files:
         try:
             data = pd.read_csv(os.path.join(data_folder, f), delimiter=';', parse_dates=['timestamp'], index_col=5)
@@ -74,8 +74,8 @@ def average_sensors(data_folder: str, start_date: datetime.date,
             new_data.reindex(idx, fill_value=None)
             sds_data['P1_' + str(s_id)] = new_data.P1
             sds_data['P2_' + str(s_id)] = new_data.P2
-        except EmptyDataError:
-            pass
+        except (EmptyDataError, ParserError) as e:
+            print(f, str(e))
 
     sens = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
     p1_col = [i for i in sds_data.columns if 'P1_' in i]

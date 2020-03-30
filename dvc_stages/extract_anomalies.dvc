@@ -1,17 +1,17 @@
-md5: df1aafcf21679be44a2da465479a95dd
+md5: 96bb590b0de9ee240662e818d589e37f
 cmd: python -m src.model.extract_anomalies
 wdir: ..
 deps:
-- md5: e9a428ccc5912bdf5bf8842a03d53446
+- md5: 7756a62abf54d41aca9697a06322827b
   path: DATA/processed/dataset.csv
-- md5: da48e268ebe36d5df6b2365de8265b71
+- md5: 13025d416cf8a37ddd5d25d027fd0b4e
   path: models/kmean.obj
-- md5: a247b8109fe25ae0272917a43af698fa
+- md5: eae99b6e21f8db26c8e2f75799219b24
   path: models/pca.obj
 - md5: be16353b12b4bc2f5e6363377e507f8e
   path: src/model/extract_anomalies.py
 outs:
-- md5: d2e06df2e6a94b978cd8874e9cf9adf2
+- md5: 55338146fcee764868a6622329ad053d
   path: DATA/processed/anomalies.csv
   cache: true
   metric: false
