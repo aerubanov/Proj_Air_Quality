@@ -28,9 +28,9 @@ class SensorSchema(Schema):
 
     @validates('press')
     def validate_press(self, value):
-        if value > 109000:
+        if value > 150000:
             raise ValidationError(f'Pressure very high: {value}')
-        if value < 85000:
+        if value < 50000:
             raise ValidationError(f'Pressure very low: {value}')
 
     @validates('hum')
@@ -57,7 +57,7 @@ class WeatherSchema(Schema):
     wind_dir = fields.List(fields.String, required=True)
     humidity = fields.List(fields.Float, required=True)
 
-    PERMISSIBLE_WIND_DIR = ['С', 'Ю', 'З', 'В', 'С-В', 'С-З', 'Ю-З', 'Ю-В']
+    PERMISSIBLE_WIND_DIR = ['С', 'Ю', 'З', 'В', 'С-В', 'С-З', 'Ю-З', 'Ю-В', 'ШТЛ']
 
     @validates('pressure')
     def validate_press(self, value):
