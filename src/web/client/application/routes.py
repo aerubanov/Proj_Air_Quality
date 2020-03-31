@@ -118,7 +118,7 @@ def sensors_graph():
     else:
         end_date = datetime.datetime.utcnow().isoformat('T')
 
-    data = requests.get('http://93.115.20.79:8080/sensor_data',
+    data = requests.get('http://api:8000/sensor_data',
                         json={"end_time": end_date,
                               "start_time": start_date}
                         )
@@ -164,7 +164,7 @@ def sensors_graph():
 
 @app.route('/graph/aqius')
 def aqius_graph():
-    data = requests.get('http://93.115.20.79:8080/sensor_data',
+    data = requests.get('http://api:8000/sensor_data',
                         json={"end_time": datetime.datetime.utcnow().isoformat('T'),
                               "start_time": (datetime.datetime.utcnow() - datetime.timedelta(days=3)).isoformat('T')}
                         )
@@ -190,7 +190,7 @@ def aqius_graph():
 
 @app.route('/graph/forecast')
 def forecast_graph():
-    data = requests.get('http://93.115.20.79:8080/forecast', json={})
+    data = requests.get('http://api:8000/forecast', json={})
     data = json.loads(data.text)
     df = pd.DataFrame(data)
     df['date'] = pd.to_datetime(df.date, utc=True)
