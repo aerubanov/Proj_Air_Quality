@@ -74,5 +74,18 @@ services:
     volumes:
       - "../../DATA/processed:/code/data"
 
+  web_client:
+    build:
+      context: ../../src
+      dockerfile: ./web/client/Dockerfile
+    container_name: web_client
+    networks:
+      - backend
+    ports:
+      - "8080:5000"
+    depends_on:
+      - api
+    command: gunicorn src.web.client.run:app -b 0.0.0.0:5000
+
 networks:
   backend:
