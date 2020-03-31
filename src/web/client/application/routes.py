@@ -1,14 +1,25 @@
-from flask import render_template
+from flask import render_template, request, session
 import altair as alt
 import datetime
 import requests
 import pandas as pd
 import json
+from flask_wtf import FlaskForm
+from wtforms.fields.html5 import DateField
+from wtforms.fields import SubmitField
 
 from src.web.client.application import app
 
+app.config['SECRET_KEY'] = 'secret'
+
+
+class DateForm(FlaskForm):
+    start_date = DateField('начальная дата', format='%Y-%m-%d')
+    end_date = DateField('конечная дата', format='%Y-%m-%d')
+    submit = SubmitField('Submit')
 
 # ------- Pages ----------------------
+
 
 @app.route('/')
 @app.route('/index')
@@ -19,6 +30,19 @@ def index():
 @app.route('/forecast')
 def forecast():
     return render_template('forecast.html')
+
+
+@app.route('/history', methods=['POST', 'GET'])
+def history():
+    form = DateForm()
+    if request.method == 'POST':
+        session['start_date'] = datetime.datetime.combine(form.start_date.data,
+                                                          datetime.datetime.min.time()).isoformat()
+        session['end_date'] = datetime.datetime.combine(form.end_date.data,
+                                                        datetime.datetime.min.time()).isoformat()
+        print(datetime.datetime.combine(form.start_date.data, datetime.datetime.min.time()), form.end_date.data)
+    return render_template('history.html', form=form)
+
 
 # -------- helper function -----------
 
@@ -82,9 +106,21 @@ nearest = alt.selection(type='single', nearest=True, on='mouseover',
 
 @app.route('/graph/sensors')
 def sensors_graph():
+    if 'start_date' in session:
+        start_date = session['start_date']
+        session.pop('start_date')
+    else:
+        start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=3)).isoformat('T')
+
+    if "end_date" in session:
+        end_date = session['end_date']
+        session.pop('end_date')
+    else:
+        end_date = datetime.datetime.utcnow().isoformat('T')
+
     data = requests.get('http://93.115.20.79:8080/sensor_data',
-                        json={"end_time": datetime.datetime.utcnow().isoformat('T'),
-                              "start_time": (datetime.datetime.utcnow() - datetime.timedelta(days=3)).isoformat('T')}
+                        json={"end_time": end_date,
+                              "start_time": start_date}
                         )
     data = json.loads(data.text)
     df = pd.DataFrame(data)

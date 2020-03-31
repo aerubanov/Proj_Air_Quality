@@ -17,3 +17,4 @@ flask
 codecov
 pytz
 altair
+Flask-WTF
