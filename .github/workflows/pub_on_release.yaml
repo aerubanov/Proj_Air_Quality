@@ -5,7 +5,7 @@ on:
 
 
 jobs:
- run_tests:
+ build:
    runs-on: [ubuntu-latest]
    env:
      LOGIN: ${{ secrets.DOCKER_LOGIN }}
@@ -13,6 +13,7 @@ jobs:
    steps:
     - name: Login to docker.io
       run:  echo ${{ secrets.DOCKER_PWD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
+    - uses: actions/checkout@master
     - name: Build loader
       run: docker-compose build loader
       working-directory: ./src/web
