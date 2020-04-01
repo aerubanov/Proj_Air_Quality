@@ -2,30 +2,32 @@ on:
  release:
    types: [published]
 
-env:
- LOGIN: ${{ secrets.DOCKER_LOGIN }}
- NAME: ${{ secrets.DOCKER_NAME }}
 
-steps:
- - name: Login to docker.io
-   run:  echo ${{ secrets.DOCKER_PWD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
- - uses: aerubanov/DS_for_Air@master
 
- - name: Build loader
-   run: docker-compose build loader
-   wirking-directory: ./src/web
- - name: Build api
-   run: docker-compose build api
-   wirking-directory: ./src/web
- - name: Build script
-   run: docker-compose build script
-   wirking-directory: ./src/web
- - name: Build ml
-   run: docker-compose build ml
-   wirking-directory: ./src/web
- - name: Build web_client
-   run: docker-compose build web_client
-   wirking-directory: ./src/web
+jobs:
+ run_tests:
+   runs-on: [ubuntu-latest]
+   env:
+     LOGIN: ${{ secrets.DOCKER_LOGIN }}
+     NAME: ${{ secrets.DOCKER_NAME }}
+   steps:
+    - name: Login to docker.io
+      run:  echo ${{ secrets.DOCKER_PWD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
+    - name: Build loader
+      run: docker-compose build loader
+      wirking-directory: ./src/web
+    - name: Build api
+      run: docker-compose build api
+      wirking-directory: ./src/web
+    - name: Build script
+      run: docker-compose build script
+      wirking-directory: ./src/web
+    - name: Build ml
+      run: docker-compose build ml
+      wirking-directory: ./src/web
+    - name: Build web_client
+      run: docker-compose build web_client
+      wirking-directory: ./src/web
 
  - name: Push image loader
    run: docker-compose push loader
