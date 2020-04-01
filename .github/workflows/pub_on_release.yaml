@@ -18,14 +18,14 @@ steps:
    run: docker-compose build api
    wirking-directory: ./src/web
  - name: Build script
-     run: docker-compose build script
-     wirking-directory: ./src/web
+   run: docker-compose build script
+   wirking-directory: ./src/web
  - name: Build ml
-     run: docker-compose build ml
-     wirking-directory: ./src/web
+   run: docker-compose build ml
+   wirking-directory: ./src/web
  - name: Build web_client
-     run: docker-compose build web_client
-     wirking-directory: ./src/web
+   run: docker-compose build web_client
+   wirking-directory: ./src/web
 
  - name: Push image loader
    run: docker-compose push loader
