@@ -1,0 +1,46 @@
+on:
+ release:
+   types: [published]
+
+
+
+jobs:
+ build:
+   runs-on: [ubuntu-latest]
+   env:
+     LOGIN: ${{ secrets.DOCKER_LOGIN }}
+     NAME: ${{ secrets.DOCKER_NAME }}
+   steps:
+    - name: Login to docker.io
+      run:  echo ${{ secrets.DOCKER_PWD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
+    - uses: actions/checkout@master
+    - name: Build loader
+      run: docker-compose build loader
+      working-directory: ./src/web
+    - name: Build api
+      run: docker-compose build api
+      working-directory: ./src/web
+    - name: Build script
+      run: docker-compose build script
+      working-directory: ./src/web
+    - name: Build ml
+      run: docker-compose build ml
+      working-directory: ./src/web
+    - name: Build web_client
+      run: docker-compose build web_client
+      working-directory: ./src/web
+    - name: Push image loader
+      run: docker-compose push loader
+      working-directory: ./src/web
+    - name: Push image api
+      run: docker-compose push api
+      working-directory: ./src/web
+    - name: Push image script
+      run: docker-compose push script
+      working-directory: ./src/web
+    - name: Push image ml
+      run: docker-compose push ml
+      working-directory: ./src/web
+    - name: Push image web_client
+      run: docker-compose push web_client
+      working-directory: ./src/web
