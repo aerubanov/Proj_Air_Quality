@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Период наблюдений</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.start_date.label}}<br>
+            {{ form.start_date(size=32) }}
+        </p>
+        <p>
+            {{ form.end_date.label }}<br>
+            {{ form.end_date(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+    <div class="charts text-center">
+        <h2> Концентрация частиц </h2>
+    </div>
+
+    <div class="charts text-center">
+    <div id="vis_sens">
+        <script type="text/javascript">
+        var spec = "/graph/sensors";
+        vegaEmbed('#vis_sens', spec).then(function(result) {
+            // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+        }).catch(console.error);
+        </script>
+    </div>
+    </div>
+{% endblock %}
