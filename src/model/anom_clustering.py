@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import typing
 import warnings
+import matplotlib.pyplot as plt
 
 from src.features.preproc_anom import prepare_features
 
@@ -133,6 +134,56 @@ class AnomalyCluster:
         return clusters
 
 
+def plot_distribution(anomalies):
+    f, axs = plt.subplots(2, 4, figsize=(30, 15))
+    n_clast = num_clusters
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].P1.hist(ax=axs[0, 0], alpha=0.6, label=f'cluster {i}', density=True)
+    axs[0, 0].set_title('Концентрация PM2.5')
+    axs[0, 0].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].P2.hist(ax=axs[0, 1], alpha=0.6, label=f'cluster {i}', density=True)
+    axs[0, 1].set_title('Концентрация PM10')
+    axs[0, 1].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].humidity.hist(ax=axs[0, 2], alpha=0.6, label=f'cluster {i}', density=True)
+    axs[0, 2].set_title('Влажность')
+    axs[0, 2].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].temperature.hist(ax=axs[0, 3], alpha=0.6, label=f'cluster {i}',
+                                                           density=True)
+    axs[0, 3].set_title('Температура')
+    axs[0, 3].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].wind_speed.hist(ax=axs[1, 0], bins=10, alpha=0.6, label=f'cluster {i}',
+                                                          density=True)
+    axs[1, 0].set_title('Скорость ветра')
+    axs[1, 0].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].prec_amount.hist(ax=axs[1, 1], bins=20, alpha=0.6, label=f'cluster {i}',
+                                                           density=True)
+    axs[1, 1].set_title('Кол-во осадков')
+    axs[1, 1].set_xlim([0, 1])
+    axs[1, 1].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].dew_point_temp.hist(ax=axs[1, 2], alpha=0.6, label=f'cluster {i}',
+                                                              density=True)
+    axs[1, 2].set_title('Точка росы')
+    axs[1, 2].legend(loc='best')
+
+    for i in range(n_clast):
+        anomalies[anomalies.cluster == i].resid.hist(ax=axs[1, 3], alpha=0.6, label=f'cluster {i}', density=True)
+    axs[1, 3].set_title('Residual')
+    axs[1, 3].legend(loc='best')
+    plt.savefig('images/clusters_distribution.png')
+
+
 def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
     data = pd.read_csv(dataset_file, parse_dates=['date'])
     data = data.set_index('date')
@@ -150,6 +201,13 @@ def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
         pickle.dump(pca, f)
     with open(metric_file, "w") as f:
         json.dump({'pca_score': pca_score, 'clustering_score': score, 'silhouette_score': silh_score}, f)
+    anomalies['cluster'] = km.labels_
+    anom = anomalies_list[0]
+    anom['cluster'] = anomalies.cluster.values[0]
+    for i in range(1, len(anomalies_list)):
+        anomalies_list[i]['cluster'] = anomalies.cluster.values[i]
+        anom = anom.append(anomalies_list[i])
+    plot_distribution(anom)
     return pca, km
 
 
