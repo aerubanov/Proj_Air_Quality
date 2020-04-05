@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Период наблюдений</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.start_date.label}}<br>
+            {{ form.start_date(size=32) }}
+        </p>
+        <p>
+            {{ form.end_date.label }}<br>
+            {{ form.end_date(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+    <div class="charts text-center">
+        <h2> Концентрация частиц и аномалии </h2>
+    </div>
+
+    <div class="charts text-center">
+    <div id="vis_sens">
+        <script type="text/javascript">
+        var spec = "/graph/anomalies";
+        vegaEmbed('#vis_sens', spec).then(function(result) {
+            // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
+        }).catch(console.error);
+        </script>
+    </div>
+    </div>
+
+    <div class="charts text-center">
+        <h2> Распределение признаков для различных кластеров</h2>
+        <img src={{url_for('static', filename='images/clusters_distribution.png')}} alt="Distribution" style="width:1200px;height:700px;">
+        <p align="justify">
+        Таким образом, для кластеров 0, 2 характерно понижение значения концентрации частиц, а для 1 и 3 повышение.
+        Причем для кластера 1 харакетерно существенное отличие распределений PM10 и PM2.5.<br>
+
+        Так же для кластера 1 характерны высокая влажность, невысокая темпераура, наличие осадков и более высокая
+        температруры точки росы. Поэтому аномалии из этого кластера можно интерпретировать
+        как завышенные показания датчиков из-за наличия в воздухе частиц воды.
+
+        Кластер 3 харатеризуется высокими концентрациями частиц Р1 и Р2 при относительно низкой скорости
+        ветра и небольшом количестве осадков, что позволяет сделать вывод о повышенной концентрации
+        пыли в воздухе для аномалий этого типа.<br>
+
+        Кластера 0 и 2 характеризуются низкой концентрацией частиц, что обусловлено наличием
+        в этих кластерах отрезков времени с высокой скоростью ветра. Кроме того, в кластере 2
+        в качестве дополнительного фактора, приводящего к снижению концентрации
+        частиц можно рассматривать наличие высоких значений количества выпавщих осадков. <br>
+        </p>
+
+    </div>
+{% endblock %}
