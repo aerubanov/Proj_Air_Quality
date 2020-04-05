@@ -17,6 +17,7 @@ class DateForm(FlaskForm):
     end_date = DateField('конечная дата', format='%Y-%m-%d')
     submit = SubmitField('Submit')
 
+
 # ------- Pages ----------------------
 
 
@@ -40,6 +41,17 @@ def history():
         session['end_date'] = datetime.datetime.combine(form.end_date.data,
                                                         datetime.datetime.min.time()).isoformat()
     return render_template('history.html', form=form)
+
+
+@app.route('/anomalies', methods=['POST', 'GET'])
+def anomalies():
+    form = DateForm()
+    if request.method == 'POST':
+        session['start_date'] = datetime.datetime.combine(form.start_date.data,
+                                                          datetime.datetime.min.time()).isoformat()
+        session['end_date'] = datetime.datetime.combine(form.end_date.data,
+                                                        datetime.datetime.min.time()).isoformat()
+    return render_template('anomalies.html', form=form)
 
 
 # -------- Graphs --------------------
@@ -185,3 +197,67 @@ def forecast_graph():
                            data=df,
                            width=WIDTH, height=HEIGHT)
     return conc_chart.to_json()
+
+
+@app.route('/graph/anomalies')
+def anomalies_graph():
+    if 'start_date' in session:
+        start_date = datetime.datetime.fromisoformat(session['start_date'])
+        session.pop('start_date')
+    else:
+        start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=3))
+
+    if "end_date" in session:
+        end_date = datetime.datetime.fromisoformat(session['end_date'])
+        session.pop('end_date')
+    else:
+        end_date = datetime.datetime.utcnow()
+    interval = end_date - start_date
+    start_date = start_date.isoformat('T')
+    end_date = end_date.isoformat('T')
+
+    data = requests.get(app.config['API_URL'] + 'sensor_data',
+                        json={"end_time": end_date,
+                              "start_time": start_date}
+                        )
+    data = json.loads(data.text)
+    df = pd.DataFrame(data)
+    df = df[['date', 'p1']]
+    df['date'] = pd.to_datetime(df.date, utc=True)
+    df = df.set_index('date')
+
+    if interval > datetime.timedelta(days=5):
+        df = df.resample('0.5H').mean()
+    if interval > datetime.timedelta(days=15):
+        df = df.resample('1H').mean()
+
+    anom_resp = requests.get(app.config['API_URL'] + 'anomaly',
+                             json={"end_time": end_date,
+                                   "start_time": start_date}
+                             )
+    anom_data = json.loads(anom_resp.text)
+    anom_df = pd.DataFrame(columns=['p1', 'cluster'])
+
+    for item in anom_data:
+        temp = df[item['start_date']:item['end_date']]
+        temp['cluster'] = item['cluster']
+        anom_df = anom_df.append(temp)
+
+    #print(anom_df)
+
+    df = df.reset_index()
+    anom_df = anom_df.reset_index()
+    print(anom_df)
+    line = alt.Chart(data=df).mark_line(interpolate='basis').encode(
+        x=alt.X('date:T', axis=alt.Axis(title='Date')),
+        y=alt.Y('p1:Q', axis=alt.Axis(title='Concentration [g/m^3]'))
+    ).interactive()
+
+    bar = alt.Chart(data=anom_df).mark_bar().encode(
+        x=alt.X('index:T'),
+        y=alt.Y('p1:Q'),
+        color='cluster:N'
+    ).interactive()
+
+    chart = alt.layer(line, bar, width=WIDTH, height=HEIGHT)
+    return chart.to_json()
