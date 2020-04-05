@@ -1,4 +1,4 @@
-from flask import render_template, request, session
+from flask import render_template, request, session, url_for
 import altair as alt
 import datetime
 import requests
@@ -247,16 +247,20 @@ def anomalies_graph():
 
     df = df.reset_index()
     anom_df = anom_df.reset_index()
-    print(anom_df)
+
     line = alt.Chart(data=df).mark_line(interpolate='basis').encode(
         x=alt.X('date:T', axis=alt.Axis(title='Date')),
         y=alt.Y('p1:Q', axis=alt.Axis(title='Concentration [g/m^3]'))
+
     ).interactive()
+
+    range_ = ['#78add2', '#ffb26e', '#80c680', '#e67d7e']
+    domain = [0, 1, 2, 3]
 
     bar = alt.Chart(data=anom_df).mark_bar().encode(
         x=alt.X('index:T'),
         y=alt.Y('p1:Q'),
-        color='cluster:N'
+        color=alt.Color('cluster:N', scale=alt.Scale(domain=domain, range=range_))
     ).interactive()
 
     chart = alt.layer(line, bar, width=WIDTH, height=HEIGHT)

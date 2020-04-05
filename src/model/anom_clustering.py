@@ -181,7 +181,8 @@ def plot_distribution(anomalies):
         anomalies[anomalies.cluster == i].resid.hist(ax=axs[1, 3], alpha=0.6, label=f'cluster {i}', density=True)
     axs[1, 3].set_title('Residual')
     axs[1, 3].legend(loc='best')
-    plt.savefig('images/clusters_distribution.png')
+    plt.savefig('src/web/client/application/static/images/clusters_distribution.png',
+                clear=True, bbox_inches='tight')
 
 
 def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
