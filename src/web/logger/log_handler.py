@@ -11,6 +11,7 @@ class LogDBHandler(logging.Handler):
 
     def __init__(self):
         super().__init__()
+        print(DATABASE)
         engine = create_engine(DATABASE)
         Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)

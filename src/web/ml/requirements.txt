@@ -4,3 +4,4 @@ sqlalchemy
 sklearn
 psycopg2
 statsmodels
+matplotlib
