@@ -11,8 +11,6 @@ from wtforms.fields import SubmitField
 from src.web.client.application import app
 from src.web.client.application.helper_functions import pm25_to_aqius, aqi_level
 
-app.config['SECRET_KEY'] = 'secret'
-
 
 class DateForm(FlaskForm):
     start_date = DateField('начальная дата', format='%Y-%m-%d')
@@ -41,7 +39,6 @@ def history():
                                                           datetime.datetime.min.time()).isoformat()
         session['end_date'] = datetime.datetime.combine(form.end_date.data,
                                                         datetime.datetime.min.time()).isoformat()
-        print(datetime.datetime.combine(form.start_date.data, datetime.datetime.min.time()), form.end_date.data)
     return render_template('history.html', form=form)
 
 
@@ -56,18 +53,21 @@ nearest = alt.selection(type='single', nearest=True, on='mouseover',
 @app.route('/graph/sensors')
 def sensors_graph():
     if 'start_date' in session:
-        start_date = session['start_date']
+        start_date = datetime.datetime.fromisoformat(session['start_date'])
         session.pop('start_date')
     else:
-        start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=3)).isoformat('T')
+        start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=3))
 
     if "end_date" in session:
-        end_date = session['end_date']
+        end_date = datetime.datetime.fromisoformat(session['end_date'])
         session.pop('end_date')
     else:
-        end_date = datetime.datetime.utcnow().isoformat('T')
+        end_date = datetime.datetime.utcnow()
+    interval = end_date - start_date
+    start_date = start_date.isoformat('T')
+    end_date = end_date.isoformat('T')
 
-    data = requests.get('http://api:8000/sensor_data',
+    data = requests.get(app.config['API_URL'] + 'sensor_data',
                         json={"end_time": end_date,
                               "start_time": start_date}
                         )
@@ -76,6 +76,12 @@ def sensors_graph():
     df = df[['date', 'p1', 'p2']]
     df['date'] = pd.to_datetime(df.date, utc=True)
     df = df.set_index('date')
+
+    if interval > datetime.timedelta(days=5):
+        df = df.resample('0.5H').mean()
+    if interval > datetime.timedelta(days=15):
+        df = df.resample('1H').mean()
+
     df = df.reset_index().melt('date', var_name='series', value_name='y')
 
     line = alt.Chart().mark_line(interpolate='basis').encode(
@@ -113,7 +119,7 @@ def sensors_graph():
 
 @app.route('/graph/aqius')
 def aqius_graph():
-    data = requests.get('http://api:8000/sensor_data',
+    data = requests.get(app.config['API_URL'] + 'sensor_data',
                         json={"end_time": datetime.datetime.utcnow().isoformat('T'),
                               "start_time": (datetime.datetime.utcnow() - datetime.timedelta(days=3)).isoformat('T')}
                         )
@@ -139,7 +145,7 @@ def aqius_graph():
 
 @app.route('/graph/forecast')
 def forecast_graph():
-    data = requests.get('http://api:8000/forecast', json={})
+    data = requests.get(app.config['API_URL'] + 'forecast', json={})
     data = json.loads(data.text)
     df = pd.DataFrame(data)
     df['date'] = pd.to_datetime(df.date, utc=True)
