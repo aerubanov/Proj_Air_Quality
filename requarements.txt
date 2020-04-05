@@ -18,3 +18,4 @@ codecov
 pytz
 altair
 Flask-WTF
+matplotlib
