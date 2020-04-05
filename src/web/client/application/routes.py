@@ -243,8 +243,6 @@ def anomalies_graph():
         temp['cluster'] = item['cluster']
         anom_df = anom_df.append(temp)
 
-    #print(anom_df)
-
     df = df.reset_index()
     anom_df = anom_df.reset_index()
 
