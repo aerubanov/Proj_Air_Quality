@@ -1,4 +1,4 @@
-from flask import render_template, request, session, url_for
+from flask import render_template, request, session, url_for, g
 import altair as alt
 import datetime
 import requests
@@ -7,9 +7,12 @@ import json
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
 from wtforms.fields import SubmitField
+import logging.config
+import time
 
 from src.web.client.application import app
 from src.web.client.application.helper_functions import pm25_to_aqius, aqi_level
+from src.web.logger.logging_config import LOGGING_CONFIG
 
 
 class DateForm(FlaskForm):
@@ -17,6 +20,29 @@ class DateForm(FlaskForm):
     end_date = DateField('конечная дата', format='%Y-%m-%d')
     submit = SubmitField('Submit')
 
+
+def get_logger():
+    if 'log' not in g:
+        logging.config.dictConfig(LOGGING_CONFIG)
+        logger = logging.getLogger('ClientLogger')
+        g.log = logger
+    return g.log
+
+
+@app.before_request
+def before_request():
+    g.start = time.time()
+
+
+@app.after_request
+def after_request(response):
+    if app.config['DEBUG']:
+        return response
+    resp_time = (time.time() - g.start) * 1000  # время ответа сервера в миллисекндах
+    logger = get_logger()
+    logger.info(f'path: {request.path} - method: {request.method} - remote: {request.remote_addr} '
+                f'- json: {request.json} - status: {response.status} - time: {resp_time}')
+    return response
 
 # ------- Pages ----------------------
 
