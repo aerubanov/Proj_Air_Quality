@@ -3,7 +3,7 @@ import pandas as pd
 from src.features.preproc_anom import prepare_features
 from src.model.anom_clustering import sel_columns
 
-test_data = 'src/model/tests/data/test_dataset.csv'
+test_data = 'tests/model/data/test_dataset.csv'
 
 
 def test_prepare_features_smoke():

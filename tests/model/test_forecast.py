@@ -5,7 +5,7 @@ from src.model.forecast import ForecastModel
 
 p1_file = 'models/p1_forecast.obj'
 p2_file = 'models/p2_forecast.obj'
-data_file = 'src/model/tests/data/test_dataset_2.csv'
+data_file = 'tests/model/data/test_dataset_2.csv'
 
 
 def test_forecast_model_smoke():

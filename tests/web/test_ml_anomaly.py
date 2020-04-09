@@ -81,7 +81,7 @@ def test_combine_data():
 
 
 def test_extract_anomalies():
-    data = pd.read_csv('src/web/tests/data/test_dataset_3.csv', parse_dates=['date'])
+    data = pd.read_csv('tests/web/data/test_dataset_3.csv', parse_dates=['date'])
     data = data.set_index('date')
     anom_list = extract_anomalies(data)
     for i in anom_list:

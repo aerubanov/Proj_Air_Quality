@@ -8,7 +8,7 @@ from src.web.models.model import Sensors, Anomaly
 
 
 def test_load_data():
-    data = load_sensor_data('src/web/tests/data/test_dataset_1.csv')
+    data = load_sensor_data('tests/web/data/test_dataset_1.csv')
     assert data.index[0].to_pydatetime() == datetime.datetime(2019, 4, 1, 3, 0)
     assert math.isclose(data.p1[0], 6.647142857142856, rel_tol=1e-09)
     assert math.isclose(data.p2[0], 2.8817857142857144, rel_tol=1e-09)
@@ -18,13 +18,13 @@ def test_load_data():
 
 
 def test_last_date_sensors():
-    data = load_sensor_data('src/web/tests/data/test_dataset_1.csv')
+    data = load_sensor_data('tests/web/data/test_dataset_1.csv')
     last_date = get_last_date_sensors(data)
     assert last_date == datetime.datetime(2019, 4, 1, 3, 10)
 
 
 def test_last_date_anomalies():
-    data = pd.read_csv('src/web/tests/data/test_anomalies.csv', parse_dates=['start_date', 'end_date'])
+    data = pd.read_csv('tests/web/data/test_anomalies.csv', parse_dates=['start_date', 'end_date'])
     last_date = get_last_date_anomalies(data)
     assert last_date == datetime.datetime(2019, 4, 6, 8, 50)  # 2019-04-06 08:50:00
 
@@ -66,7 +66,7 @@ def test_write_data(database_session):
     entry = Sensors(date=datetime.datetime(2019, 4, 1, 3, 10, 15))
     database_session.add(entry)
     database_session.commit()
-    data = load_sensor_data('src/web/tests/data/test_dataset_1.csv')
+    data = load_sensor_data('tests/web/data/test_dataset_1.csv')
     write_data(data, database_session, 'sensors')
     res = database_session.query(Sensors).all()
     assert len(res) == len(data) + 1
