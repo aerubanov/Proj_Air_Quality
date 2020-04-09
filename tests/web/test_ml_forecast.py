@@ -4,7 +4,7 @@ import pandas as pd
 from src.web.ml.forecast import perform_forecast
 from src.web.models.model import Forecast
 
-test_data = 'src/web/tests/data/test_dataset_2.csv'
+test_data = 'tests/web/data/test_dataset_2.csv'
 
 
 def test_perform_forecast(database_session):

@@ -3,7 +3,7 @@ import pickle
 from src.model.extract_anomalies import extract_anom
 from src.model.anom_clustering import num_clusters
 
-test_data = 'src/model/tests/data/test_dataset.csv'
+test_data = 'tests/model/data/test_dataset.csv'
 pca_model_file = 'models/pca.obj'
 kmean_model_file = 'models/kmean.obj'
 
