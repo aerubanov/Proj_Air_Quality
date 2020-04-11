@@ -13,6 +13,15 @@ API methods provide access to data. To use it, you should send http-request on
 
  Get all sensor data from time interval between start_time and and time.
 
+ Return:
+  [{'date': <iso-format datetime>,
+  'p1': <float>,
+  'p2': <float>,
+  'temperature': <float>,
+  'humidity': <float>,
+  'pressure':  <float>,
+  }, ... ]
+
 /forecast, method: GET
 ----------------------
  JSON
@@ -23,6 +32,16 @@ API methods provide access to data. To use it, you should send http-request on
  Get latest available forecast for particles concentration P1 and P2. If start_time
  and end_time arguments passed, all forecasts generated it this time interval return.
 
+ Return:
+  [{'date': <iso-format datetime>,
+  'p1': <float>,
+  'p2': <float>,
+  'forward_time': <int>,
+  }, ...]
+
+
+
+
 /anomaly, method: GET
 -----------------------
  JSON
@@ -31,3 +50,9 @@ API methods provide access to data. To use it, you should send http-request on
   'end_time': '<iso-format datetime>'
 
  Get all detected anomalies that fully or partially in range between start_time and end_time.
+
+ Return:
+  [{'start_date': <iso-format datetime>,
+  'end_date': <iso-format datetime>,
+  'cluster': <int>,
+  }, ... ]
