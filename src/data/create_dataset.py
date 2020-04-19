@@ -74,7 +74,7 @@ def average_sensors(data_folder: str, start_date: datetime.date,
             new_data.reindex(idx, fill_value=None)
             sds_data['P1_' + str(s_id)] = new_data.P1
             sds_data['P2_' + str(s_id)] = new_data.P2
-        except (EmptyDataError, ParserError) as e:
+        except (EmptyDataError, ParserError, KeyError) as e:
             print(f, str(e))
 
     sens = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
