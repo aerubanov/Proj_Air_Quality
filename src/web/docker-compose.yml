@@ -91,6 +91,8 @@ services:
       - "80:5000"
     depends_on:
       - api
+    volumes:
+      - "./logs:/code/logs"
     command: gunicorn src.web.client.run:app -b 0.0.0.0:5000
 
 networks:
