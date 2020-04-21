@@ -6,6 +6,7 @@ from src.web.loader.sensor_loading import load_sensors
 from src.web.loader.weather_loading import parse_weather
 from src.web.models.model import Sensors, Weather
 from src.web.loader.validation import SensorSchema, WeatherSchema
+from src.web.loader.mosecom_loading import load_data, write_processed, write_raw_data
 
 sensor_schema = SensorSchema()
 weather_schema = WeatherSchema()
@@ -74,3 +75,12 @@ def weather_task(session, logger=None):
     resp_time = (time.time() - start_time) * 1000  # time in milliseconds
     if logger is not None:
         logger.info('%s %s', 'weather data saved in database', f'timing: {resp_time}')
+
+
+def mosecom_task(logger=None):
+    p1_data, p2_data = load_data()
+    write_raw_data(p1_data, 'P1')
+    write_raw_data(p2_data, 'P2')
+    write_processed(p1_data, p2_data)
+    if logger is not None:
+        logger.info('%s', 'write mosecom data in file')

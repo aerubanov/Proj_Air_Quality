@@ -1,0 +1,7 @@
+md5: 81ff3ab2f5f34cc2e9b0f536855d2cf3
+outs:
+- md5: fa26b8d61a5d1465c1fff79df49fdce2.dir
+  path: mosecom
+  cache: true
+  metric: false
+  persist: false
