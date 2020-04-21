@@ -2,3 +2,4 @@ flask
 altair
 requests
 Flask-WTF
+sqlalchemy
