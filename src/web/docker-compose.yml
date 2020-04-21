@@ -28,7 +28,7 @@ services:
     depends_on:
             - PostgreSQL
     volumes:
-      - "../../DATA/processed:/code/data"
+      - "../../DATA:/code/DATA"
       - "./logs:/code/logs"
 
   api:
