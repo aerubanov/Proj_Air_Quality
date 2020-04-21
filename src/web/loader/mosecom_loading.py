@@ -34,7 +34,7 @@ def write_raw_data(data: List, data_type: str):
         if not os.path.exists(path):
             # create file for data
             with open(path, 'w') as file:
-                writer = csv.DictWriter(file, fieldnames=['date','pdk', 'norma'])
+                writer = csv.DictWriter(file, fieldnames=['date', 'pdk', 'norma'])
                 writer.writeheader()
             # add info about station location in list
             with open(os.path.join(processed_path, 'mosecom_station.csv'), 'a') as file:
@@ -88,6 +88,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
