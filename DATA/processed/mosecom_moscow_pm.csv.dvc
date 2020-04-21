@@ -1,6 +1,6 @@
-md5: 901135ed827191610dce728f0dbf396e
+md5: 630d43bf4acaf17d349540bd0b2d9b68
 outs:
-- md5: 508f1ee493e109c0865c22429ab7eaa7
+- md5: 4baea7bbc8e10af6467333596e8168d9
   path: mosecom_moscow_pm.csv
   cache: true
   metric: false
