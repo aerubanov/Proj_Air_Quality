@@ -16,9 +16,10 @@ test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                    </th><th><a href="?C=S;O=A">Size</a></th><th><a href="?C=D;O=A">Description</a>
                    </th></tr>
                    <tr><th colspan="5"><hr></th></tr>
-                <tr><td valign="top"><img src="/icons/back.gif" alt="[PARENTDIR]"></td><td>
-                    <a href="/">Parent Directory</a></td><td>&nbsp;</td>
-                    <td align="right">  - </td><td>&nbsp;</td></tr>
+                <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
+                    <a href="2019-12-02">Parrent</a>
+                    </td><td align="right">2019-12-03 01:46  </td><td align="right"> 39K</td>
+                    <td>&nbsp;</td></tr>
                 <tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td>
                     <a href="2019-12-02_csv1">2019-12-02_bme280_sensor_141.csv</a>
                     </td><td align="right">2019-12-03 01:46  </td><td align="right"> 39K</td>
@@ -52,22 +53,22 @@ test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 
 def test_get_links(tmpdir, requests_mock):
     date = datetime.datetime(2019, 12, 2)
-    requests_mock.get('http://archive.luftdaten.info/2019-12-02/',
+    requests_mock.get('https://archive.sensor.community/2019-12-02/',
                       text=test_html)
     p = tmpdir.mkdir("data").join("test_links.txt")
     data = ''  # no already seen files
     p.write(data)
     links = get_links(date.date(), p)
     assert links == [
-        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv1',
-        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
-        'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3',
+        'https://archive.sensor.community/2019-12-02/2019-12-02_csv1',
+        'https://archive.sensor.community/2019-12-02/2019-12-02_csv2',
+        'https://archive.sensor.community/2019-12-02/2019-12-02_csv3',
     ]
     data = "2019-12-02_csv1"  # already seen first file
     p.write(data)
     links = get_links(date.date(), p)
-    assert links == ['http://archive.luftdaten.info/2019-12-02/2019-12-02_csv2',
-                     'http://archive.luftdaten.info/2019-12-02/2019-12-02_csv3']
+    assert links == ['https://archive.sensor.community/2019-12-02/2019-12-02_csv2',
+                     'https://archive.sensor.community/2019-12-02/2019-12-02_csv3']
     assert p.read() == data
 
 
