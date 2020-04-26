@@ -31,6 +31,7 @@ def get_links(for_date, links_file):
         links = [i for i in links if str(for_date) in i and i[10:] not in checked_links]
         links = [url+i for i in links]
         links = [i for i in links if 'indoor' not in i]
+        links = links[1:] # first links is reference on parrent folder
     return links
 
 
