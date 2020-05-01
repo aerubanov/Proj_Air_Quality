@@ -109,7 +109,7 @@ def get_sensor_data(data_folder: str) -> (pd.DataFrame, pd.DataFrame):
     hum_data = combine_data(bme_files, 'humidity')
 
     perc_p1 = calc_percentiles(p1_data, 'P1')
-    perc_p2 = calc_percentiles(p2_data, 'P1')
+    perc_p2 = calc_percentiles(p2_data, 'P2')
     perc_press = calc_percentiles(press_data, 'pressure')
     perc_hum = calc_percentiles(hum_data, 'humidity')
     perc_temp = calc_percentiles(temp_data, 'temperature')
@@ -152,6 +152,7 @@ def main():
     avg_data.index = avg_data.index.tz_localize(tz="UTC")
     meteo_data = get_weather_data(os.path.join(WATHER_DATA_FOLDER, WATHER_FILE))
     data = pd.concat((avg_data, meteo_data), axis=1)
+    data.index.name = 'date'
     data.to_csv('DATA/processed/dataset.csv')
     sensors.to_csv('DATA/processed/sensors.csv')
 
