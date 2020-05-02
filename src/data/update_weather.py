@@ -6,22 +6,22 @@ import gzip
 from bs4 import BeautifulSoup
 import re
 
-from src.data.config import WATHER_DATA_FOLDER, WATHER_FILE
-from src.data.config import WATHER_URL1, WATHER_URL2
+from src.data.config import WEATHER_DATA_FOLDER, WEATHER_FILE
+from src.data.config import WEATHER_URL1, WEATHER_URL2
 
 # DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
 DEFAULT_DATE = datetime.date(2019, 4, 1)
 
 
-def check_file(fname, data_folder=WATHER_DATA_FOLDER):
+def check_file(fname, data_folder=WEATHER_DATA_FOLDER):
     """
-    checking existing wather data
+    checking existing weather data
     :param fname: file name for checking
     :param data_folder: path to folder
     :return: (True, last_date) if file with data exist, (False, None) otherwise
     """
     try:
-        f = open(os.path.join(data_folder, fname), 'r')
+        f = open(os.path.join(data_folder, fname), 'r', encoding="utf-8")
         reader = csv.DictReader(f, delimiter=";")
         try:
             row = next(reversed(list(reader)))
@@ -42,9 +42,9 @@ def check_file(fname, data_folder=WATHER_DATA_FOLDER):
 def get_link(start_date: datetime.date, end_date: datetime.date):
     date1 = f'{start_date.day}.{start_date.month}.{start_date.year}'
     date2 = f'{end_date.day}.{end_date.month}.{end_date.year}'
-    resp = requests.get(WATHER_URL1)
+    resp = requests.get(WEATHER_URL1)
     php_id = resp.cookies.get_dict()["PHPSESSID"]
-    my_url = WATHER_URL2
+    my_url = WEATHER_URL2
     my_header = {}
     my_header["Accept"] = "text/html, */*; q=0.01"
     my_header["Accept-Encoding"] = "gzip, deflate, br"
@@ -91,16 +91,18 @@ def download_data(link):
               }
     resp = requests.get(url=link, headers=header, stream=True)
     # file = gzip.GzipFile(resp.content, 'rb')
-    with open('download_wather_data.gz', 'wb') as f:
+    with open('download_weather_data.gz', 'wb') as f:
         f.write(resp.content)
-    with gzip.open('download_wather_data.gz') as g:
+    with gzip.open('download_weather_data.gz') as g:
         data = g.read().decode('utf-8')
-    os.remove('download_wather_data.gz')
+    os.remove('download_weather_data.gz')
     return data
 
 
 def main(datafile: str):
     file_exist, start_date = check_file(datafile)
+    print(file_exist)
+    exit()
     if start_date is None:
         start_date = DEFAULT_DATE
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
@@ -110,14 +112,14 @@ def main(datafile: str):
     data = download_data(link).splitlines()
     data = data[6:]  # skip header
     if not file_exist:
-        with open(os.path.join(WATHER_DATA_FOLDER, datafile), "w") as f:
+        with open(os.path.join(WEATHER_DATA_FOLDER, datafile), "w") as f:
             f.write(data[0])
-    with open(os.path.join(WATHER_DATA_FOLDER, datafile), 'a') as f:
+    with open(os.path.join(WEATHER_DATA_FOLDER, datafile), 'a') as f:
         for i in reversed(data[1:]):
             f.write(i+'\n')
 
 
 if __name__ == '__main__':
-    main(WATHER_FILE)
-    with open('last_wather_update.txt', 'w') as f:
+    main(WEATHER_FILE)
+    with open('last_weather_update.txt', 'w') as f:
         f.write(str(datetime.date.today()))

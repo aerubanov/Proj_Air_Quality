@@ -6,5 +6,5 @@ __pycache__/
 /last_data_update.txt
 .vscode/
 /last_links_update.txt
-/last_wather_update.txt
+/last_weather_update.txt
 test_db.db

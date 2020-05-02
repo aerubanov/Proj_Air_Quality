@@ -1,0 +1,7 @@
+md5: 3205b5ff61ed6b4e7c886e43d6d01bb8
+outs:
+- md5: 6a7233b0d59f0756be0544eeb1ccae47.dir
+  path: weather
+  cache: true
+  metric: false
+  persist: false

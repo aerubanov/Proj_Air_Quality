@@ -309,3 +309,8 @@ _sds011_sensor_41109.csv
 _sds011_sensor_45366.csv
 _sds011_sensor_45470.csv
 _sds011_sensor_45378.csv
+_dht22_sensor_45603.csv
+_sds011_sensor_45568.csv
+_sds011_sensor_45570.csv
+_sds011_sensor_45600.csv
+_sds011_sensor_45602.csv

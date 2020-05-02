@@ -3,13 +3,13 @@ cmd: python -m src.data.create_dataset
 wdir: ..
 deps:
 - md5: 2a7e496b1243fbe0c04f7b4e25d8e22b.dir
-  path: DATA/raw/wather
+  path: DATA/raw/weather
 - md5: e2671b36f98bcd430eac4ffbd036c294.dir
   path: DATA/raw/sensors
 - md5: 8b2bda1bffc9b90f399d7958bd051278
   path: last_data_update.txt
 - md5: 8b2bda1bffc9b90f399d7958bd051278
-  path: last_wather_update.txt
+  path: last_weather_update.txt
 - md5: e22d64ee12de030c49f7801560f6ad8c
   path: src/data/create_dataset.py
 outs:
