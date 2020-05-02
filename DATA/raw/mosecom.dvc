@@ -1,6 +1,6 @@
-md5: 72305b3b67be8e7c2d51acbbb09a05fe
+md5: 25c4ed64c465037020a6409cb0edca28
 outs:
-- md5: 34562b41441e8c8021cb4074219a7912.dir
+- md5: c82d534e17468a26f43b943bb7265aa1.dir
   path: mosecom
   cache: true
   metric: false
