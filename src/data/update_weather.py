@@ -112,7 +112,7 @@ def main(datafile: str):
     if not file_exist:
         with open(os.path.join(WEATHER_DATA_FOLDER, datafile), "w") as f:
             f.write(data[0])
-    with open(os.path.join(WEATHER_DATA_FOLDER, datafile), 'a') as f:
+    with open(os.path.join(WEATHER_DATA_FOLDER, datafile), 'a', encoding='utf-8') as f:
         for i in reversed(data[1:]):
             f.write(i+'\n')
 
