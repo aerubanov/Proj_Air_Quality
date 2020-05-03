@@ -101,8 +101,6 @@ def download_data(link):
 
 def main(datafile: str):
     file_exist, start_date = check_file(datafile)
-    print(file_exist)
-    exit()
     if start_date is None:
         start_date = DEFAULT_DATE
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
