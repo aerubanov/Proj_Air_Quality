@@ -1,11 +1,11 @@
-md5: 88e5e358159fd906f0c4709e1396ec12
+md5: 7b7e81fbe0b25df7f50bb292ac5c1b2d
 cmd: python -m src.data.update_weather
 wdir: ..
 deps:
-- md5: 1cecba99466456ccc70c604e6db5de4f
+- md5: f88f5a02efdad85bdadfb307c801f90a
   path: src/data/update_weather.py
 outs:
-- md5: 8b2bda1bffc9b90f399d7958bd051278
+- md5: fbfc749736a09669896b331ba42d86b6
   path: last_weather_update.txt
   cache: true
   metric: false

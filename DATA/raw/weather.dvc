@@ -1,6 +1,6 @@
-md5: 3205b5ff61ed6b4e7c886e43d6d01bb8
+md5: ba55aaa7e347161b88f0225c7b58aaed
 outs:
-- md5: 6a7233b0d59f0756be0544eeb1ccae47.dir
+- md5: c5ed8fb91aa18a96efd36306a0d654c0.dir
   path: weather
   cache: true
   metric: false
