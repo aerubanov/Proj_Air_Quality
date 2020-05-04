@@ -1,10 +1,10 @@
-md5: ea796f75d05ac4c6669564002bc95510
+md5: 2314a15ab4d52e38a747e1e6ba874ee0
 cmd: python -m src.model.anom_clustering
 wdir: ..
 deps:
-- md5: 4c3b2fd246c3ff2158c483e827cb539b
+- md5: b95364a9990f7aa9fbfdf79fcef1c2a6
   path: DATA/processed/dataset.csv
-- md5: c01ceaa984fddd0edeb2e86353d4bf84
+- md5: 33d6ff2b3a9897e8645fc7e9fc216632
   path: src/features/preproc_anom.py
 - md5: 02a5af3565d644392af472cf050c607d
   path: src/model/anom_clustering.py
