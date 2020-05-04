@@ -63,7 +63,7 @@ def test_get_sensor_loc():
 
 
 def test_get_weather_data():
-    data = get_weather_data('tests/data/data/wather/wather_centr.csv')
+    data = get_weather_data('tests/data/data/weather/weather_centr.csv')
     assert set(data.columns) == {'temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_direction', 'wind_speed',
                                  'precipitation', 'prec_amount', 'visibility', 'dew_point_temp', 'prec_time'}
     assert data.index.min().date() == datetime.date(2019, 4, 1)

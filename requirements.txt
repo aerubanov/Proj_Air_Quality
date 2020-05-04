@@ -19,3 +19,4 @@ pytz
 altair
 Flask-WTF
 matplotlib
+awscli

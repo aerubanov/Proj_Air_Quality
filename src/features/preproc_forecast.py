@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+import time
 import numpy as np
 from typing import List
 
@@ -14,20 +15,23 @@ def prepare_features(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def pp(start: datetime.datetime, end: datetime.datetime, n: int) -> pd.DatetimeIndex:
-    """ generate random n datetime from [start, end] interval"""
+    """Generate random DatetimeIndex with n items in [start, end] period
+    Courtesy of: https://stackoverflow.com/questions/50559078/generating-random-dates-within-a-given-range-in-pandas
+    """
     start_u = start.value//10**9
     end_u = end.value//10**9
 
-    return pd.DatetimeIndex((10**9*np.random.randint(start_u, end_u, n)).view('M8[ns]'))
+    return pd.DatetimeIndex((10**9*np.random.randint(start_u, end_u, n, dtype=np.int64)).view('M8[ns]'))
 
 
 def generate_chunks(series: pd.DataFrame, n: int, start: datetime.datetime, end: datetime.datetime):
     """split time-series by chunks"""
-    chanks = []
+    chunks = []
+
     for idx in pp(start, end, n):
         c = series[str(idx):str(idx+datetime.timedelta(days=2))]
-        chanks.append(c)
-    return chanks
+        chunks.append(c)
+    return chunks
 
 
 def create_sample(chunk: pd.DataFrame, target_col: str, columns: List[str]):

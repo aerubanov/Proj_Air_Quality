@@ -4,9 +4,9 @@ import datetime
 import typing
 import numpy as np
 
-from src.data.config import SENSOR_ID_FILE, SENSOR_DATA_FOLDER, WATHER_FILE, WATHER_DATA_FOLDER
+from src.data.config import SENSOR_ID_FILE, SENSOR_DATA_FOLDER, WEATHER_FILE, WEATHER_DATA_FOLDER
 
-# This script create dataset with sensor average data and wather data from raw downloaded data
+# This script create dataset with sensor average data and weather data from raw downloaded data
 
 START_DATE = datetime.date(2019, 4, 1)  # start date for dataset creation
 END_DATE = datetime.date.today() - datetime.timedelta(days=1)  # end date for dataset reation
@@ -119,14 +119,14 @@ def get_sensor_data(data_folder: str) -> (pd.DataFrame, pd.DataFrame):
     return sensor_data, sensors_location
 
 
-def get_weather_data(wather_file: str) -> pd.DataFrame:
+def get_weather_data(weather_file: str) -> pd.DataFrame:
     """
-    Select and resample wather data
-    :param wather_file: path to raw data file
+    Select and resample weather data
+    :param weather_file: path to raw data file
     :return: processed data
     """
     def parser(date): return pd.to_datetime(date, format='%d.%m.%Y %H:%M')
-    data = pd.read_csv(wather_file, delimiter=';', parse_dates=['Местное время в Москве (центр, Балчуг)'],
+    data = pd.read_csv(weather_file, delimiter=';', parse_dates=['Местное время в Москве (центр, Балчуг)'],
                        date_parser=parser,
                        index_col=False)
     data = data.rename(columns={'Местное время в Москве (центр, Балчуг)': 'date'})
@@ -150,7 +150,7 @@ def get_weather_data(wather_file: str) -> pd.DataFrame:
 def main():
     avg_data, sensors = get_sensor_data(SENSOR_DATA_FOLDER)
     avg_data.index = avg_data.index.tz_localize(tz="UTC")
-    meteo_data = get_weather_data(os.path.join(WATHER_DATA_FOLDER, WATHER_FILE))
+    meteo_data = get_weather_data(os.path.join(WEATHER_DATA_FOLDER, WEATHER_FILE))
     data = pd.concat((avg_data, meteo_data), axis=1)
     data.index.name = 'date'
     data.to_csv('DATA/processed/dataset.csv')
