@@ -1,10 +1,10 @@
-md5: e183a0d38f5e75bdd4e46db3c3c4d63b
+md5: ff6658b3f17e620c36be23615eb8b5f4
 cmd: python -m src.model.forecast
 wdir: ..
 deps:
 - md5: 1f9e0dc821fc9f135f6f1f7d92120caa
   path: src/model/forecast.py
-- md5: 47bf35886f99f0735665f76b1fedd7cc
+- md5: 202b40d0d984389817f249a98bff0d2c
   path: src/features/preproc_forecast.py
 - md5: 47a11249398e0993046e45df01ac9500
   path: DATA/processed/dataset.csv
