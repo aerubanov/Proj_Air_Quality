@@ -1,0 +1,29 @@
+channels:
+    - anaconda
+    - conda-forge
+    - defaults
+dependencies:
+    - dvc
+    - bs4
+    - lxml
+    - pytest
+    - pandas
+    - requests-mock
+    - pytest-pep8
+    - pytest-cov
+    - boto3
+    - statsmodels
+    - schedule
+    - sqlalchemy
+    - marshmallow
+    - flask
+    - codecov
+    - pytz
+    - altair
+    - Flask-WTF
+    - matplotlib
+    - awscli
+    - pip
+    - pip:
+        - psycopg2-binary
+        - sklearn

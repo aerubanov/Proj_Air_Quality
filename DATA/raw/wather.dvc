@@ -1,7 +1,0 @@
-md5: 36f92642c42c6b384ef8c698150b84a8
-outs:
-- md5: 2a7e496b1243fbe0c04f7b4e25d8e22b.dir
-  path: wather
-  cache: true
-  metric: false
-  persist: false

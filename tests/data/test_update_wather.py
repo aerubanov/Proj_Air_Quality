@@ -1,6 +1,6 @@
 import datetime
 
-from src.data.update_wather import check_file, get_link
+from src.data.update_weather import check_file, get_link
 import re
 
 
