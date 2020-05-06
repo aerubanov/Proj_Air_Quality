@@ -119,5 +119,3 @@ def main(datafile: str):
 
 if __name__ == '__main__':
     main(WEATHER_FILE)
-    with open('last_weather_update.txt', 'w') as f:
-        f.write(str(datetime.date.today()))

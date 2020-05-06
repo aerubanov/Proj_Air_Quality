@@ -1,4 +1,4 @@
-md5: c3e805d533fa1ea27a9614f80cb5609a
+md5: 7afe0e6b912dc44460dfb64a9f9170f6
 cmd: python -m src.data.create_dataset
 wdir: ..
 deps:
@@ -6,19 +6,15 @@ deps:
   path: DATA/raw/weather
 - md5: b307d2a4d46ad3564be1b09f22e46dca.dir
   path: DATA/raw/sensors
-- md5: f41f59514325e85f339bb757bb36b47d
-  path: last_data_update.txt
-- md5: f41f59514325e85f339bb757bb36b47d
-  path: last_weather_update.txt
 - md5: 16e2969a6d5144afa62c9c89e04795fd
   path: src/data/create_dataset.py
 outs:
-- md5: 47a11249398e0993046e45df01ac9500
+- md5: 043f66383faa523bc5dac3e62689c355
   path: DATA/processed/dataset.csv
   cache: true
   metric: false
   persist: false
-- md5: bac69376d6ea797f38ff11e572fe7163
+- md5: 538879195e1d6ce23797b7b70755db36
   path: DATA/processed/sensors.csv
   cache: true
   metric: false
