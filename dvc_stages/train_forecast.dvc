@@ -1,4 +1,4 @@
-md5: 925e866c983a9dc6a66768a36934ed3e
+md5: 3405d5d3579e250fe987a28638ca10b9
 cmd: python -m src.model.forecast
 wdir: ..
 deps:
@@ -6,20 +6,20 @@ deps:
   path: src/model/forecast.py
 - md5: 202b40d0d984389817f249a98bff0d2c
   path: src/features/preproc_forecast.py
-- md5: 043f66383faa523bc5dac3e62689c355
+- md5: 78730fb1955f5ec9c03c587ab2a2ce1f
   path: DATA/processed/dataset.csv
 outs:
-- md5: 1ecd6e14b235158dce40a46296ed8895
+- md5: 98151ed7e1e24764e89aae24dfc4cf86
   path: models/p1_forecast.obj
   cache: false
   metric: false
   persist: false
-- md5: bee6ea073fb5fee017ce30c9a2315608
+- md5: d0536ca4627170ebf9eef155353cb072
   path: models/p2_forecast.obj
   cache: false
   metric: false
   persist: false
-- md5: 84717a98a2608986926845f8a447f1ec
+- md5: 5d38971f22477c29acb1d580c7cd4c33
   path: DATA/metrics/forecast_metrics.json
   cache: false
   metric: true
