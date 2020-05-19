@@ -38,7 +38,7 @@ python -m src.data.get_sensor_list
 ```
 - обновление данных с сенсоров
 ```bash
-python -m src.data.upadate_data
+python -m src.data.update_data
 ```
 - обновление данных метеостанции
 ```bash
@@ -89,5 +89,5 @@ python -m src.data.update_weather
   в соответсвие
  - api - на flask реализовано api для получения данных в json из базы ([дока](docs/api/api.rst))
  - web_client - опять же на flask напписан клиент, который через api получает данные и рисует графики.
-  Для графиков там [altair](https://altair-viz.github.io/), гененрируется json с данными для графика, который
+  Для графиков там [altair](https://altair-viz.github.io/), гененрируется json с данными для gitграфика, который
   уже рендерится на стороне пользователя в браузере
