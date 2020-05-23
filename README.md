@@ -27,7 +27,7 @@
  
  [Anomaly detection.ipynb](notebooks/Anomaly%20detection.ipynb)
  
- [Linear forecast model on lag features](notebooks/forecasting_sensor_P1.ipynb)
+ [Forecasting](notebooks/forecast_ansamble.ipynb)
 
 [EDA](notebooks/EDA.ipynb)
 
