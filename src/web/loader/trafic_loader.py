@@ -6,7 +6,7 @@ import csv
 
 from src.web.loader.config import trafic_map_url, trafic_level_url
 
-DATA_PATH = '../../../DATA/processed/trafic_level.csv'
+DATA_PATH = 'DATA/processed/trafic_level.csv'
 
 
 def get_traffic_ball(map_url, level_url):
