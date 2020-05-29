@@ -7,5 +7,3 @@ weather_url = 'https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C
 weather_time_interval = 60  # interval for weather forecast requests in minutes
 
 mosecom_url = 'https://mosecom.mos.ru/wp-content/themes/moseco/map/stations-new.php'
-
-logs_file = 'logs/loader_log.txt'

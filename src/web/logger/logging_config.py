@@ -1,4 +1,8 @@
-from src.web.loader.config import logs_file
+
+loader_logs_file = 'logs/loader_log.txt'
+api_logs_file = 'logs/api_log.txt'
+ml_logs_file = 'logs/ml_log.txt'
+client_logs_file = 'logs/client_log.txt'
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -9,11 +13,11 @@ LOGGING_CONFIG = {
         },
     },
     'handlers': {
-        'log_file_handler': {
+        'loader_file_handler': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': logs_file,
+            'filename': loader_logs_file,
             'maxBytes': 1000000,
             'backupCount': 3,
         },
@@ -21,7 +25,7 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/api_log.txt',
+            'filename': api_logs_file,
             'maxBytes': 1000000,
             'backupCount': 3,
         },
@@ -29,7 +33,7 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/ml_log.txt',
+            'filename': ml_logs_file,
             'maxBytes': 1000000,
             'backupCount': 3,
         },
@@ -37,33 +41,29 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/client_log.txt',
+            'filename': client_logs_file,
             'maxBytes': 1000000,
             'backupCount': 3,
         },
-        'db_handler': {
-            'level': 'INFO',
-            'class': 'src.web.logger.log_handler.LogDBHandler',
-        }
     },
     'loggers': {
         'LoaderLogger': {
-            'handlers': ['log_file_handler', 'db_handler'],
+            'handlers': ['loader_file_handler'],
             'level': 'INFO',
             'propagate': False
         },
         'ApiLogger': {
-            'handlers': ['api_file_handler', 'db_handler'],
+            'handlers': ['api_file_handler'],
             'level': 'INFO',
             'propagate': False
         },
         'MLLogger': {
-            'handlers': ['ml_file_handler', 'db_handler'],
+            'handlers': ['ml_file_handler'],
             'level': 'INFO',
             'propagate': False
         },
         'ClientLogger': {
-            'handlers': ['client_file_handler', 'db_handler'],
+            'handlers': ['client_file_handler'],
             'level': 'INFO',
             'propagate': False
         },
