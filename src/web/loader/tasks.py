@@ -7,6 +7,7 @@ from src.web.loader.weather_loading import parse_weather
 from src.web.models.model import Sensors, Weather
 from src.web.loader.validation import SensorSchema, WeatherSchema
 from src.web.loader.mosecom_loading import load_data, write_processed, write_raw_data
+from src.web.loader.trafic_loader import load_traffic_level
 
 sensor_schema = SensorSchema()
 weather_schema = WeatherSchema()
@@ -84,3 +85,8 @@ def mosecom_task(logger=None):
     write_processed(p1_data, p2_data)
     if logger is not None:
         logger.info('%s', 'write mosecom data in file')
+
+
+def traffic_task(logger):
+    load_traffic_level()
+    logger.info('write traffic level in file')

@@ -1,3 +1,4 @@
+requests
 dvc
 bs4
 lxml
