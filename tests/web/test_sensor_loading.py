@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.web.loader.sensor_loading import read_sensor_id, average_data, load_data, api_url
+from src.web.loader.sensor_loading import read_sensor_id, average_data, load_data, api_url, filter_average
 
 
 def test_read_sensor_id(tmpdir):
@@ -15,28 +15,40 @@ def test_read_sensor_id(tmpdir):
     assert s_id == {26717, 32440, 35435, 36948}
 
 
-def test_average_data():
+def test_filter_average():
+    data = np.array([0, 4, 5, 6, 10])
+    assert np.isclose(5, filter_average(data))
+
+
+def test_average_data(monkeypatch):
     test_data = [
         {'id': 31767, 'humidity': '85.74', 'pressure': '97354.17', 'temperature':
             '0.06', 'pressure_at_sealevel': 99482.08},
-        {'id': 31862, 'P1': '7.25', 'P2': '1.75'},
-        {'id': 32074, 'P1': '5.28', 'P2': '2.67'},
+        {'id': 31862, 'P1': '15', 'P2': '1.75'},
+        {'id': 32074, 'P1': '5.28', 'P2': '35.5'},
         {'id': 32075, 'humidity': '75.34', 'pressure': '96792.30', 'temperature': '-0.22',
          'pressure_at_sealevel': 98897.79},
-        {'id': 32226, 'P1': '5.62', 'P2': '1.98'},
-        {'id': 32337, 'P1': '2.70', 'P2': '1.64'},
+        {'id': 32226, 'P1': '5.62', 'P2': '9.98'},
+        {'id': 32337, 'P1': '1', 'P2': '7.64'},
     ]
+
+    def mockreturn(d):
+        assert isinstance(d, np.ndarray)
+        return 1
+
+    monkeypatch.setattr('src.web.loader.sensor_loading.filter_average', mockreturn)
+
     data = average_data(test_data)
     assert 'p1' in data
     assert 'p2' in data
     assert 'hum' in data
     assert 'press' in data
     assert 'temp' in data
-    assert np.isclose(np.mean([5.28, 5.62, 2.7, 7.25]), data['p1'])
-    assert np.isclose(np.mean([1.75, 2.67, 1.98, 1.64]), data['p2'])
-    assert np.isclose(np.mean([85.74, 75.34]), data['hum'])
-    assert np.isclose(np.mean([97354.17, 96792.3]), data['press'])
-    assert np.isclose(np.mean([0.06, -0.22]), data['temp'])
+    assert data['p1'] == 1
+    assert data['p2'] == 1
+    assert data['hum'] == 1
+    assert data['press'] == 1
+    assert data['temp'] == 1
 
 
 def test_load_data(requests_mock):
