@@ -6,7 +6,7 @@ def test_get_traffic_ball(requests_mock):
         html = html_file.read()
         requests_mock.get('http:://map/', text=html)
         requests_mock.get('http:://level/', text='''{"data":{"level":0}}''')
-        level = trafic_loader.get_traffic_ball('http:://map/', 'http:://level/')
+        level = trafic_loader.get_traffic_ball('http://map.com', 'http://level.com')
         assert level == 0
 
 
