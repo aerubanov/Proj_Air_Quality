@@ -4,8 +4,8 @@ from src.web.loader import trafic_loader
 def test_get_traffic_ball(requests_mock):
     with open('tests/web/data/test_map.html', 'r') as html_file:
         html = html_file.read()
-        requests_mock.get('http://map/', text=html)
-        requests_mock.get('http://level/', text='''{"data":{"level":0}}''')
+        requests_mock.get('http://map.com/', text=html)
+        requests_mock.get('http://level.com/', text='''{"data":{"level":0}}''')
         level = trafic_loader.get_traffic_ball('http://map.com', 'http://level.com')
         assert level == 0
 
