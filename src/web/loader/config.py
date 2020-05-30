@@ -8,4 +8,5 @@ weather_time_interval = 60  # interval for weather forecast requests in minutes
 
 mosecom_url = 'https://mosecom.mos.ru/wp-content/themes/moseco/map/stations-new.php'
 
-logs_file = 'logs/loader_log.txt'
+trafic_map_url = 'https://yandex.ru/maps/213/moscow/?l=trf%2Ctrfe&ll=37.622504%2C55.753215&z=10'
+trafic_level_url = 'https://yandex.ru/maps/api/traffic/getLevelInfo?ajax=1&'

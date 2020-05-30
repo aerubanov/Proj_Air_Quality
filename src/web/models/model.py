@@ -94,15 +94,3 @@ class Forecast(Base):
 
     def __repr__(self):
         return f'date: {self.date}|forward: {self.forward_time}|p1: {self.p1}|p2: {self.p2}'
-
-
-class LoaderLog(Base):
-    __tablename__ = 'loader_logs'
-
-    date = Column(DateTime, primary_key=True)
-    level = Column(String)
-    name = Column(String)
-    message = Column(String)
-
-    def __repr__(self):
-        return f'date: {self.date}| level: {self.level}|name: {self.name}|message: {self.message}'

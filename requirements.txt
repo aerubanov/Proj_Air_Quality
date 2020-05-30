@@ -1,5 +1,6 @@
+requests
 dvc
-bs4
+beautifulsoup4==4.8.2
 lxml
 pytest
 pandas
