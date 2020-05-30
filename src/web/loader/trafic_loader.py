@@ -25,8 +25,7 @@ def get_traffic_ball(map_url, level_url):
 
     soup = BeautifulSoup(resp.text, 'lxml')
     content = soup.find("script", {"class": "config-view"})
-    print(content.text)
-    conf = json.loads(content.text)
+    conf = json.loads(content.get_text())
     sess_id = conf['counters']['analytics']['sessionId']
     token = conf['csrfToken']
 
@@ -43,7 +42,3 @@ def load_traffic_level():
     with open(DATA_PATH, 'a') as file:
         writer = csv.DictWriter(file, fieldnames=['date', 'traffic_level'])
         writer.writerow({'date': date, 'traffic_level': level})
-
-
-if __name__ == "__main__":
-    load_traffic_level()
