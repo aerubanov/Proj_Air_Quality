@@ -22,11 +22,10 @@ def get_traffic_ball(map_url, level_url):
               'TE': 'Trailers',
               }
     resp = requests.get(map_url, headers=header)
-    print(resp.text)
 
     soup = BeautifulSoup(resp.text, 'lxml')
     content = soup.find("script", {"class": "config-view"})
-    print(content)
+    print(content.text)
     conf = json.loads(content.text)
     sess_id = conf['counters']['analytics']['sessionId']
     token = conf['csrfToken']
