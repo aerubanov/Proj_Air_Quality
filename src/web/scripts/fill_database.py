@@ -18,11 +18,11 @@ def load_sensor_data(file: str) -> pd.DataFrame:
     df = pd.read_csv(file, parse_dates=['date'])
     data = pd.DataFrame(index=df.index)
     data['date'] = df.date
-    data['p1'] = df.P1
-    data['p2'] = df.P2
-    data['temperature'] = df.temperature
-    data['humidity'] = df.humidity
-    data['pressure'] = df.pressure
+    data['p1'] = df.P1_filtr_mean
+    data['p2'] = df.P2_filtr_mean
+    data['temperature'] = df.temperature_filtr_mean
+    data['humidity'] = df.humidity_filtr_mean
+    data['pressure'] = df.pressure_filtr_mean
     data = data.set_index('date')
     return data
 
