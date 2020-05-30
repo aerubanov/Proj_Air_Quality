@@ -32,6 +32,7 @@ def get_traffic_ball(map_url, level_url):
     param = {'ajax': '1', 'csrfToken': token, 'ids[0]': '213', 'ids[1]': '1', 'sessionId': sess_id, 'ids[0': '213'}
     resp = requests.get(level_url, cookies=resp.cookies,
                         headers=header, params=param)
+    print(resp.text)
     data = json.loads(resp.text)
     return data['data']['level']
 
