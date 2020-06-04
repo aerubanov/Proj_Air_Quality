@@ -333,3 +333,6 @@ _sds011_sensor_46232.csv
 _sds011_sensor_46280.csv
 _sds011_sensor_46292.csv
 _sds011_sensor_46435.csv
+_bme280_sensor_45603.csv
+_bme280_sensor_46436.csv
+_sds011_sensor_46541.csv
