@@ -1,7 +1,7 @@
 pandas
 schedule
 sqlalchemy
-sklearn
+scikit-learn==0.22.1
 psycopg2
 statsmodels
 matplotlib
