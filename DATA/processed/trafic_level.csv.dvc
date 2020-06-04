@@ -1,0 +1,7 @@
+md5: 360716693cbe6ddac61e5a0b4104b365
+outs:
+- md5: 88f5347da24eb330b881cd545556113b
+  path: trafic_level.csv
+  cache: true
+  metric: false
+  persist: false
