@@ -1,68 +1,112 @@
 import pandas as pd
-import datetime
-import time
 import numpy as np
-from typing import List
 
 
-def prepare_features(data: pd.DataFrame) -> pd.DataFrame:
-    """Features preparation for anomaly detection and clustering"""
-    # fill missing value
-    for c in data.columns:
-        data[c].fillna((data[c].mean()), inplace=True)
+def prepare_data(data: pd.DataFrame) -> pd.DataFrame:
+    data['P1_filtr_mean'] = data.P1_filtr_mean.interpolate()
 
+    data['pres_meteo'] = data.pres_meteo.fillna(method='bfill')
+    data['temp_meteo'] = data.temp_meteo.fillna(method='bfill')
+    data['hum_meteo'] = data.hum_meteo.fillna(method='bfill')
+    data['pres_meteo'] = data.pres_meteo.interpolate()
+    data['hum_meteo'] = data.hum_meteo.interpolate()
+    data['temp_meteo'] = data.temp_meteo.interpolate()
+
+    data['humidity_filtr_mean'] = data.humidity_filtr_mean.interpolate()
+    data['temperature_filtr_mean'] = data.temperature_filtr_mean.interpolate()
+
+    data['prec_amount'] = data.prec_amount.fillna(method='bfill')
+    data['prec_time'] = data.prec_time.fillna(method='bfill')
+    data.loc[data.prec_amount == 'Осадков нет', 'prec_amount'] = 0
+    data.loc[data.prec_amount == 'Следы осадков', 'prec_amount'] = 0
+    data['prec_amount'] = data.prec_amount.astype(float)
+    data['prec_time'] = data.prec_time.interpolate()
+    data['prec_amount'] = data.prec_amount.interpolate()
+    data['wind_direction'] = data.wind_direction.fillna(method='bfill')
     return data
 
 
-def pp(start: datetime.datetime, end: datetime.datetime, n: int) -> pd.DatetimeIndex:
-    """Generate random DatetimeIndex with n items in [start, end] period
-    Courtesy of: https://stackoverflow.com/questions/50559078/generating-random-dates-within-a-given-range-in-pandas
-    """
-    start_u = start.value//10**9
-    end_u = end.value//10**9
-
-    return pd.DatetimeIndex((10**9*np.random.randint(start_u, end_u, n, dtype=np.int64)).view('M8[ns]'))
-
-
-def generate_chunks(series: pd.DataFrame, n: int, start: datetime.datetime, end: datetime.datetime):
-    """split time-series by chunks"""
-    chunks = []
-
-    for idx in pp(start, end, n):
-        c = series[str(idx):str(idx+datetime.timedelta(days=2))]
-        chunks.append(c)
-    return chunks
-
-
-def create_sample(chunk: pd.DataFrame, target_col: str, columns: List[str]):
-    """extract features from chunks"""
-    x = dict()
-    y = dict()
-    d1 = chunk.iloc[:24]
-    d2 = chunk.iloc[24:]
-    for i in range(24):
-        for c in columns:
-            x[f'{c}_lag_{i}'] = d1[target_col][-(i+1)]
-        y[f'{target_col}_forec_{i}'] = d2[target_col][i]
-    return x, y
+wind_dir = {'Ветер, дующий с востока': 0,
+            'Ветер, дующий с востоко-северо-востока': 45 / 2,
+            'Ветер, дующий с северо-востока': 45,
+            'Ветер, дующий с северо-северо-востока': 45 + 45 / 2,
+            'Ветер, дующий с севера': 90,
+            'Ветер, дующий с северо-северо-запад': 90 + 45 / 2,
+            'Ветер, дующий с северо-запада': 135,
+            'Ветер, дующий с западо-северо-запада': 135 + 45 / 2,
+            'Ветер, дующий с запада': 180,
+            'Ветер, дующий с западо-юго-запада': 180 + 45 / 2,
+            'Ветер, дующий с юго-запада': 225,
+            'Ветер, дующий с юго-юго-запада': 225 + 45 / 2,
+            'Ветер, дующий с юга': 270,
+            'Ветер, дующий с юго-юго-востока': 270 + 45 / 2,
+            'Ветер, дующий с юго-востока': 315,
+            'Ветер, дующий с востоко-юго-востока': 315 + 45 / 2,
+            'Штиль, безветрие': None,
+            }
 
 
-def prepare_data_from_chunks(chunks: List[pd.DataFrame], target: str, col: List[str]):
-    """generate dataframe from chunks"""
-    df = pd.DataFrame(index=range(len(chunks)))
-    for i in range(len(chunks)):
-        x, y = create_sample(chunks[i], target, col)
-        for key, value in x.items():
-            df.loc[i, key] = value
-        for key, value in y.items():
-            df.loc[i, key] = value
-    return df
+def add_features(data: pd.DataFrame) -> pd.DataFrame:
+    data['day_of_week'] = data.index.dayofweek
+    data['hour'] = data.index.hour
+    data['sin_day'] = np.sin(2 * np.pi * data.day_of_week / 7)
+    data['cos_day'] = np.cos(2 * np.pi * data.day_of_week / 7)
+    data['sin_hour'] = np.sin(2 * np.pi * data.hour / 24)
+    data['cos_hour'] = np.cos(2 * np.pi * data.hour / 24)
+
+    data['P1_diff1'] = data.P1_filtr_mean.diff(periods=1)
+    data['P1_diff2'] = data.P1_diff1.diff(periods=1)
+    data['P1_diff3'] = data.P1_diff2.diff(periods=1)
+    data['t_diff'] = data.temperature_filtr_mean.diff(periods=1)
+    data['t_diff1'] = data.t_diff.diff(periods=1)
+    data['t_diff2'] = data.t_diff1.diff(periods=1)
+    data['h_diff'] = data.humidity_filtr_mean.diff(periods=1)
+    data['h_diff1'] = data.h_diff.diff(periods=1)
+    data['h_diff2'] = data.h_diff1.diff(periods=1)
+
+    data['wind_direction'] = data.wind_direction.map(wind_dir)
+    data["wind_sin"] = np.sin(np.radians(data.wind_direction))
+    data["wind_cos"] = np.cos(np.radians(data.wind_direction))
+    data['wind_sin'] = data.wind_sin.fillna(value=2)
+    data['wind_cos'] = data.wind_cos.fillna(value=2)
+
+    data['temp_diff'] = data.temp_meteo.diff(periods=3)
+    data['humidity_diff'] = data.hum_meteo.diff(periods=3)
+    data['pressure_diff'] = data.pres_meteo.diff(periods=3)
+    data['wind_sin_diff'] = data.wind_sin.diff(periods=3)
+    data['wind_cos_diff'] = data.wind_cos.diff(periods=3)
+    data['temp_diff3'] = data.temp_meteo.diff(periods=9)
+    data['humidity_diff3'] = data.hum_meteo.diff(periods=9)
+    data['pressure_diff3'] = data.pres_meteo.diff(periods=9)
+    data['wind_sin_diff3'] = data.wind_sin.diff(periods=9)
+    data['wind_cos_diff3'] = data.wind_cos.diff(periods=9)
+    return data
 
 
-def prepare_test_sample(chunk, columns, target_col='P1'):
-    d1 = chunk.iloc[:24]
-    x = pd.DataFrame(index=range(1))
-    for i in range(24):
-        for c in columns:
-            x[f'{c}_lag_{i}'] = d1[target_col][-(i + 1)]
-    return x
+class DataTransform:
+
+    def __init__(self, train_transform, target_transform, columns, num_columns, target_col):
+        self.train_transform = train_transform
+        self.target_transform = target_transform
+        self.sel_columns = columns
+        self.num_columns = num_columns
+        self.target_col = target_col
+
+    def fit_transform(self, data):
+        data = data[self.sel_columns]
+        data = prepare_data(data)
+        data['P1_original'] = data['P1_filtr_mean']
+        data[self.num_columns] = self.train_transform.fit_transform(data[self.num_columns])
+        data[self.target_col] = self.target_transform.fit_transform(data[self.target_col])
+        data = add_features(data)
+        data = data.resample('1H').mean()
+        return data
+
+    def transform(self, data):
+        data = data[self.sel_columns]
+        data = prepare_data(data)
+        data[self.num_columns] = self.train_transform.transform(data[self.num_columns])
+        data[self.target_col] = self.target_transform.transform(data[self.target_col])
+        data = add_features(data)
+        data = data.resample('1H').mean()
+        return data
