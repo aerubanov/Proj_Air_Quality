@@ -23,6 +23,7 @@ def prepare_data(data: pd.DataFrame) -> pd.DataFrame:
     data['prec_time'] = data.prec_time.interpolate()
     data['prec_amount'] = data.prec_amount.interpolate()
     data['wind_direction'] = data.wind_direction.fillna(method='bfill')
+    data['wind_speed'] = data.wind_speed.fillna(method='bfill')
     return data
 
 
@@ -105,6 +106,7 @@ class DataTransform:
     def transform(self, data):
         data = data[self.sel_columns]
         data = prepare_data(data)
+        data['P1_original'] = data['P1_filtr_mean']
         data[self.num_columns] = self.train_transform.transform(data[self.num_columns])
         data[self.target_col] = self.target_transform.transform(data[self.target_col])
         data = add_features(data)
