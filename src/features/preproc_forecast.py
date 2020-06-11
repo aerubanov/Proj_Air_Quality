@@ -4,6 +4,7 @@ import numpy as np
 
 def prepare_data(data: pd.DataFrame) -> pd.DataFrame:
     data['P1_filtr_mean'] = data.P1_filtr_mean.interpolate()
+    data['P2_filtr_mean'] = data.P2_filtr_mean.interpolate()
 
     data['pres_meteo'] = data.pres_meteo.fillna(method='bfill')
     data['temp_meteo'] = data.temp_meteo.fillna(method='bfill')
@@ -47,7 +48,7 @@ wind_dir = {'Ветер, дующий с востока': 0,
             }
 
 
-def add_features(data: pd.DataFrame) -> pd.DataFrame:
+def add_features(data: pd.DataFrame, target) -> pd.DataFrame:
     data['day_of_week'] = data.index.dayofweek
     data['hour'] = data.index.hour
     data['sin_day'] = np.sin(2 * np.pi * data.day_of_week / 7)
@@ -55,9 +56,9 @@ def add_features(data: pd.DataFrame) -> pd.DataFrame:
     data['sin_hour'] = np.sin(2 * np.pi * data.hour / 24)
     data['cos_hour'] = np.cos(2 * np.pi * data.hour / 24)
 
-    data['P1_diff1'] = data.P1_filtr_mean.diff(periods=1)
-    data['P1_diff2'] = data.P1_diff1.diff(periods=1)
-    data['P1_diff3'] = data.P1_diff2.diff(periods=1)
+    data['P_diff1'] = data[target].diff(periods=1)
+    data['P_diff2'] = data.P_diff1.diff(periods=1)
+    data['P_diff3'] = data.P_diff2.diff(periods=1)
     data['t_diff'] = data.temperature_filtr_mean.diff(periods=1)
     data['t_diff1'] = data.t_diff.diff(periods=1)
     data['t_diff2'] = data.t_diff1.diff(periods=1)
@@ -96,19 +97,19 @@ class DataTransform:
     def fit_transform(self, data):
         data = data[self.sel_columns]
         data = prepare_data(data)
-        data['P1_original'] = data['P1_filtr_mean']
+        data['P_original'] = data[self.target_col]
         data[self.num_columns] = self.train_transform.fit_transform(data[self.num_columns])
-        data[self.target_col] = self.target_transform.fit_transform(data[self.target_col])
-        data = add_features(data)
+        data[self.target_col] = self.target_transform.fit_transform(data[[self.target_col]])
+        data = add_features(data, target=self.target_col)
         data = data.resample('1H').mean()
         return data
 
     def transform(self, data):
         data = data[self.sel_columns]
         data = prepare_data(data)
-        data['P1_original'] = data['P1_filtr_mean']
+        data['P_original'] = data[self.target_col]
         data[self.num_columns] = self.train_transform.transform(data[self.num_columns])
-        data[self.target_col] = self.target_transform.transform(data[self.target_col])
-        data = add_features(data)
+        data[self.target_col] = self.target_transform.transform(data[[self.target_col]])
+        data = add_features(data, target=self.target_col)
         data = data.resample('1H').mean()
         return data
