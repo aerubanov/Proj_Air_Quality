@@ -10,17 +10,18 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import QuantileTransformer
 import pickle
 import json
+import os
 
 from src.features.preproc_forecast import DataTransform
 
-# columns that which will be used
-columns = ['P1_filtr_mean', 'humidity_filtr_mean', 'temperature_filtr_mean', 'pres_meteo', 'temp_meteo',
-           'hum_meteo', 'wind_direction',
-           'wind_speed', 'prec_amount', 'prec_time']
+pd.options.mode.chained_assignment = None  # disable SettingWithCopyWarning
+
+# columns of dataset which will be used
+columns = ['P1_filtr_mean', 'P2_filtr_mean', 'humidity_filtr_mean', 'temperature_filtr_mean', 'pres_meteo',
+           'temp_meteo', 'hum_meteo', 'wind_direction', 'wind_speed', 'prec_amount', 'prec_time']
 # columns with numerical features
 num_colunms = ['humidity_filtr_mean', 'temperature_filtr_mean', 'pres_meteo', 'temp_meteo', 'hum_meteo',
                'wind_speed', 'prec_amount', 'prec_time']
-target_col = ['P1_filtr_mean']
 CHUNK_LEN = 48  # in hours
 TEST_LEN = 24  # in hours
 TEST_NUM_SAMPLES = 300  # number of chunks which will be used for validation
@@ -29,21 +30,27 @@ features = ['pres_meteo', 'temp_meteo', 'hum_meteo', 'wind_speed', 'prec_amount'
             'sin_day', 'cos_day', 'sin_hour', 'cos_hour', 'wind_sin', 'wind_cos', 'temp_diff', 'humidity_diff',
             'pressure_diff', 'temp_diff3', 'humidity_diff3',
             'pressure_diff3']
+DATASET_START = '2019-04-02 00:00:00+00:00'
+
+model_path = 'models/forecast'
+metric_path = 'DATA/metrics/forecast_metrics.json'
+data_path = 'DATA/processed/dataset.csv'
 
 
 class Chunk:
     """Chunk of time-series data. Each chunk consist train and test part."""
 
-    def __init__(self, train_part, test_part, feature_names):
+    def __init__(self, train_part, test_part, feature_names, target):
         self.train = train_part
         self.test = test_part
         self.features = feature_names
+        self.target = target
 
     def get_x(self):
-        x = list(self.train.P1_filtr_mean.values)
-        x += list(self.train.P1_diff1.values)
-        x += list(self.train.P1_diff2.values)
-        x += list(self.train.P1_diff3.values)
+        x = list(self.train[self.target].values)
+        x += list(self.train.P_diff1.values)
+        x += list(self.train.P_diff2.values)
+        x += list(self.train.P_diff3.values)
 
         x += list(self.train.temperature_filtr_mean.values)
         x += list(self.train.t_diff.values)
@@ -54,8 +61,8 @@ class Chunk:
 
     def get_y(self, forward_time, orig=False):
         if orig:
-            return self.test.P1_original.values[forward_time]
-        y = self.test.P1_filtr_mean.values[forward_time]
+            return self.test.P_original.values[forward_time]
+        y = self.test[self.target].values[forward_time]
         return y
 
     def get_meta_x(self, forward_time, models):
@@ -68,7 +75,7 @@ class Chunk:
         return x_meta
 
 
-def pp(start: datetime.datetime, end: datetime.datetime, n: int) -> pd.DatetimeIndex:
+def pp(start: pd.DatetimeIndex, end: pd.DatetimeIndex, n: int) -> pd.DatetimeIndex:
     """Generate random DatetimeIndex with n items in [start, end] period
     Courtesy of: https://stackoverflow.com/questions/50559078/generating-random-dates-within-a-given-range-in-pandas
     """
@@ -78,17 +85,18 @@ def pp(start: datetime.datetime, end: datetime.datetime, n: int) -> pd.DatetimeI
     return pd.DatetimeIndex((10 ** 9 * np.random.randint(start_u, end_u, n, dtype=np.int64)).view('M8[ns]'))
 
 
-def generate_chunks(series: pd.DataFrame, n: int, start: datetime.datetime, end: datetime.datetime,
-                    chunk_len: int, test_len: int, features: List[str]) -> List[Chunk]:
+def generate_chunks(series: pd.DataFrame, n: int, start: pd.DatetimeIndex, end: pd.DatetimeIndex,
+                    chunk_len: int, test_len: int, features_list: List[str], target) -> List[Chunk]:
     """
     generate list of chunks from dataframe
+    :param target: name of target column
     :param series: initial dataframe
     :param n: number of chunks
     :param start: start date
     :param end: end date (must be with offset = chunk_len from the series end)
     :param chunk_len: len of chunks (in hours)
     :param test_len: len of test part inside chunk (in hours)
-    :param features: features names columns (will be added in X_train during meta-model training)
+    :param features_list: features names columns (will be added in X_train during meta-model training)
     :return: list of chunks
     """
     chunks = []
@@ -96,16 +104,17 @@ def generate_chunks(series: pd.DataFrame, n: int, start: datetime.datetime, end:
         train_part = series[str(idx):str(idx + datetime.timedelta(hours=chunk_len - test_len))]
         test_part = series[str(idx + datetime.timedelta(hours=chunk_len - test_len)):str(
             idx + datetime.timedelta(hours=chunk_len))]
-        chunk = Chunk(train_part, test_part, features)
+        chunk = Chunk(train_part, test_part, features_list, target)
         chunks.append(chunk)
     return chunks
 
 
 def prepare_x(data: pd.DataFrame, chunk_len: int,
-              test_len: int, num_chunks_factor=3.2,
+              test_len: int, target, num_chunks_factor=3.2,
               test_dataset_len=50, meta_train_fraction=0.5) -> (List[Chunk], List[Chunk], List[Chunk]):
     """
     Prepare X_train, X_meta_train, X_validation
+    :param target: name of target column
     :param data: dataset
     :param chunk_len: len of single chunk in hourse
     :param test_len: len of test part of single chunk in hourse
@@ -114,7 +123,7 @@ def prepare_x(data: pd.DataFrame, chunk_len: int,
     :param test_dataset_len: len of validation dataset (in days)
     :return:
     """
-    train_data = data['2019-04-02 00:00:00+00:00':str(data.index[-1] - datetime.timedelta(days=50))]
+    train_data = data[DATASET_START:str(data.index[-1] - datetime.timedelta(days=test_dataset_len))]
     test_data = data[str(data.index[-1] - datetime.timedelta(days=test_dataset_len)):]
 
     train_start_idx = train_data.index[0]
@@ -123,14 +132,14 @@ def prepare_x(data: pd.DataFrame, chunk_len: int,
     np.random.seed(42)
     train_chunks = generate_chunks(train_data, train_num_samples,
                                    train_start_idx, train_end_idx,
-                                   chunk_len, test_len, features)
+                                   chunk_len, test_len, features, target)
 
     test_start_idx = test_data.index[0]
     test_end_idx = test_data.index[-1] - datetime.timedelta(hours=chunk_len)
     validation = generate_chunks(test_data, TEST_NUM_SAMPLES,
                                  test_start_idx, test_end_idx,
                                  chunk_len, test_len,
-                                 features)
+                                 features, target)
 
     train, train_meta = train_test_split(train_chunks, test_size=meta_train_fraction, random_state=42)
     return train, train_meta, validation
@@ -138,10 +147,11 @@ def prepare_x(data: pd.DataFrame, chunk_len: int,
 
 class Model:
 
-    def __init__(self, data_transform: DataTransform, models=None, meta_models=None):
-        self.data_transform = data_transform
+    def __init__(self, target_transform, models=None, meta_models=None, target='P1_filtr_mean'):
+        self.target_transform = target_transform
         self.models = models
         self.meta_models = meta_models
+        self.target = target
 
     def fit(self, x_train, x_meta_train):
         model = Lasso(alpha=0.005, random_state=42, max_iter=3000)
@@ -155,7 +165,7 @@ class Model:
             x = [chunk.get_meta_x(i, self.models)]
             local_model = self.meta_models[i]
             prediction = local_model.predict(x)
-            prediction = self.data_transform.target_transform.inverse_transform(prediction.reshape(-1, 1))[0][0]
+            prediction = self.target_transform.inverse_transform(prediction.reshape(-1, 1))[0][0]
             predictions.append(prediction)
         return predictions
 
@@ -165,7 +175,7 @@ class Model:
             x = [chunk.get_x() for chunk in chunks]
             local_model = self.models[i]
             prediction = local_model.predict(x)
-            prediction = self.data_transform.target_transform.inverse_transform(prediction.reshape(-1, 1))
+            prediction = self.target_transform.inverse_transform(prediction.reshape(-1, 1))
             y = [chunk.get_y(i, orig=True) for chunk in chunks]
             mae = metric(y, prediction)
             scores.append(mae)
@@ -177,7 +187,7 @@ class Model:
             x = [chunk.get_meta_x(i, self.models) for chunk in chunks]
             local_model = self.meta_models[i]
             prediction = local_model.predict(x)
-            prediction = self.data_transform.target_transform.inverse_transform(prediction.reshape(-1, 1))
+            prediction = self.target_transform.inverse_transform(prediction.reshape(-1, 1))
             y = [chunk.get_y(i, orig=True) for chunk in chunks]
             mae = metric(y, prediction)
             scores.append(mae)
@@ -202,21 +212,44 @@ class Model:
             self.meta_models.append(local_model)
 
 
-def main():
-    data = pd.read_csv('DATA/processed/dataset.csv', parse_dates=['date'])
+def train_model(target):
+    data = pd.read_csv(data_path, parse_dates=['date'])
     data = data.set_index('date')
     data_transform = QuantileTransformer(output_distribution='normal')
     target_transform = QuantileTransformer(output_distribution='normal')
-    transform = DataTransform(data_transform, target_transform, columns, num_colunms, target_col)
+    transform = DataTransform(data_transform, target_transform, columns, num_colunms, target)
     data = transform.fit_transform(data)
-    x_train, x_meta_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN)
-    model = Model(transform)
+    x_train, x_meta_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN, target)
+
+    model = Model(transform.target_transform)
     model.fit(x_train, x_meta_train)
-    print('MAE: ;', model.get_metric(x_val, mean_absolute_error))
-    print('MSE: ;', model.get_metric(x_val, mean_squared_error))
-    print('meta_MAE: ;', model.get_meta_metric(x_val, mean_absolute_error))
-    print('meta_MSE: ;', model.get_meta_metric(x_val, mean_squared_error))
+
+    mae = model.get_metric(x_val, mean_absolute_error)
+    mse = model.get_metric(x_val, mean_squared_error)
+    meta_mae = model.get_meta_metric(x_val, mean_absolute_error)
+    meta_mse = model.get_meta_metric(x_val, mean_squared_error)
+
+    print('MAE: ;', np.mean(mae))
+    print('MSE: ;', np.mean(mse))
+    print('meta_MAE: ;', np.mean(meta_mae))
+    print('meta_MSE: ;', np.mean(meta_mse))
+
+    prefix = target.split('_')[0]
+    with open(os.path.join(model_path, prefix+'_models.obj'), 'wb') as f:
+        pickle.dump(model.models, f)
+    with open(os.path.join(model_path, prefix+'_meta_models.obj'), 'wb') as f:
+        pickle.dump(model.meta_models, f)
+    with open(os.path.join(model_path, prefix+'_data_transform.obj'), 'wb') as f:
+        pickle.dump(transform.train_transform, f)
+    with open(os.path.join(model_path, prefix+'_target_transform.obj'), 'wb') as f:
+        pickle.dump(transform.target_transform, f)
+
+    return mae, mse, meta_mae, meta_mse
 
 
 if __name__ == '__main__':
-    main()
+    p1_mae, p1_mse, p1_meta_mae, p1_meta_mse = train_model(target='P1_filtr_mean')
+    p2_mae, p2_mse, p2_meta_mae, p2_meta_mse = train_model(target='P2_filtr_mean')
+    with open(metric_path, 'w') as file:
+        json.dump({'p1_mae': p1_mae, 'p1_mse': p1_mse, 'p1_meta_mae': p1_meta_mae, 'p1_meta_mse': p1_meta_mse,
+                   'p2_mae': p2_mae, 'p2_mse': p2_mse, 'p2_meta_mae': p2_meta_mae, 'p2_meta_mse': p2_meta_mse}, file)
