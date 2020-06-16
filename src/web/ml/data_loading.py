@@ -5,17 +5,17 @@ import re
 from src.web.models.model import Sensors, Weather
 
 
-def get_sensor_data(session, date=None) -> pd.DataFrame:
-    """get sensor data for time interval [date-1day, date]"""
+def get_sensor_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd.DataFrame:
+    """get sensor data for time interval [date-delta, date]"""
     if date is None:
         date = datetime.datetime.utcnow()
 
     # get sensor data for Chunk.train
-    result = session.query(Sensors).filter(Sensors.date >= date - datetime.timedelta(days=1))
-    result = [i.serialize for i in result]
-    data = pd.DataFrame(result)
+    result = session.query(Sensors).filter(Sensors.date >= date - delta).all()
+    data = [i.serialize for i in result]
+    data = pd.DataFrame(data)
     data = data.rename(columns={'p1': 'P1_filtr_mean', 'p2': 'P2_filtr_mean', 'temperature': 'temperature_filtr_mean',
-                                'humidity': 'humidity_filtr_mean'})
+                                'humidity': 'humidity_filtr_mean', 'pressure': 'pressure_filtr_mean'})
     data['date'] = pd.to_datetime(data.date)
     data = data.set_index('date')
     return data.resample('5T').mean()
@@ -25,7 +25,7 @@ def transform_prec_amount(x):
     """extract precipitations amount from string stored in database"""
     numbers = re.findall(r'\d*\.\d+|\d+', x)
     if len(numbers) > 0:
-        return numbers[0]
+        return float(numbers[0])
     else:
         return 0
 
@@ -42,9 +42,11 @@ wind_dir = {'В': 'Ветер, дующий с востока',
             }
 
 
-def get_weather_data(session, date=None) -> pd.DataFrame:
-    """ get weather data for time interval [date-1day, date]"""
-    res = session.query(Weather).filter(Weather.date >= date - datetime.timedelta(days=1)).all()
+def get_weather_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd.DataFrame:
+    """ get weather data for time interval [date-delta, date]"""
+    if date is None:
+        date = datetime.datetime.utcnow()
+    res = session.query(Weather).filter(Weather.date >= date - delta).all()
     data = [i.serialize for i in res]
     data = pd.DataFrame(data)
     data['date'] = pd.to_datetime(data.date)
