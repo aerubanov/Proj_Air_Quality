@@ -36,10 +36,12 @@ def get_transforms(target: str) -> DataTransform:
 def get_chunk(session, transform: DataTransform, target: str) -> Chunk:
     """create chunk of time-series data for forecast model"""
     sensor_data = get_sensor_data(session)
-    weather_data = get_sensor_data(session)
+    weather_data = get_weather_data(session)
     train_part = pd.concat((sensor_data, weather_data), axis=1)
     train_part = transform.transform(train_part)
+    print(train_part.columns)
     test_part = get_weather_data(session, date=datetime.datetime.utcnow()+datetime.timedelta(days=1))
+    print(test_part.columns)
     for c in ['P1_filtr_mean', 'P2_filtr_mean', 'humidity_filtr_mean', 'temperature_filtr_mean']:
         test_part[c] = train_part[c].mean()
     test_part = transform.transform(test_part)
@@ -64,7 +66,9 @@ def get_model(target: str, target_transform) -> Model:
 
 def perform_forecast(session, date=None, logger=None):
     """make forecast for date + 24 hours and write it in database"""
-    targets = ['P1_filtr_mean, P2_filtr_mean']
+    if date is None:
+        date = datetime.datetime.utcnow()
+    targets = ['P1_filtr_mean', 'P2_filtr_mean']
     predictions = []
     for targ in targets:
         transform = get_transforms(targ)
