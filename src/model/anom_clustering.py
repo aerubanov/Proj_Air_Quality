@@ -10,15 +10,21 @@ import typing
 import warnings
 import matplotlib.pyplot as plt
 
-from src.features.preproc_anom import prepare_features
+from src.features.preproc_anom import prepare_meteo_data, prepare_sensors_data, add_features
 
 pd.options.mode.chained_assignment = None  # prevent false positives SettingWithCopyWarning
 warnings.simplefilter(action='ignore', category=FutureWarning)  # prevent "FutureWarning: elementwise comparison failed;
 # returning scalar instead, but in the future will perform elementwise comparison"
-# from line 44: anomaly['gap'] = (anomaly.index.to_series().diff()) > pd.Timedelta(10, 'm')
 
-sel_columns = ['mean_hum', 'prec_amount',
-               'max_w_speed', 'min_w_speed', 'change_hum', 'max_resid', 'min_resid', 'prec_time']
+sensor_columns = ['P1_filtr_mean', 'P2_filtr_mean', 'temperature_filtr_mean',
+                  'humidity_filtr_mean', 'pressure_filtr_mean']
+meteo_columns = ['temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_direction', 'wind_speed',
+                 'precipitation', 'prec_amount', 'prec_time', 'visibility',
+                 'dew_point_temp']
+
+sel_columns = ['P1_filtr_mean', 'P2_filtr_mean',
+               'temperature_filtr_mean', 'humidity_filtr_mean', 'temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_speed',
+               'prec_amount', 'dew_point_temp', 'dew_point_diff', 'prec_time', 'wind_sin', 'wind_cos', 'wind_direction']
 PCA_n_components = 3
 num_clusters = 4
 
@@ -31,9 +37,9 @@ def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85
     :param quant: al moment with decomposition residual above this quantile is anomaly
     :return: list of anomaly series
     """
-    time_series['P1'] = time_series.P1.interpolate()
-    time_series['P1'] = time_series.P1.rolling(4, min_periods=1).mean()
-    decomp = sm.tsa.seasonal_decompose(time_series.P1, model='additive', freq=freq, extrapolate_trend='freq')
+    time_series['P1_filtr_mean'] = time_series.P1_filtr_mean.interpolate()
+    time_series['P1_filtr_mean'] = time_series.P1_filtr_mean.rolling(4, min_periods=1).mean()
+    decomp = sm.tsa.seasonal_decompose(time_series.P1_filtr_mean, model='additive', freq=freq, extrapolate_trend='freq')
     q = decomp.resid.quantile(quant)
 
     # find anomaly
@@ -72,23 +78,25 @@ def detect_anomalies(data: pd.DataFrame) -> typing.List[pd.DataFrame]:
 
 def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
     anomdata = pd.DataFrame(index=[i for i in range(len(anom_list))])
-    anomdata['max_P1'] = [i.P1.max() for i in anom_list]
-    anomdata['min_P1'] = [i.P1.min() for i in anom_list]
-    anomdata['min_P2'] = [i.P2.min() for i in anom_list]
-    anomdata['max_P2'] = [i.P2.max() for i in anom_list]
-    anomdata['mean_hum'] = [i.humidity.mean() for i in anom_list]
-    anomdata['change_hum'] = [i.humidity.max() - i.humidity.min() for i in anom_list]
-    anomdata['change_temp'] = [i.temperature.max() - i.temperature.min() for i in anom_list]
-    anomdata['prec_amount'] = [i.prec_amount.mean() for i in anom_list]
-    anomdata['max_w_speed'] = [i.wind_speed.max() for i in anom_list]
-    anomdata['min_w_speed'] = [i.wind_speed.min() for i in anom_list]
-    anomdata['w_dir_sin_max'] = [np.max(np.sin(i.wind_direction)) for i in anom_list]
-    anomdata['w_dir_sin_mix'] = [np.min(np.sin(i.wind_direction)) for i in anom_list]
-    anomdata['w_dir_cos_max'] = [np.max(np.cos(i.wind_direction)) for i in anom_list]
-    anomdata['w_dir_cos_min'] = [np.min(np.cos(i.wind_direction)) for i in anom_list]
-    anomdata['max_resid'] = [np.max(i.resid) for i in anom_list]
-    anomdata['min_resid'] = [np.min(i.resid) for i in anom_list]
-    anomdata['prec_time'] = [np.max(i.prec_time) for i in anom_list]
+    anomdata['resid_change'] = [i.loc[i.resid.abs().idxmax()].resid -
+                                i.loc[i.resid.abs().idxmin()].resid for i in anom_list]
+
+    anomdata['hum'] = [i.loc[i.resid.abs().idxmax()].hum_meteo -
+                       i.loc[i.resid.abs().idxmin()].hum_meteo for i in anom_list]
+
+    anomdata['temp'] = [i.loc[i.resid.abs().idxmax()].temp_meteo -
+                        i.loc[i.resid.abs().idxmin()].temp_meteo for i in anom_list]
+
+    anomdata['prec'] = [i.loc[i.resid.abs().idxmax()].prec_amount -
+                        i.loc[i.resid.abs().idxmin()].prec_amount for i in anom_list]
+
+    anomdata['wind_speed'] = [i.loc[i.resid.abs().idxmax()].wind_speed -
+                              i.loc[i.resid.abs().idxmin()].wind_speed for i in anom_list]
+
+    anomdata['wind_sin'] = [i.loc[i.resid.abs().idxmax()].wind_sin -
+                            i.loc[i.resid.abs().idxmin()].wind_sin for i in anom_list]
+    anomdata['wind_cos'] = [i.loc[i.resid.abs().idxmax()].wind_cos -
+                            i.loc[i.resid.abs().idxmin()].wind_cos for i in anom_list]
     return anomdata
 
 
@@ -110,6 +118,52 @@ def clustering(x: np.array, n_clusters=num_clusters, random_state=42) -> (KMeans
     return km, score, silh_score
 
 
+class Model:
+
+    def __init__(self, reduction: PCA, clustering: KMeans, cluster_map=None):
+        self.reduction = reduction
+        self.clustering = clustering
+        self.cluster_map = cluster_map
+
+    def train(self, train_data: pd.DataFrame) -> (float, float, float):
+        train_data = self._prepare_data(train_data)
+        anomalies_list = detect_anomalies(train_data)
+        anom_features = get_anomaly_features(anomalies_list)
+
+        self.reduction.fit(anom_features)
+        x = self.reduction.transform(anom_features)
+        pca_score = 1 - self.reduction.explained_variance_ratio_[-1]
+
+        self.clustering.fit(x)
+        km_score = self.clustering.inertia_
+        silh_score = silhouette_score(x, self.clustering.labels_, random_state=42)
+        anom_features['cluster'] = self.clustering.labels_
+        clust_prop = anom_features.groupby(['cluster']).mean().sort_values('resid_change').reset_index()
+        self.cluster_map = {}
+        for i in range(len(clust_prop)):
+            self.cluster_map[int(clust_prop.iloc[i].cluster)] = i
+        return pca_score, km_score, silh_score
+
+    @staticmethod
+    def _prepare_data(data: pd.DataFrame) -> pd.DataFrame:
+        data = prepare_sensors_data(data, sensor_columns)
+        data = prepare_meteo_data(data, meteo_columns)
+        data = add_features(data)
+        return data[sel_columns]
+
+    def predict(self, data: pd.DataFrame) -> pd.DataFrame:
+        data = self._prepare_data(data)
+        anomalies = anom_detector(data)
+        anom_fetures = get_anomaly_features(anomalies)
+        x = self.reduction.transform(anom_fetures)
+        clusters = self.clustering.predict(x)
+        start_dates = [anomalies[i].index[0].to_pydatetime() for i in range(len(anomalies))]
+        end_dates = [anomalies[i].index[-1].to_pydatetime() for i in range(len(anomalies))]
+        result = pd.DataFrame(data={'start_date': start_dates, 'end_date': end_dates, 'cluster': clusters})
+        result['cluster'] = result.cluster.map(self.cluster_map)
+        return result
+
+'''
 class AnomalyCluster:
     """ Anomaly selection and cluster label prediction on test data"""
 
@@ -132,6 +186,7 @@ class AnomalyCluster:
         x = self.pca.transform(anom_fetures[sel_columns])
         clusters = self.kmean.predict(x)
         return clusters
+'''
 
 
 def plot_distribution(anomalies):
@@ -184,7 +239,7 @@ def plot_distribution(anomalies):
     plt.savefig('src/web/client/application/static/images/clusters_distribution.png',
                 clear=True, bbox_inches='tight')
 
-
+"""
 def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
     data = pd.read_csv(dataset_file, parse_dates=['date'])
     data = data.set_index('date')
@@ -210,12 +265,15 @@ def main(dataset_file: str, kmean_file: str, pca_file: str, metric_file: str):
         anom = anom.append(anomalies_list[i])
     plot_distribution(anom)
     return pca, km
-
+"""
 
 if __name__ == '__main__':
     data_file = 'DATA/processed/dataset.csv'
-    model = "models/anom_model.obj"
-    metric = 'DATA/metrics/clustering_metric.json'
-    kmean = 'models/kmean.obj'
-    pca = 'models/pca.obj'
-    main(data_file, kmean, pca, metric)
+    data = pd.read_csv(data_file, parse_dates=['date'])
+    data = data.set_index('date')
+    kmean = KMeans(n_clusters=num_clusters, random_state=42)
+    pca = PCA(n_components=PCA_n_components)
+    model = Model(pca, kmean)
+    model.train(data)
+    print(model.predict(data['2020-06-01':'2020-06-07']))
+
