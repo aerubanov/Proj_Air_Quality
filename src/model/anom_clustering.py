@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-import typing
+from typing import List
 import warnings
 
 from src.features.preproc_anom import prepare_meteo_data, prepare_sensors_data, add_features
@@ -34,7 +34,7 @@ PCA_n_components = 3
 num_clusters = 4
 
 
-def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> typing.List[pd.DataFrame]:
+def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> List[pd.DataFrame]:
     """
     Anomaly detection by time-series decomposition.
     :param time_series: to series for anomaly search
@@ -65,7 +65,7 @@ def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85
     return ls
 
 
-def detect_anomalies(data: pd.DataFrame) -> typing.List[pd.DataFrame]:
+def detect_anomalies(data: pd.DataFrame) -> List[pd.DataFrame]:
     """
     Anomaly detection by time series decomposition
     :param data: preprocessed data (see src/features/prerpoc_anom.py)
@@ -81,7 +81,7 @@ def detect_anomalies(data: pd.DataFrame) -> typing.List[pd.DataFrame]:
     return anom_list
 
 
-def get_anomaly_features(anom_list: typing.List[pd.DataFrame]) -> pd.DataFrame:
+def get_anomaly_features(anom_list: List[pd.DataFrame]) -> pd.DataFrame:
     anomdata = pd.DataFrame(index=[i for i in range(len(anom_list))])
     anomdata['resid_change'] = [i.loc[i.resid.abs().idxmax()].resid -
                                 i.loc[i.resid.abs().idxmin()].resid for i in anom_list]
@@ -158,7 +158,7 @@ class Model:
         data = add_features(data)
         return data[sel_columns]
 
-    def predict(self, data: pd.DataFrame) -> pd.DataFrame:
+    def predict(self, data: pd.DataFrame) -> (pd.DataFrame, List[pd.DataFrame]):
         data = self._prepare_data(data)
         anomalies = anom_detector(data)
         anom_fetures = get_anomaly_features(anomalies)
@@ -168,7 +168,7 @@ class Model:
         end_dates = [anomalies[i].index[-1].to_pydatetime() for i in range(len(anomalies))]
         result = pd.DataFrame(data={'start_date': start_dates, 'end_date': end_dates, 'cluster': clusters})
         result['cluster'] = result.cluster.map(self.cluster_map)
-        return result
+        return result, anomalies
 
 
 def main():
