@@ -17,9 +17,10 @@ def test_prepare_data():
     data = pd.read_csv(test_data, parse_dates=['date'])
     data = data.set_index('date')
     data = prepare_data(data)
+    print(data.head(15))
     for c in model_columns:
         assert c in data.columns
-    for c in data.columns:
+    for c in model_columns:
         assert not data[c].isna().any()
 
 
@@ -28,10 +29,10 @@ def test_add_features():
     data = data.set_index('date')
 
     data = add_features(data.iloc[:2], target='P1_filtr_mean')
-    assert set(data.columns) == set(new_features + model_columns)
+    assert set(data.columns) == set(new_features + model_columns+['dew_point_temp'])
 
     data = add_features(data.iloc[:2], target='P2_filtr_mean')
-    assert set(data.columns) == set(new_features + model_columns)
+    assert set(data.columns) == set(new_features + model_columns+['dew_point_temp'])
 
 
 def test_data_transform():

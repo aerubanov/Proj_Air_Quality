@@ -36,10 +36,10 @@ def test_clear_table(database_session):
 
 def test_write_data(database_session):
     d = {'start_date': [datetime.datetime(2020, 3, 1, 4, 15), datetime.datetime(2020, 3, 2, 10, 35),
-                           datetime.datetime(2020, 3, 2, 20, 25)],
-            'end_date': [datetime.datetime(2020, 3, 1, 7, 5), datetime.datetime(2020, 3, 2, 15, 5),
-                         datetime.datetime(2020, 3, 3, 0, 25)],
-            'cluster': [1, 1, 0]}
+                        datetime.datetime(2020, 3, 2, 20, 25)],
+         'end_date': [datetime.datetime(2020, 3, 1, 7, 5), datetime.datetime(2020, 3, 2, 15, 5),
+                      datetime.datetime(2020, 3, 3, 0, 25)],
+         'cluster': [1, 1, 0]}
     anomalies = pd.DataFrame(data=d)
     write_data(database_session, anomalies)
     res = database_session.query(Anomaly).order_by(Anomaly.start_date).all()

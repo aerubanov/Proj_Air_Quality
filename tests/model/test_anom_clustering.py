@@ -32,7 +32,7 @@ def test_get_anomalies_features():
     with open('tests/model/data/anomalies.obj', 'rb') as file:
         data = pickle.load(file)
     result = get_anomaly_features(data)
-    for c in ['resid_change', 'hum', 'temp', 'prec', 'wind_speed', 'wind_sin','wind_cos']:
+    for c in ['resid_change', 'hum', 'temp', 'prec', 'wind_speed', 'wind_sin', 'wind_cos']:
         assert c in result.columns
     result.to_csv('tests/model/data/anom_features.csv', index=False)
 
