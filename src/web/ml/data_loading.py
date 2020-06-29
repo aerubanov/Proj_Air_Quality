@@ -54,7 +54,7 @@ def get_weather_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd
                                 'prec': 'prec_amount', 'wind_speed': 'wind_speed',
                                 'wind_dir': 'wind_direction', 'hum': 'hum_meteo'})
     data['prec_amount'] = data.prec_amount.apply(transform_prec_amount).astype(float)
-    data['prec_time'] = 3.0
+    data['prec_time'] = 3.0  # time step of weather forecast from rp5.ru
     data['wind_direction'] = data.wind_direction.map(wind_dir)
     data = data.set_index('date')
     return data.resample('5T').bfill()
