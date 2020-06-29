@@ -32,6 +32,9 @@ sel_columns = ['P1_filtr_mean', 'P2_filtr_mean',
 PCA_n_components = 3
 num_clusters = 4
 
+kmean = KMeans(n_clusters=num_clusters, random_state=42)
+pca = PCA(n_components=PCA_n_components)
+
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> List[pd.DataFrame]:
     """
@@ -103,7 +106,7 @@ def get_anomaly_features(anom_list: List[pd.DataFrame]) -> pd.DataFrame:
                             i.loc[i.resid.abs().idxmin()].wind_cos for i in anom_list]
     return anomdata
 
-
+'''
 def dimension_reduction(anomdata: pd.DataFrame, sel_col=None) -> (PCA, np.array, float):
     """fit and transform data with PCA"""
     if sel_col is None:
@@ -121,7 +124,7 @@ def clustering(x: np.array, n_clusters=num_clusters, random_state=42) -> (KMeans
     km.fit(x)
     score = km.inertia_
     silh_score = silhouette_score(x, km.labels_, random_state=42)
-    return km, score, silh_score
+    return km, score, silh_score'''
 
 
 class Model:
@@ -173,8 +176,6 @@ class Model:
 def main():
     data = pd.read_csv(data_file, parse_dates=['date'])
     data = data.set_index('date')
-    kmean = KMeans(n_clusters=num_clusters, random_state=42)
-    pca = PCA(n_components=PCA_n_components)
     model = Model(pca, kmean)
     pca_score, km_score, silh_score = model.train(data)
     with open(dim_red_file, 'wb') as pca_file, open(clustering_file, 'wb') as km_file, open(map_file, 'wb') as m_file:
