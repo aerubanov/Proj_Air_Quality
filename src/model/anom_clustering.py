@@ -22,10 +22,9 @@ map_file = 'models/anomalies/cluster_map.obj'
 metrics_file = 'DATA/metrics/clustering_metric.json'
 
 sensor_columns = ['P1_filtr_mean', 'P2_filtr_mean', 'temperature_filtr_mean',
-                  'humidity_filtr_mean', 'pressure_filtr_mean']
+                  'humidity_filtr_mean']
 meteo_columns = ['temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_direction', 'wind_speed',
-                 'precipitation', 'prec_amount', 'prec_time', 'visibility',
-                 'dew_point_temp']
+                 'prec_amount', 'prec_time', 'dew_point_temp']
 sel_columns = ['P1_filtr_mean', 'P2_filtr_mean',
                'temperature_filtr_mean', 'humidity_filtr_mean', 'temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_speed',
                'prec_amount', 'dew_point_temp', 'dew_point_diff', 'prec_time', 'wind_sin', 'wind_cos', 'wind_direction']

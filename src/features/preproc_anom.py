@@ -4,14 +4,14 @@ import numpy as np
 
 def prepare_meteo_data(data, columns):
     for c in columns:
-        data[c].fillna(method='bfill', inplace=True)
+        data[c] = data[c].fillna(method='bfill')
     return data
 
 
 def prepare_sensors_data(data, columns):
     for c in columns:
-        data[c].interpolate(inplace=True)
-        data[c].fillna(data[c].mean(), inplace=True)
+        data[c] = data[c].interpolate()
+        data[c] = data[c].fillna(data[c].mean())
     return data
 
 
@@ -50,18 +50,6 @@ def add_features(data: pd.DataFrame) -> pd.DataFrame:
     data['prec_amount'] = data.prec_amount / data.prec_time
 
     data['dew_point_diff'] = data.temp_meteo - data.dew_point_temp
-
-    # data['P1_iqr_25_75'] = data.P1_p75 - data.P1_p25
-    # data['P1_iqr_10_90'] = data.P1_p90 - data.P1_p10
-
-    # data['P2_iqr_25_75'] = data.P2_p75 - data.P2_p25
-    # data['P2_iqr_10_90'] = data.P2_p90 - data.P2_p10
-
-    # data['temp_iqr_25_75'] = data.temperature_p75 - data.temperature_p25
-    # data['temp_iqr_10_90'] = data.temperature_p90 - data.temperature_p10
-
-    # data['hum_iqr_25_75'] = data.humidity_p75 - data.humidity_p25
-    # data['hum_iqr_10_90'] = data.humidity_p90 - data.humidity_p10
 
     data["wind_sin"] = np.sin(np.radians(data.wind_direction))
     data["wind_cos"] = np.cos(np.radians(data.wind_direction))
