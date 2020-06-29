@@ -8,7 +8,7 @@ from src.model.anom_clustering import Model
 
 pca_model_file = 'models/anomalies/dim_red.obj'
 kmean_model_file = 'models/anomalies/clustering.obj'
-cluster_map_file = 'models/anaomalies/cluster_map.obj'
+cluster_map_file = 'models/anomalies/cluster_map.obj'
 
 
 def clear_anomalies_table(start_date: datetime.datetime, end_date: datetime.datetime, session):
