@@ -38,7 +38,7 @@ def test_get_anomalies_features():
 
 
 def test_model():
-    data = pd.read_csv('DATA/processed/dataset.csv', parse_dates=['date'])
+    data = pd.read_csv(test_data, parse_dates=['date'])
     data = data.set_index('date')
     data = data['2020-03']
     model = Model(pca, kmean)
