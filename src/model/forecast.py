@@ -248,6 +248,7 @@ def train_model(target):
 
 
 if __name__ == '__main__':
+    os.mkdir('models/forecast/')
     p1_mae, p1_mse, p1_meta_mae, p1_meta_mse = train_model(target='P1_filtr_mean')
     p2_mae, p2_mse, p2_meta_mae, p2_meta_mse = train_model(target='P2_filtr_mean')
     with open(metric_path, 'w') as file:
