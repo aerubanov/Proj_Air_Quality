@@ -21,7 +21,7 @@ if __name__ == '__main__':
     Session = sessionmaker(bind=engine)
     sess = Session()
     schedule.every(sensor_time_interval).minutes.do(sensor_task, session=sess, logger=logger)
-    schedule.every(weather_time_interval).minutes.do(weather_task, session=sess, logger=logger)
+    schedule.every().hour.at(":30").do(weather_task, session=sess, logger=logger)
     schedule.every().hour.at(":16").do(mosecom_task, logger=logger)
     # schedule.every().hour.at(":01").do(traffic_task, logger=logger)
     logger.info('%s', 'loader started')
