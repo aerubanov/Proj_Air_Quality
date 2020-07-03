@@ -1,4 +1,4 @@
-md5: 832b176add015e04a854008562305c2d
+md5: a8d135857859e8092451277717e14fee
 cmd: python -m src.data.create_dataset
 wdir: ..
 deps:
@@ -11,11 +11,5 @@ deps:
 outs:
 - md5: d04a7d1e0c6da1f6ff2e8b4a02b84fef
   path: DATA/processed/dataset.csv
-  cache: true
-  metric: false
-  persist: false
 - md5: da5f2b656532ab0983515f3369d9ba77
   path: DATA/processed/sensors.csv
-  cache: true
-  metric: false
-  persist: false

@@ -2,7 +2,7 @@ import pandas as pd
 import pickle
 import json
 import statsmodels.api as sm
-import numpy as np
+import os
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -106,26 +106,6 @@ def get_anomaly_features(anom_list: List[pd.DataFrame]) -> pd.DataFrame:
                             i.loc[i.resid.abs().idxmin()].wind_cos for i in anom_list]
     return anomdata
 
-'''
-def dimension_reduction(anomdata: pd.DataFrame, sel_col=None) -> (PCA, np.array, float):
-    """fit and transform data with PCA"""
-    if sel_col is None:
-        sel_col = sel_columns
-    pca = PCA(n_components=PCA_n_components)
-    pca.fit(anomdata[sel_col])
-    x = pca.transform(anomdata[sel_col])
-    score = 1 - pca.explained_variance_ratio_[-1]
-    return pca, x, score
-
-
-def clustering(x: np.array, n_clusters=num_clusters, random_state=42) -> (KMeans, float, float):
-    """k-means clustering"""
-    km = KMeans(n_clusters=n_clusters, random_state=random_state)
-    km.fit(x)
-    score = km.inertia_
-    silh_score = silhouette_score(x, km.labels_, random_state=42)
-    return km, score, silh_score'''
-
 
 class Model:
 
@@ -178,6 +158,7 @@ def main():
     data = data.set_index('date')
     model = Model(pca, kmean)
     pca_score, km_score, silh_score = model.train(data)
+    os.mkdir('models/anomalies/')
     with open(dim_red_file, 'wb') as pca_file, open(clustering_file, 'wb') as km_file, open(map_file, 'wb') as m_file:
         pickle.dump(model.reduction, pca_file)
         pickle.dump(model.clustering, km_file)
