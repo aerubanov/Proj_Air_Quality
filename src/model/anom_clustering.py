@@ -11,10 +11,15 @@ import warnings
 
 from src.features.preproc_anom import prepare_meteo_data, prepare_sensors_data, add_features
 
+# Perform anomaly detection based on time-series decomposition residual value. Then construct features for each
+# anomaly and clustering them.
+
 pd.options.mode.chained_assignment = None  # prevent false positives SettingWithCopyWarning
 warnings.simplefilter(action='ignore', category=FutureWarning)  # prevent "FutureWarning: elementwise comparison failed;
 # returning scalar instead, but in the future will perform elementwise comparison"
 
+
+# -------------------- constants ---------------------------------------------------------------------------------
 data_file = 'DATA/processed/dataset.csv'
 dim_red_file = 'models/anomalies/dim_red.obj'
 clustering_file = 'models/anomalies/clustering.obj'
@@ -31,9 +36,10 @@ sel_columns = ['P1_filtr_mean', 'P2_filtr_mean',
 
 PCA_n_components = 3
 num_clusters = 4
+# ---------------------------------------------------------------------------------------------------------------------
 
-kmean = KMeans(n_clusters=num_clusters, random_state=42)
-pca = PCA(n_components=PCA_n_components)
+kmean = KMeans(n_clusters=num_clusters, random_state=42)  # model for clustering
+pca = PCA(n_components=PCA_n_components)  # dimension reduction model
 
 
 def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85) -> List[pd.DataFrame]:
@@ -84,6 +90,7 @@ def detect_anomalies(data: pd.DataFrame) -> List[pd.DataFrame]:
 
 
 def get_anomaly_features(anom_list: List[pd.DataFrame]) -> pd.DataFrame:
+    """ construct features for detected anomalies"""
     anomdata = pd.DataFrame(index=[i for i in range(len(anom_list))])
     anomdata['resid_change'] = [i.loc[i.resid.abs().idxmax()].resid -
                                 i.loc[i.resid.abs().idxmin()].resid for i in anom_list]
@@ -115,18 +122,23 @@ class Model:
         self.cluster_map = cluster_map
 
     def train(self, train_data: pd.DataFrame) -> (float, float, float):
+        """ fir clustering and dimension reduction"""
         train_data = self._prepare_data(train_data)
         anomalies_list = detect_anomalies(train_data)
         anom_features = get_anomaly_features(anomalies_list)
 
+        # dimension reduction
         self.reduction.fit(anom_features)
         x = self.reduction.transform(anom_features)
         pca_score = 1 - self.reduction.explained_variance_ratio_[-1]
 
+        # clustring
         self.clustering.fit(x)
         km_score = self.clustering.inertia_
         silh_score = silhouette_score(x, self.clustering.labels_, random_state=42)
         anom_features['cluster'] = self.clustering.labels_
+
+        # match clusters label and residual values
         clust_prop = anom_features.groupby(['cluster']).mean().sort_values('resid_change').reset_index()
         self.cluster_map = {}
         for i in range(len(clust_prop)):
@@ -141,11 +153,20 @@ class Model:
         return data[sel_columns]
 
     def predict(self, data: pd.DataFrame) -> (pd.DataFrame, List[pd.DataFrame]):
+        """
+        detect anomalies and get clusters for them
+        :param data: 7-days length time-series data
+        :return: result - anomalies start and end dates, cluster labels
+                 anomalies - chunks of input time-series recognized as anomaly
+        """
         data = self._prepare_data(data)
+
         anomalies = anom_detector(data)
         anom_fetures = get_anomaly_features(anomalies)
+
         x = self.reduction.transform(anom_fetures)
         clusters = self.clustering.predict(x)
+
         start_dates = [anomalies[i].index[0].to_pydatetime() for i in range(len(anomalies))]
         end_dates = [anomalies[i].index[-1].to_pydatetime() for i in range(len(anomalies))]
         result = pd.DataFrame(data={'start_date': start_dates, 'end_date': end_dates, 'cluster': clusters})

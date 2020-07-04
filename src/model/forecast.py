@@ -16,6 +16,12 @@ from src.features.preproc_forecast import DataTransform
 
 pd.options.mode.chained_assignment = None  # disable SettingWithCopyWarning
 
+# Build models for PM2.5 and PM10 forecast for next 24-hours, separate model for each hour. We use model
+# ansamble from two models. Firstly, Linear model take sensor data from previous 24-hours and predict PM. Next,
+# Random Forest take this prediction and weather forecast (from external source) as input and make final prediction.
+
+
+# ------------------- constants ----------------------------------------------------------------------------
 # columns of dataset which will be used
 columns = ['P1_filtr_mean', 'P2_filtr_mean', 'humidity_filtr_mean', 'temperature_filtr_mean', 'pres_meteo',
            'temp_meteo', 'hum_meteo', 'wind_direction', 'wind_speed', 'prec_amount', 'prec_time']
@@ -35,6 +41,7 @@ DATASET_START = '2019-04-02 00:00:00+00:00'
 model_path = 'models/forecast'
 metric_path = 'DATA/metrics/forecast_metrics.json'
 data_path = 'DATA/processed/dataset.csv'
+# -------------------------------------------------------------------------------------------------------------
 
 
 class Chunk:
@@ -47,6 +54,7 @@ class Chunk:
         self.target = target
 
     def get_x(self):
+        """return X - sensor values from previous 24-hours"""
         x = list(self.train[self.target].values)
         x += list(self.train.P_diff1.values)
         x += list(self.train.P_diff2.values)
@@ -60,12 +68,14 @@ class Chunk:
         return x
 
     def get_y(self, forward_time, orig=False):
+        """return target value for some forvard time in next 24-hours"""
         if orig:
             return self.test.P_original.values[forward_time]
         y = self.test[self.target].values[forward_time]
         return y
 
     def get_meta_x(self, forward_time, models):
+        """return X for meta model - consist prediction from first layer model and weather forecast data"""
         x = self.get_x()
         model = models[forward_time]
         prediction = model.predict([x])[0]
@@ -213,6 +223,7 @@ class Model:
 
 
 def train_model(target):
+    """train models for PM2.5 and PM10 and save it with pickle"""
     data = pd.read_csv(data_path, parse_dates=['date'])
     data = data.set_index('date')
     data_transform = QuantileTransformer(output_distribution='normal')
