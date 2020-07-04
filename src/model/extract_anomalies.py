@@ -13,6 +13,7 @@ dim_red_file = 'models/anomalies/dim_red.obj'
 clustering_file = 'models/anomalies/clustering.obj'
 map_file = 'models/anomalies/cluster_map.obj'
 anomalies_file = 'DATA/processed/anomalies.csv'
+image_file = 'src/web/client/application/static/images/clusters_distribution.png'
 # ------ constants --------------------------------------------------------------------------------------
 
 
@@ -78,7 +79,7 @@ def plot_distribution(anomalies):
                                                               density=True)
     axs[1, 4].set_title('Направление ветра')
     axs[1, 4].legend(loc='best')
-    plt.savefig('src/web/client/application/static/images/clusters_distribution.png',
+    plt.savefig(image_file,
                 clear=True, bbox_inches='tight')
 
 
