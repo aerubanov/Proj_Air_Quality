@@ -5,7 +5,7 @@ import schedule
 import logging.config
 
 from src.web.models.model import Base
-from src.web.loader.config import sensor_time_interval, weather_time_interval
+from src.web.loader.config import sensor_time_interval
 from src.web.logger.logging_config import LOGGING_CONFIG
 from src.web.loader.tasks import sensor_task, weather_task, mosecom_task, traffic_task
 from src.web.config import DATABASE
