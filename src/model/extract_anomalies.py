@@ -6,10 +6,14 @@ from typing import List
 from src.model.anom_clustering import Model, num_clusters, sensor_columns, meteo_columns
 from src.features.preproc_anom import prepare_sensors_data, prepare_meteo_data
 
+
+# ------ constants --------------------------------------------------------------------------------------
 data_file = 'DATA/processed/dataset.csv'
 dim_red_file = 'models/anomalies/dim_red.obj'
 clustering_file = 'models/anomalies/clustering.obj'
 map_file = 'models/anomalies/cluster_map.obj'
+anomalies_file = 'DATA/processed/anomalies.csv'
+# ------ constants --------------------------------------------------------------------------------------
 
 
 def plot_distribution(anomalies):
@@ -101,7 +105,7 @@ def main():
         cluster_map = pickle.load(m_file)
         model = Model(pca, kmean, cluster_map)
     anomalies, anom_data = extract_anom(data, model)
-    anomalies.to_csv('DATA/processed/anomalies.csv', index=False)
+    anomalies.to_csv(anomalies_file, index=False)
     for i in range(len(anomalies)):
         anom_data[i]['cluster'] = anomalies.iloc[i]['cluster']
     anom_data = pd.concat(anom_data, axis=0)
