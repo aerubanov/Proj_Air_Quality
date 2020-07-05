@@ -80,6 +80,17 @@ def test_get_chunk(monkeypatch):
     assert len(chunk.test) == 24
 
 
+    targets = ['P1_filtr_mean', 'P2_filtr_mean']
+    predictions = []
+    for targ in targets:
+        transform = get_transforms(targ)
+        model = get_model(targ, transform.target_transform)
+        pred = model.predict(chunk)
+        predictions.append(pred)
+    assert len(predictions[0]) == 24
+    assert len(predictions[1]) == 24
+
+
 def test_perform_forecast(database_session, monkeypatch):
     def mock_get_chunk(*args, **kwargs):
         return None

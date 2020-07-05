@@ -4,7 +4,7 @@ import pickle
 
 from src.web.models.model import Forecast
 from src.model.forecast import Model, Chunk, columns, num_colunms, features
-from src.features.preproc_forecast import DataTransform
+from src.features.preproc_forecast import DataTransform, add_features
 from src.web.ml.data_loading import get_weather_data, get_sensor_data
 
 p1_models_file = "models/forecast/P1_models.obj"
@@ -38,14 +38,18 @@ def get_chunk(session, transform: DataTransform, target: str) -> Chunk:
     sensor_data = get_sensor_data(session)
     weather_data = get_weather_data(session)
     train_part = pd.concat((sensor_data, weather_data), axis=1)
-    train_part = transform.transform(train_part)
-    print(train_part.columns)
+    train_data = transform.transform(train_part)
     test_part = get_weather_data(session, date=datetime.datetime.utcnow()+datetime.timedelta(days=1))
-    print(test_part.columns)
     for c in ['P1_filtr_mean', 'P2_filtr_mean', 'humidity_filtr_mean', 'temperature_filtr_mean']:
         test_part[c] = train_part[c].mean()
-    test_part = transform.transform(test_part)
-    chunk = Chunk(train_part, test_part, features, target)
+    test_data = transform.transform(test_part)
+    train_data = add_features(train_data, target)
+    test_data = add_features(test_data, target)
+    train_data = train_data.interpolate()
+    test_data = test_data.interpolate()
+    train_data = train_data.fillna(train_data.mean())
+    test_data = test_data.fillna(train_data.mean())
+    chunk = Chunk(train_data, test_data, features, target)
     return chunk
 
 
