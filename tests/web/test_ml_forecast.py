@@ -79,7 +79,6 @@ def test_get_chunk(monkeypatch):
     assert len(chunk.train) == 24
     assert len(chunk.test) == 24
 
-
     targets = ['P1_filtr_mean', 'P2_filtr_mean']
     predictions = []
     for targ in targets:
