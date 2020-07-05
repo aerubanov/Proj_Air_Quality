@@ -231,7 +231,7 @@ def train_model(target):
     transform = DataTransform(data_transform, target_transform, columns, num_colunms, target)
     data = transform.fit_transform(data)
     x_train, x_meta_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN, target)
-    print(x_train[0].train.columns, x_train[0].shape)
+    print(x_train[0].train.shape, x_train[0].test.shape)
 
     model = Model(transform.target_transform)
     model.fit(x_train, x_meta_train)

@@ -48,6 +48,7 @@ def get_chunk(session, transform: DataTransform, target: str) -> Chunk:
     train_data = train_data.interpolate()
     test_data = test_data.interpolate()
     train_data = train_data.fillna(train_data.mean())
+    train_data = train_data[:24]
     test_data = test_data.fillna(train_data.mean())
     chunk = Chunk(train_data, test_data, features, target)
     return chunk
