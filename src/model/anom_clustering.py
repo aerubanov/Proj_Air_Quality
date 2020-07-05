@@ -147,10 +147,13 @@ class Model:
 
     @staticmethod
     def _prepare_data(data: pd.DataFrame) -> pd.DataFrame:
-        data = prepare_sensors_data(data, sensor_columns)
-        data = prepare_meteo_data(data, meteo_columns)
+        sens_col = [i for i in sensor_columns if i in data.columns]
+        met_col = [i for i in meteo_columns if i in data.columns]
+        data = prepare_sensors_data(data, sens_col)
+        data = prepare_meteo_data(data, met_col)
         data = add_features(data)
-        return data[sel_columns]
+        sel_col = [i for i in sel_columns if i in data.columns]
+        return data[sel_col]
 
     def predict(self, data: pd.DataFrame) -> (pd.DataFrame, List[pd.DataFrame]):
         """

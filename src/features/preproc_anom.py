@@ -49,7 +49,8 @@ def add_features(data: pd.DataFrame) -> pd.DataFrame:
     data['prec_time'] = data.prec_time.fillna(method='bfill')
     data['prec_amount'] = data.prec_amount / data.prec_time
 
-    data['dew_point_diff'] = data.temp_meteo - data.dew_point_temp
+    if 'dew_point_temp' in data.columns:
+        data['dew_point_diff'] = data.temp_meteo - data.dew_point_temp
 
     data["wind_sin"] = np.sin(np.radians(data.wind_direction))
     data["wind_cos"] = np.cos(np.radians(data.wind_direction))
