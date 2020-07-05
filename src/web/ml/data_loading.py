@@ -11,8 +11,9 @@ def get_sensor_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd.
         date = datetime.datetime.utcnow()
 
     # get sensor data for Chunk.train
-    result = session.query(Sensors).filter(Sensors.date >= date - delta).all()
+    result = session.query(Sensors).filter(Sensors.date.between(date-delta, date)).all()
     data = [i.serialize for i in result]
+    print(data)
     data = pd.DataFrame(data)
     data = data.rename(columns={'p1': 'P1_filtr_mean', 'p2': 'P2_filtr_mean', 'temperature': 'temperature_filtr_mean',
                                 'humidity': 'humidity_filtr_mean', 'pressure': 'pressure_filtr_mean'})
@@ -46,7 +47,7 @@ def get_weather_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd
     """ get weather data for time interval [date-delta, date]"""
     if date is None:
         date = datetime.datetime.utcnow()
-    res = session.query(Weather).filter(Weather.date >= date - delta).all()
+    res = session.query(Weather).filter(Weather.date.between(date-delta, date)).all()
     data = [i.serialize for i in res]
     data = pd.DataFrame(data)
     data['date'] = pd.to_datetime(data.date)

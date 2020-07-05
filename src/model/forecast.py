@@ -231,6 +231,7 @@ def train_model(target):
     transform = DataTransform(data_transform, target_transform, columns, num_colunms, target)
     data = transform.fit_transform(data)
     x_train, x_meta_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN, target)
+    print(x_train[0].train.columns, x_train[0].shape)
 
     model = Model(transform.target_transform)
     model.fit(x_train, x_meta_train)
@@ -259,7 +260,10 @@ def train_model(target):
 
 
 if __name__ == '__main__':
-    os.mkdir('models/forecast/')
+    try:
+        os.mkdir('models/forecast/')
+    except FileExistsError:
+        pass
     p1_mae, p1_mse, p1_meta_mae, p1_meta_mse = train_model(target='P1_filtr_mean')
     p2_mae, p2_mse, p2_meta_mae, p2_meta_mse = train_model(target='P2_filtr_mean')
     with open(metric_path, 'w') as file:

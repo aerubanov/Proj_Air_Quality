@@ -76,8 +76,8 @@ def test_get_chunk(monkeypatch):
 
     chunk = get_chunk(None, MockTransform, 'P1_filtr_mean')
 
-    assert len(chunk.train) == 24
-    assert len(chunk.test) == 24
+    assert chunk.train.shape == (24, 38)
+    assert chunk.test.shape == (24, 38)
 
     targets = ['P1_filtr_mean', 'P2_filtr_mean']
     predictions = []
