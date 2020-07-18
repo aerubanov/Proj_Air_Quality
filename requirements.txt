@@ -22,3 +22,4 @@ altair
 Flask-WTF
 matplotlib
 awscli
+graphyte
