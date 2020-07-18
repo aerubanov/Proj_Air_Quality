@@ -71,5 +71,6 @@ def load_sensors() -> dict:
     """get current average values from sensors"""
     sensor_id = read_sensor_id(sensor_file)
     data = load_data(sensor_id)
+    loaded = len(data)
     avg_data = average_data(data)
-    return avg_data
+    return avg_data, loaded

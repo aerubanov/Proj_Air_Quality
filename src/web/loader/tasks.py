@@ -1,6 +1,7 @@
 import time
 import datetime
 from marshmallow import ValidationError
+import graphyte
 
 from src.web.loader.sensor_loading import load_sensors
 from src.web.loader.weather_loading import parse_weather
@@ -8,17 +9,19 @@ from src.web.models.model import Sensors, Weather
 from src.web.loader.validation import SensorSchema, WeatherSchema
 from src.web.loader.mosecom_loading import load_data, write_processed, write_raw_data
 from src.web.loader.trafic_loader import load_traffic_level
+from src.web.loader.config import metrics_host
 
 sensor_schema = SensorSchema()
 weather_schema = WeatherSchema()
+graphyte.init(metrics_host, prefix='loader')
 
 
-def sensor_task(session, logger=None):
+def sensor_task(session, logger=None, metrics=False):
     """request sensor api data and save in database"""
 
     # getting data
     start_time = time.time()
-    avg_data = load_sensors()
+    avg_data, loaded = load_sensors()
     resp_time = (time.time() - start_time) * 1000  # time in milliseconds
     try:
         avg_data = sensor_schema.load(avg_data)
@@ -39,9 +42,11 @@ def sensor_task(session, logger=None):
     resp_time = (time.time() - start_time) * 1000  # time in milliseconds
     if logger is not None:
         logger.info('%s %s', 'sensor data saved in database', f'timing: {resp_time}')
+    if metrics:
+        graphyte.send('sensors', loaded)
 
 
-def weather_task(session, logger=None):
+def weather_task(session, logger=None, metrics=False):
     """download weather forecast and save in database"""
     # get data
     start_time = time.time()
@@ -76,15 +81,19 @@ def weather_task(session, logger=None):
     resp_time = (time.time() - start_time) * 1000  # time in milliseconds
     if logger is not None:
         logger.info('%s %s', 'weather data saved in database', f'timing: {resp_time}')
+    if metrics:
+        graphyte.send('weather', len(data['date']))
 
 
-def mosecom_task(logger=None):
+def mosecom_task(logger=None, metrics=False):
     p1_data, p2_data = load_data()
     write_raw_data(p1_data, 'P1')
     write_raw_data(p2_data, 'P2')
     write_processed(p1_data, p2_data)
     if logger is not None:
         logger.info('%s', 'write mosecom data in file')
+    if metrics:
+        graphyte.send('mosecom', len(p1_data))
 
 
 def traffic_task(logger):

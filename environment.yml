@@ -23,6 +23,7 @@ dependencies:
     - Flask-WTF
     - matplotlib
     - awscli
+    - graphyte
     - pip
     - pip:
         - psycopg2-binary
