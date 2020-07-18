@@ -18,7 +18,7 @@ def test_sensor_task_correct_data(monkeypatch, database_session):
                 'temp': temp,
                 'press': press,
                 'hum': hum,
-                }
+                }, 10
 
     monkeypatch.setattr('src.web.loader.tasks.load_sensors', mockreturn)
 
@@ -51,7 +51,7 @@ def test_sensor_task_incorrect_data(monkeypatch, database_session):
         data[key] = test_data_incorrect[key]
 
         def mockreturn():
-            return data
+            return data, 10
 
         monkeypatch.setattr('src.web.loader.tasks.load_sensors', mockreturn)
 
