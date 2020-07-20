@@ -33,9 +33,10 @@ meteo_columns = ['temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_direction', 'win
 sel_columns = ['P1_filtr_mean', 'P2_filtr_mean',
                'temperature_filtr_mean', 'humidity_filtr_mean', 'temp_meteo', 'pres_meteo', 'hum_meteo', 'wind_speed',
                'prec_amount', 'dew_point_temp', 'dew_point_diff', 'prec_time', 'wind_sin', 'wind_cos', 'wind_direction']
+features = ['resid_change', 'hum', 'temp', 'prec', 'wind_speed', 'wind_sin', 'wind_cos', 'P1']
 
 PCA_n_components = 3
-num_clusters = 4
+num_clusters = 3
 # ---------------------------------------------------------------------------------------------------------------------
 
 kmean = KMeans(n_clusters=num_clusters, random_state=42)  # model for clustering
@@ -111,6 +112,12 @@ def get_anomaly_features(anom_list: List[pd.DataFrame]) -> pd.DataFrame:
                             i.loc[i.resid.abs().idxmin()].wind_sin for i in anom_list]
     anomdata['wind_cos'] = [i.loc[i.resid.abs().idxmax()].wind_cos -
                             i.loc[i.resid.abs().idxmin()].wind_cos for i in anom_list]
+    anomdata['wind_dir_change'] = [i.loc[i.resid.abs().idxmax()].wind_direction -
+                                   i.loc[i.resid.abs().idxmin()].wind_direction for i in anom_list]
+    anomdata['resid_max'] = [i.loc[i.resid.abs().idxmax()].resid for i in anom_list]
+    anomdata['P1'] = [i.loc[i.resid.abs().idxmax()].P1_filtr_mean for i in anom_list]
+    anomdata['hum_max'] = [i.loc[i.resid.abs().idxmax()].hum_meteo for i in anom_list]
+    anomdata['prec_max'] = [i.loc[i.resid.abs().idxmax()].prec_amount for i in anom_list]
     return anomdata
 
 
@@ -128,8 +135,8 @@ class Model:
         anom_features = get_anomaly_features(anomalies_list)
 
         # dimension reduction
-        self.reduction.fit(anom_features)
-        x = self.reduction.transform(anom_features)
+        self.reduction.fit(anom_features[features])
+        x = self.reduction.transform(anom_features[features])
         pca_score = 1 - self.reduction.explained_variance_ratio_[-1]
 
         # clustring
@@ -165,16 +172,17 @@ class Model:
         data = self._prepare_data(data)
 
         anomalies = anom_detector(data)
-        anom_fetures = get_anomaly_features(anomalies)
+        anom_features = get_anomaly_features(anomalies)
 
-        x = self.reduction.transform(anom_fetures)
+        x = self.reduction.transform(anom_features[features])
         clusters = self.clustering.predict(x)
 
         start_dates = [anomalies[i].index[0].to_pydatetime() for i in range(len(anomalies))]
         end_dates = [anomalies[i].index[-1].to_pydatetime() for i in range(len(anomalies))]
         result = pd.DataFrame(data={'start_date': start_dates, 'end_date': end_dates, 'cluster': clusters})
         result['cluster'] = result.cluster.map(self.cluster_map)
-        return result, anomalies
+        anom_features['cluster'] = result.cluster
+        return result, anom_features
 
 
 def main():
