@@ -278,8 +278,8 @@ def anomalies_graph():
 
     ).interactive()
 
-    range_ = ['red', 'green', 'blue', '#7D3C98']
-    domain = [0, 1, 2, 3]
+    range_ = ['green', 'red', 'blue']
+    domain = [0, 1, 2]
 
     bar = alt.Chart(data=anom_df).mark_bar().encode(
         x=alt.X('index:T'),
