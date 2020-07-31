@@ -60,6 +60,29 @@ def test_get_sensor_data_incorrect_request(database_session, api_test_client):
     assert resp.status_code == 400
 
 
+def test_get_sensor_data_with_columns(database_session, api_test_client):
+    s1 = Sensors(date=datetime.datetime(2020, 2, 12, 15, 30, 4), p1=6.7, p2=4.7,
+                 temperature=22, humidity=65, pressure=99679)
+    s2 = Sensors(date=datetime.datetime(2020, 2, 15, 11, 44, 6), p1=7.7, p2=5.7,
+                 temperature=22, humidity=65, pressure=99679)
+    database_session.add(s1)
+    database_session.commit()
+    database_session.add(s2)
+    database_session.commit()
+
+    columns = ['date', 'p1', 'p2']
+    resp = api_test_client.get('/sensor_data', json={"start_time": "2020-02-12T00:00:00",
+                                                     "end_time": "2020-02-16T00:00:00",
+                                                     "columns": columns},
+                               content_type='application/json')
+    assert resp.status_code == 200
+    resp_data = json.loads(resp.data)
+    assert len(resp_data) == 2
+    for item in resp_data:
+        for column in columns:
+            assert column in item
+
+
 def test_get_forecast_without_date(database_session, api_test_client):
     f1 = Forecast(date=datetime.datetime(2020, 3, 1, 9, 0, 0), forward_time=0)
     f2 = Forecast(date=datetime.datetime(2020, 3, 1, 10, 0, 0), forward_time=0)

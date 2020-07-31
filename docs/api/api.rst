@@ -11,7 +11,10 @@ API methods provide access to data. To use it, you should send http-request on
 
   'end_time': '<iso-format datetime>'
 
- Get all sensor data from time interval between start_time and and time.
+  optional: 'columns': [<'date', 'p1', 'p2', 'pressure', 'humidity', 'temperature'>]
+
+ Get all sensor data from time interval between start_time and and time. If 'columns' list
+ \specified, only this columns will be returned.
 
  Return:
   [{'date': <iso-format datetime>,
