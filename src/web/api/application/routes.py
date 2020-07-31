@@ -41,49 +41,65 @@ def get_db():
 def get_sensor_data():
     try:
         args = sensor_data_schema.load(request.get_json())
-        session = get_db()
-        res = session.query(Sensors).filter(args['start_time'] <= Sensors.date)
-        res = res.filter(Sensors.date <= args['end_time'])
-        res = res.order_by(Sensors.date)
-        data = [i.serialize for i in res.all()]
-        return jsonify(data)
     except ValidationError as e:
         abort(400, str(e))
+        return
+    session = get_db()
+    res = session.query(Sensors)
+    '''else:
+        columns_map = {
+            'p1': Sensors.p1,
+            'p2': Sensors.p2,
+            'pressure': Sensors.pressure,
+            'humidity': Sensors.humidity,
+            'temperature': Sensors.temperature,
+        }
+        entities = [columns_map[i] for i in args['columns']]
+        res = session.query().with_entities(*entities)'''
+    res = res.filter(args['start_time'] <= Sensors.date)
+    res = res.filter(Sensors.date <= args['end_time'])
+    res = res.order_by(Sensors.date)
+    data = [i.serialize for i in res.all()]
+    if 'columns' in args:
+        data = [{i: item[i] for i in args['columns']} for item in data]
+    return jsonify(data)
 
 
 @app.route('/forecast', methods=['GET'])
 def get_forecast():
     try:
         args = forecast_schema.load(request.get_json())
-        session = get_db()
-        res = session.query(Forecast)
-        if 'start_time' in args:
-            res = res.filter(Forecast.date >= args['start_time'])
-        if 'end_time' in args:
-            res = res.filter(Forecast.date <= args['end_time'])
-        res = res.order_by(Forecast.date.desc())
-        if 'start_time' not in args and 'end_time' not in args:
-            res = res.limit(1)
-            date = res.first().date  # get last available datetime for forecast
-            res = session.query(Forecast).filter(Forecast.date == date)
-        data = [i.serialize for i in res.all()]
-        return jsonify(data)
     except ValidationError as e:
         abort(400, str(e))
+        return
+    session = get_db()
+    res = session.query(Forecast)
+    if 'start_time' in args:
+        res = res.filter(Forecast.date >= args['start_time'])
+    if 'end_time' in args:
+        res = res.filter(Forecast.date <= args['end_time'])
+    res = res.order_by(Forecast.date.desc())
+    if 'start_time' not in args and 'end_time' not in args:
+        res = res.limit(1)
+        date = res.first().date  # get last available datetime for forecast
+        res = session.query(Forecast).filter(Forecast.date == date)
+    data = [i.serialize for i in res.all()]
+    return jsonify(data)
 
 
 @app.route('/anomaly', methods=['GET'])
 def get_anomaly():
     try:
         args = anomaly_schema.load(request.get_json())
-        session = get_db()
-        res = session.query(Anomaly).filter(Anomaly.end_date >= args['start_time']).\
-            filter(Anomaly.start_date <= args['end_time'])
-        res.order_by(Anomaly.start_date)
-        data = [i.serialize for i in res.all()]
-        return jsonify(data)
     except ValidationError as e:
         abort(400, str(e))
+        return
+    session = get_db()
+    res = session.query(Anomaly).filter(Anomaly.end_date >= args['start_time']). \
+        filter(Anomaly.start_date <= args['end_time'])
+    res.order_by(Anomaly.start_date)
+    data = [i.serialize for i in res.all()]
+    return jsonify(data)
 
 
 @app.teardown_appcontext
