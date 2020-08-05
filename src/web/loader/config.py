@@ -9,5 +9,3 @@ mosecom_url = 'https://mosecom.mos.ru/wp-content/themes/moseco/map/stations-new.
 
 trafic_map_url = 'https://yandex.ru/maps/213/moscow/?l=trf%2Ctrfe&ll=37.622504%2C55.753215&z=10'
 trafic_level_url = 'https://yandex.ru/maps/api/traffic/getLevelInfo?ajax=1&'
-
-metrics_host = '45.153.184.78'

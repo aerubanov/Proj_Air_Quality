@@ -24,6 +24,7 @@ dependencies:
     - matplotlib
     - awscli
     - graphyte
+    - appmetrics
     - pip
     - pip:
         - psycopg2-binary
