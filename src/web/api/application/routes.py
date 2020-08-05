@@ -4,15 +4,22 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import logging.config
 import time
+from appmetrics import metrics, reporter
 
 from src.web.api.application import app
 from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
 from src.web.models.model import Base, Sensors, Forecast, Anomaly
 from src.web.logger.logging_config import LOGGING_CONFIG
+from src.web.api.application.metrics_reporter import graphite_reporter
 
 sensor_data_schema = SensorDataSchema()
 forecast_schema = ForecastRequestSchema()
 anomaly_schema = AnomalyRequestSchema()
+
+meter_200 = metrics.new_meter('status_200')
+meter_400 = metrics.new_meter('status_400')
+meter_404 = metrics.new_meter('status_404')
+reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 
 
 def get_logger():
@@ -37,6 +44,7 @@ def get_db():
     return g.db
 
 
+@metrics.with_meter('sensors')
 @app.route('/sensor_data', methods=['GET'])
 def get_sensor_data():
     try:
@@ -65,6 +73,7 @@ def get_sensor_data():
     return jsonify(data)
 
 
+@metrics.with_meter('forecast')
 @app.route('/forecast', methods=['GET'])
 def get_forecast():
     try:
@@ -87,6 +96,7 @@ def get_forecast():
     return jsonify(data)
 
 
+@metrics.with_meter('anomalies')
 @app.route('/anomaly', methods=['GET'])
 def get_anomaly():
     try:
@@ -125,4 +135,12 @@ def after_request(response):
     logger = get_logger()
     logger.info(f'path: {request.path} - method: {request.method} - remote: {request.remote_addr} '
                 f'- json: {request.json} - status: {response.status} - time: {resp_time}')
+    try:
+        meter = {response.status_code == 200: meter_200,
+                 response.status_code == 400: meter_400,
+                 response.status_code == 404: meter_404,
+                 }[True]
+        meter.notify(1)
+    except KeyError:
+        pass
     return response

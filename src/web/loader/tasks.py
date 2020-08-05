@@ -9,7 +9,7 @@ from src.web.models.model import Sensors, Weather
 from src.web.loader.validation import SensorSchema, WeatherSchema
 from src.web.loader.mosecom_loading import load_data, write_processed, write_raw_data
 from src.web.loader.trafic_loader import load_traffic_level
-from src.web.loader.config import metrics_host
+from src.web.config import metrics_host
 
 sensor_schema = SensorSchema()
 weather_schema = WeatherSchema()
