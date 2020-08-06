@@ -20,9 +20,6 @@ jobs:
     - name: Build api
       run: docker-compose build api
       working-directory: ./src/web
-    - name: Build script
-      run: docker-compose build script
-      working-directory: ./src/web
     - name: Build ml
       run: docker-compose build ml
       working-directory: ./src/web
@@ -34,9 +31,6 @@ jobs:
       working-directory: ./src/web
     - name: Push image api
       run: docker-compose push api
-      working-directory: ./src/web
-    - name: Push image script
-      run: docker-compose push script
       working-directory: ./src/web
     - name: Push image ml
       run: docker-compose push ml
