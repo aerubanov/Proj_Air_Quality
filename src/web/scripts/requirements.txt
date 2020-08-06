@@ -1,4 +1,0 @@
-pandas
-sqlalchemy
-sklearn
-psycopg2
