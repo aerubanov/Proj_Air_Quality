@@ -4,13 +4,10 @@ import datetime
 import pandas as pd
 
 from src.web.models.model import Base, Sensors, Anomaly
-try:
-    from src.web.config import DATABASE
-except ModuleNotFoundError:
-    print("Missing config file!!!")
 
-dataset = 'data/dataset.csv'
-anomalies = 'data/anomalies.csv'
+DATABASE = 'postgresql://postgres:postgres@localhost:5432/pgdb'
+dataset = 'DATA/processed/dataset.csv'
+anomalies = 'DATA/processed/anomalies.csv'
 
 
 def load_sensor_data(file: str) -> pd.DataFrame:

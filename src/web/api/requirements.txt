@@ -4,3 +4,4 @@ sqlalchemy
 gunicorn
 psycopg2
 appmetrics
+graphyte
