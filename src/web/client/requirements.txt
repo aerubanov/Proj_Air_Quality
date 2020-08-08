@@ -4,3 +4,5 @@ requests
 Flask-WTF
 sqlalchemy
 psycopg2
+appmetrics
+graphyte

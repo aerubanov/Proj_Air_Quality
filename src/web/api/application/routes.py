@@ -5,12 +5,14 @@ from sqlalchemy import create_engine
 import logging.config
 import time
 from appmetrics import metrics, reporter
+import graphyte
 
 from src.web.api.application import app
 from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
 from src.web.models.model import Base, Sensors, Forecast, Anomaly
 from src.web.logger.logging_config import LOGGING_CONFIG
-from src.web.api.application.metrics_reporter import graphite_reporter
+from src.web.utils.metrics_reporter import GraphyteReporter
+from src.web.config import metrics_host
 
 sensor_data_schema = SensorDataSchema()
 forecast_schema = ForecastRequestSchema()
@@ -19,6 +21,8 @@ anomaly_schema = AnomalyRequestSchema()
 meter_200 = metrics.new_meter('status_200')
 meter_400 = metrics.new_meter('status_400')
 meter_404 = metrics.new_meter('status_404')
+graphyte.init(metrics_host, prefix='api')
+graphite_reporter = GraphyteReporter(graphyte)
 reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 
 
@@ -44,8 +48,8 @@ def get_db():
     return g.db
 
 
-@metrics.with_meter('sensors')
 @app.route('/sensor_data', methods=['GET'])
+@metrics.with_meter('sensors')
 def get_sensor_data():
     try:
         args = sensor_data_schema.load(request.get_json())
@@ -73,8 +77,8 @@ def get_sensor_data():
     return jsonify(data)
 
 
-@metrics.with_meter('forecast')
 @app.route('/forecast', methods=['GET'])
+@metrics.with_meter('forecast')
 def get_forecast():
     try:
         args = forecast_schema.load(request.get_json())
@@ -96,8 +100,8 @@ def get_forecast():
     return jsonify(data)
 
 
-@metrics.with_meter('anomalies')
 @app.route('/anomaly', methods=['GET'])
+@metrics.with_meter('anomalies')
 def get_anomaly():
     try:
         args = anomaly_schema.load(request.get_json())
