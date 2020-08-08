@@ -48,8 +48,8 @@ def get_db():
     return g.db
 
 
-@metrics.with_meter('sensors')
 @app.route('/sensor_data', methods=['GET'])
+@metrics.with_meter('sensors')
 def get_sensor_data():
     try:
         args = sensor_data_schema.load(request.get_json())
@@ -77,8 +77,8 @@ def get_sensor_data():
     return jsonify(data)
 
 
-@metrics.with_meter('forecast')
 @app.route('/forecast', methods=['GET'])
+@metrics.with_meter('forecast')
 def get_forecast():
     try:
         args = forecast_schema.load(request.get_json())
@@ -100,8 +100,8 @@ def get_forecast():
     return jsonify(data)
 
 
-@metrics.with_meter('anomalies')
 @app.route('/anomaly', methods=['GET'])
+@metrics.with_meter('anomalies')
 def get_anomaly():
     try:
         args = anomaly_schema.load(request.get_json())
