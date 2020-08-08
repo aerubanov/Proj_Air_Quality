@@ -1,10 +1,10 @@
-md5: 0a59acac993f222a697cd5f2aa943196
+md5: 721ed7094c266ae50d3d346ab183762b
 cmd: python -m src.model.extract_anomalies
 wdir: ..
 deps:
-- md5: 0fb99b941f29fc4aee26ed64fe160842
+- md5: 4279dd3160c3af3b8692700297b14971
   path: DATA/processed/dataset.csv
-- md5: 79af117f0a78ce7b418c887aa1da0d39.dir
+- md5: d34be5016525efc9de901296d81677a0.dir
   path: models/anomalies
 - md5: 117b4034862f84c1cb618203520e2ce2
   path: src/model/extract_anomalies.py
