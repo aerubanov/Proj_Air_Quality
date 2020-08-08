@@ -9,10 +9,22 @@ from wtforms.fields.html5 import DateField
 from wtforms.fields import SubmitField
 import logging.config
 import time
+import graphyte
+from appmetrics import metrics, reporter
 
 from src.web.client.application import app
 from src.web.client.application.helper_functions import pm25_to_aqius, aqi_level
 from src.web.logger.logging_config import LOGGING_CONFIG
+from src.web.utils.metrics_reporter import GraphyteReporter
+from src.web.config import metrics_host
+
+
+meter_200 = metrics.new_meter('client_status_200')
+meter_400 = metrics.new_meter('client_status_400')
+meter_404 = metrics.new_meter('client_status_404')
+graphyte.init(metrics_host, prefix='client')
+graphite_reporter = GraphyteReporter(graphyte)
+reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 
 
 class DateForm(FlaskForm):
@@ -42,22 +54,33 @@ def after_request(response):
     logger = get_logger()
     logger.info(f'path: {request.path} - method: {request.method} - remote: {request.remote_addr} '
                 f'- json: {request.json} - status: {response.status} - time: {resp_time}')
+    try:
+        meter = {response.status_code == 200: meter_200,
+                 response.status_code == 400: meter_400,
+                 response.status_code == 404: meter_404,
+                 }[True]
+        meter.notify(1)
+    except KeyError:
+        pass
     return response
 
 # ------- Pages ----------------------
 
 
+@metrics.with_meter('index')
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
 
 
+@metrics.with_meter('forecast')
 @app.route('/forecast')
 def forecast():
     return render_template('forecast.html')
 
 
+@metrics.with_meter('history')
 @app.route('/history', methods=['POST', 'GET'])
 def history():
     form = DateForm()
@@ -69,6 +92,7 @@ def history():
     return render_template('history.html', form=form)
 
 
+@metrics.with_meter('anomalies')
 @app.route('/anomalies', methods=['POST', 'GET'])
 def anomalies():
     form = DateForm()
