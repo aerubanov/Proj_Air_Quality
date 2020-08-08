@@ -1,7 +1,3 @@
-md5: 5e1465ed2cf5e233b681ef088007fe9f
 outs:
-- md5: e787809070143df7c5b9b8acc228eab1
+- md5: 84bd73e575cb42893675764794e6ef81
   path: mosecom_station.csv
-  cache: true
-  metric: false
-  persist: false
