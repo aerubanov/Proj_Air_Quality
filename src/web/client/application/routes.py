@@ -68,28 +68,22 @@ def after_request(response):
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['POST', 'GET'])
 @metrics.with_meter('index')
 def index():
-    return render_template('index.html')
-
-
-@app.route('/forecast')
-@metrics.with_meter('forecast')
-def forecast():
-    return render_template('forecast.html')
-
-
-@app.route('/history', methods=['POST', 'GET'])
-@metrics.with_meter('history')
-def history():
     form = DateForm()
     if request.method == 'POST':
         session['start_date'] = datetime.datetime.combine(form.start_date.data,
                                                           datetime.datetime.min.time()).isoformat()
         session['end_date'] = datetime.datetime.combine(form.end_date.data,
                                                         datetime.datetime.min.time()).isoformat()
-    return render_template('history.html', form=form)
+    return render_template('index.html', form=form)
+
+
+@app.route('/forecast')
+@metrics.with_meter('forecast')
+def forecast():
+    return render_template('forecast.html')
 
 
 @app.route('/anomalies', methods=['POST', 'GET'])

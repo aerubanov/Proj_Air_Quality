@@ -10,6 +10,20 @@
       </div>
     </div>
 
+    <h1>Период наблюдений</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.start_date.label}}<br>
+            {{ form.start_date(size=32) }}
+        </p>
+        <p>
+            {{ form.end_date.label }}<br>
+            {{ form.end_date(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
     <div class="charts text-center">
         <h2> Концентрация частиц </h2>
     </div>
