@@ -1,0 +1,56 @@
+create_dataset:
+  cmd: python -m src.data.create_dataset
+  deps:
+  - path: DATA/raw/sensors
+    md5: 02d1c44683982e53e12eb3ea9f3d07b2.dir
+  - path: DATA/raw/weather
+    md5: d523eab2051dce7186fe991d314d2ace.dir
+  - path: src/data/create_dataset.py
+    md5: 16e2969a6d5144afa62c9c89e04795fd
+  outs:
+  - path: DATA/processed/dataset.csv
+    md5: 4279dd3160c3af3b8692700297b14971
+  - path: DATA/processed/sensors.csv
+    md5: 65e0805a55568db68d2ce592d2cc2cfe
+train_clustering:
+  cmd: python -m src.model.anom_clustering
+  deps:
+  - path: DATA/processed/dataset.csv
+    md5: 4279dd3160c3af3b8692700297b14971
+  - path: src/features/preproc_anom.py
+    md5: 74959d7e5c30a33d9ab1e0638509cc03
+  - path: src/model/anom_clustering.py
+    md5: 8aa9f3b7da6745d2869bae0d1fcb9fc8
+  outs:
+  - path: DATA/metrics/clustering_metric.json
+    md5: 6caef687434307fcea75064e14f904e4
+  - path: models/anomalies
+    md5: dac9905c3889a9395ab06a618573516b.dir
+extract_anomalies:
+  cmd: python -m src.model.extract_anomalies
+  deps:
+  - path: DATA/processed/dataset.csv
+    md5: 4279dd3160c3af3b8692700297b14971
+  - path: models/anomalies
+    md5: dac9905c3889a9395ab06a618573516b.dir
+  - path: src/features/preproc_anom.py
+    md5: 74959d7e5c30a33d9ab1e0638509cc03
+  - path: src/model/anom_clustering.py
+    md5: 8aa9f3b7da6745d2869bae0d1fcb9fc8
+  outs:
+  - path: DATA/processed/anomalies.csv
+    md5: 262bd0a98d166e3e89c3ad0ec7e4f8c1
+train_forecast:
+  cmd: python -m src.model.forecast
+  deps:
+  - path: DATA/processed/dataset.csv
+    md5: 4279dd3160c3af3b8692700297b14971
+  - path: src/features/preproc_forecast.py
+    md5: ba92aedff072b2d290100eeefaa4e686
+  - path: src/model/forecast.py
+    md5: a5ead3435e6f5a7e23666af51e50f15e
+  outs:
+  - path: DATA/metrics/forecast_metrics.json
+    md5: 5e20a83b6b149a578f0bad76de85080b
+  - path: models/forecast
+    md5: 332c6f6f2b3411345bcb79fed057da28.dir
