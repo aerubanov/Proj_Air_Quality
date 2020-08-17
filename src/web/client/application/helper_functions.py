@@ -1,4 +1,10 @@
-def pm25_to_aqius(pm):
+import requests
+import datetime
+import json
+import pandas as pd
+
+
+def pm25_to_aqius(pm: float) -> float:
     if pm <= 12:
         i_low = 0
         i_high = 50
@@ -32,7 +38,7 @@ def pm25_to_aqius(pm):
     return (i_high - i_low) / (c_high - c_low) * (pm - c_low) + i_low
 
 
-def aqi_level(aqi):
+def aqi_level(aqi: float) -> str:
     if aqi <= 50:
         return 'good'
     if 50 < aqi <= 100:
@@ -45,3 +51,62 @@ def aqi_level(aqi):
         return 'Very Unhealthy'
     if aqi > 300:
         return 'Hazardous'
+
+
+def get_sensor_data(
+        start_date: datetime.datetime,
+        end_date: datetime.datetime,
+) -> pd.DataFrame:
+    interval = end_date - start_date
+    start_date = start_date.isoformat('T')
+    end_date = end_date.isoformat('T')
+
+    data = requests.get('http://api:8000/sensor_data',
+                        json={"end_time": end_date,
+                              "start_time": start_date,
+                              "columns": ['date', 'p1', 'p2']}
+                        )
+    data = json.loads(data.text)
+    df = pd.DataFrame(data)
+    df = df[['date', 'p1', 'p2']]
+    df['date'] = pd.to_datetime(df.date, utc=True)
+    df = df.set_index('date')
+
+    if interval > datetime.timedelta(days=5):
+        df = df.resample('0.5H').mean()
+    if interval > datetime.timedelta(days=15):
+        df = df.resample('1H').mean()
+
+    return df
+
+
+def get_anomaly_data(
+        start_date: datetime.datetime,
+        end_date: datetime.datetime,
+        df: pd.DataFrame,  # sensors data
+) -> pd.DataFrame:
+    start_date = start_date.isoformat('T')
+    end_date = end_date.isoformat('T')
+    anom_resp = requests.get('http://api:8000/anomaly',
+                             json={"end_time": end_date,
+                                   "start_time": start_date}
+                             )
+    anom_data = json.loads(anom_resp.text)
+    anom_df = pd.DataFrame(columns=['p1', 'cluster'])
+
+    for item in anom_data:
+        temp = df[item['start_date']:item['end_date']]
+        temp['cluster'] = item['cluster']
+        anom_df = anom_df.append(temp)
+    return anom_df
+
+
+def get_forecast_data() -> pd.DataFrame:
+    data = requests.get('http://api:8000/forecast', json={})
+    data = json.loads(data.text)
+    df = pd.DataFrame(data)
+    df['date'] = pd.to_datetime(df.date, utc=True)
+    df['date'] += pd.to_timedelta(df['forward_time'], unit='h')
+    df = df[['date', 'p1', 'p2']]
+    df = df.set_index('date')
+    return df
