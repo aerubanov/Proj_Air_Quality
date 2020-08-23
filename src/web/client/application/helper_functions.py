@@ -2,6 +2,7 @@ import requests
 import datetime
 import json
 import pandas as pd
+from typing import Optional
 
 
 def pm25_to_aqius(pm: float) -> float:
@@ -40,17 +41,17 @@ def pm25_to_aqius(pm: float) -> float:
 
 def aqi_level(aqi: float) -> str:
     if aqi <= 50:
-        return 'good'
+        return 'green'
     if 50 < aqi <= 100:
-        return 'moderate'
+        return 'gold'
     if 100 < aqi <= 150:
-        return 'Unhealthy for sens. groups'
+        return 'orange'
     if 150 < aqi <= 200:
-        return 'Unhealthy'
+        return 'red'
     if 200 < aqi <= 300:
-        return 'Very Unhealthy'
+        return 'purple'
     if aqi > 300:
-        return 'Hazardous'
+        return 'brown'
 
 
 def get_sensor_data(
@@ -101,9 +102,12 @@ def get_anomaly_data(
     return anom_df
 
 
-def get_forecast_data() -> pd.DataFrame:
+def get_forecast_data() -> Optional[pd.DataFrame]:
     data = requests.get('http://api:8000/forecast', json={})
-    data = json.loads(data.text)
+    try:
+        data = json.loads(data.text)
+    except json.JSONDecodeError:
+        return None
     df = pd.DataFrame(data)
     df['date'] = pd.to_datetime(df.date, utc=True)
     df['date'] += pd.to_timedelta(df['forward_time'], unit='h')

@@ -1,8 +1,10 @@
 flask
-altair
 requests
 Flask-WTF
 sqlalchemy
 psycopg2
 appmetrics
 graphyte
+mpld3
+matplotlib
+pandas

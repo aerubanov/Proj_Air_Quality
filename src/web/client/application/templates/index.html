@@ -8,9 +8,8 @@
         <!-- Placeholder for the tooltip -->
         <div id="vis-tooltip" class="vg-tooltip"></div>
       </div>
-    </div>
 
-    <h1>Период наблюдений</h1>
+    <h2>Период наблюдений</h2>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
@@ -25,32 +24,17 @@
     </form>
 
     <div class="charts text-center">
-        <h2> Концентрация частиц </h2>
+        <embed src="/graph" width="1100" height="700">
     </div>
 
     <div class="charts text-center">
-    <div id="vis_sens">
-        <script type="text/javascript">
-        var spec = "/graph/sensors";
-        vegaEmbed('#vis_sens', spec).then(function(result) {
-            // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
-        }).catch(console.error);
-        </script>
-    </div>
-    </div>
+        <h2> Распределение признаков для различных кластеров</h2>
+        <img src={{url_for('static', filename='images/clusters_distribution.png')}} alt="Distribution" style="width:1200px;height:700px;">
+        <p align="justify">
+       К кластеру 0 относятся аномалии, характеризующиеся небольшими значениями концентрации частиц
+            . В кластере 2 увеличение PM2.5 связано с повышением
+            влажности воздуха. В кластере 1 повышение концентрации частиц не связано с увеличением влажности.
+        </p>
 
-    <div class="charts text-center">
-        <h2> AQI US </h2>
-    </div>
-
-    <div class="charts text-center">
-    <div id="vis_aqi">
-        <script type="text/javascript">
-        var spec = "/graph/aqius";
-        vegaEmbed('#vis_aqi', spec).then(function(result) {
-            // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
-        }).catch(console.error);
-        </script>
-    </div>
     </div>
 {% endblock %}
