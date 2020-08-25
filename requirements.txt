@@ -18,7 +18,7 @@ marshmallow
 flask
 codecov
 pytz
-altair
+mpld3
 Flask-WTF
 matplotlib
 awscli

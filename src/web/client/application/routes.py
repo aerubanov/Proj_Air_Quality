@@ -1,9 +1,5 @@
-from flask import render_template, request, session, url_for, g
-import altair as alt
+from flask import render_template, request, session, g
 import datetime
-import requests
-import pandas as pd
-import json
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
 from wtforms.fields import SubmitField
@@ -13,11 +9,11 @@ import graphyte
 from appmetrics import metrics, reporter
 
 from src.web.client.application import app
-from src.web.client.application.helper_functions import pm25_to_aqius, aqi_level
+from src.web.client.application.helper_functions import get_sensor_data, get_anomaly_data, get_forecast_data
+from src.web.client.application.graphics import html_graph
 from src.web.logger.logging_config import LOGGING_CONFIG
 from src.web.utils.metrics_reporter import GraphyteReporter
 from src.web.config import metrics_host
-
 
 meter_200 = metrics.new_meter('client_status_200')
 meter_400 = metrics.new_meter('client_status_400')
@@ -64,252 +60,48 @@ def after_request(response):
         pass
     return response
 
+
 # ------- Pages ----------------------
 
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['POST', 'GET'])
+@app.route('/index', methods=['POST', 'GET'])
 @metrics.with_meter('index')
 def index():
-    return render_template('index.html')
-
-
-@app.route('/forecast')
-@metrics.with_meter('forecast')
-def forecast():
-    return render_template('forecast.html')
-
-
-@app.route('/history', methods=['POST', 'GET'])
-@metrics.with_meter('history')
-def history():
     form = DateForm()
     if request.method == 'POST':
-        session['start_date'] = datetime.datetime.combine(form.start_date.data,
-                                                          datetime.datetime.min.time()).isoformat()
-        session['end_date'] = datetime.datetime.combine(form.end_date.data,
-                                                        datetime.datetime.min.time()).isoformat()
-    return render_template('history.html', form=form)
-
-
-@app.route('/anomalies', methods=['POST', 'GET'])
-@metrics.with_meter('anomalies')
-def anomalies():
-    form = DateForm()
-    if request.method == 'POST':
-        session['start_date'] = datetime.datetime.combine(form.start_date.data,
-                                                          datetime.datetime.min.time()).isoformat()
-        session['end_date'] = datetime.datetime.combine(form.end_date.data,
-                                                        datetime.datetime.min.time()).isoformat()
-    return render_template('anomalies.html', form=form)
+        if form.start_date.data is not None:
+            session['start_date'] = datetime.datetime.combine(form.start_date.data,
+                                                              datetime.datetime.min.time()).isoformat()
+        if form.end_date.data is not None:
+            session['end_date'] = datetime.datetime.combine(form.end_date.data,
+                                                            datetime.datetime.min.time()).isoformat()
+    return render_template('index.html', form=form)
 
 
 # -------- Graphs --------------------
-WIDTH = 900
-HEIGHT = 400
 
-nearest = alt.selection(type='single', nearest=True, on='mouseover',
-                        fields=['date'], empty='none')
-
-
-@app.route('/graph/sensors')
+@app.route('/graph')
 def sensors_graph():
+    with_forecast = True
     if 'start_date' in session:
         start_date = datetime.datetime.fromisoformat(session['start_date'])
         session.pop('start_date')
+        with_forecast = False
     else:
         start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=3))
 
     if "end_date" in session:
         end_date = datetime.datetime.fromisoformat(session['end_date'])
         session.pop('end_date')
+        with_forecast = False
     else:
         end_date = datetime.datetime.utcnow()
-    interval = end_date - start_date
-    start_date = start_date.isoformat('T')
-    end_date = end_date.isoformat('T')
 
-    data = requests.get(app.config['API_URL'] + 'sensor_data',
-                        json={"end_time": end_date,
-                              "start_time": start_date}
-                        )
-    data = json.loads(data.text)
-    df = pd.DataFrame(data)
-    df = df[['date', 'p1', 'p2']]
-    df['date'] = pd.to_datetime(df.date, utc=True)
-    df = df.set_index('date')
+    sensor_df = get_sensor_data(start_date, end_date)
+    anom_df = get_anomaly_data(start_date, end_date, sensor_df)
+    forecast_df = get_forecast_data()
 
-    if interval > datetime.timedelta(days=5):
-        df = df.resample('0.5H').mean()
-    if interval > datetime.timedelta(days=15):
-        df = df.resample('1H').mean()
+    graph = html_graph(sensor_df, anom_df, forecast_df, with_forecast=with_forecast)
 
-    df = df.reset_index().melt('date', var_name='series', value_name='y')
-
-    line = alt.Chart().mark_line(interpolate='basis').encode(
-        alt.X('date:T', axis=alt.Axis(title='Date')),
-        alt.Y('y:Q', axis=alt.Axis(title='Concentration [g/m^3]')),
-        color='series:N'
-    )
-
-    selectors = alt.Chart().mark_point().encode(
-        x='date:T',
-        opacity=alt.value(0),
-    ).add_selection(
-        nearest
-    )
-
-    points = line.mark_point().encode(
-        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-    )
-
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(
-        text=alt.condition(nearest, 'y:Q', alt.value(' '))
-    )
-
-    rules = alt.Chart().mark_rule(color='gray').encode(
-        x='date:T',
-    ).transform_filter(
-        nearest
-    )
-
-    conc_chart = alt.layer(line, selectors, points, rules, text,
-                           data=df,
-                           width=WIDTH, height=HEIGHT)
-    return conc_chart.to_json()
-
-
-@app.route('/graph/aqius')
-def aqius_graph():
-    data = requests.get(app.config['API_URL'] + 'sensor_data',
-                        json={"end_time": datetime.datetime.utcnow().isoformat('T'),
-                              "start_time": (datetime.datetime.utcnow() - datetime.timedelta(days=3)).isoformat('T')}
-                        )
-    data = json.loads(data.text)
-    df = pd.DataFrame(data)
-    df = df[['date', 'p1']]
-    df['date'] = pd.to_datetime(df.date, utc=True)
-    df['aqi'] = df.p1.apply(pm25_to_aqius)
-    df['level'] = df.aqi.apply(aqi_level)
-
-    domain = ['good', 'moderate', 'Unhealthy for sens. groups', 'Unhealthy', 'Very Unhealthy', 'Hazardous']
-    range_ = ['green', '#e6ed13', 'orange', 'red', 'purple', 'brown']
-
-    line = alt.Chart(
-        data=df, height=HEIGHT,
-        width=WIDTH).mark_bar().encode(
-        x=alt.X('date:T', axis=alt.Axis(title='Date')),
-        y=alt.Y('aqi:Q', axis=alt.Axis(title='AQI US index')),
-        color=alt.Color('level', scale=alt.Scale(domain=domain, range=range_))
-    ).interactive()
-    return line.to_json()
-
-
-@app.route('/graph/forecast')
-def forecast_graph():
-    data = requests.get(app.config['API_URL'] + 'forecast', json={})
-    data = json.loads(data.text)
-    df = pd.DataFrame(data)
-    df['date'] = pd.to_datetime(df.date, utc=True)
-    df['date'] += pd.to_timedelta(df['forward_time'], unit='h')
-    df = df[['date', 'p1', 'p2']]
-    df = df.set_index('date')
-    df = df.reset_index().melt('date', var_name='series', value_name='y')
-
-    line = alt.Chart().mark_line(interpolate='basis').encode(
-        alt.X('date:T', axis=alt.Axis(title='Date')),
-        alt.Y('y:Q', axis=alt.Axis(title='Concentration [g/m^3]')),
-        color='series:N'
-    )
-
-    selectors = alt.Chart().mark_point().encode(
-        x='date:T',
-        opacity=alt.value(0),
-    ).add_selection(
-        nearest
-    )
-
-    points = line.mark_point().encode(
-        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-    )
-
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(
-        text=alt.condition(nearest, 'y:Q', alt.value(' '))
-    )
-
-    rules = alt.Chart().mark_rule(color='gray').encode(
-        x='date:T',
-    ).transform_filter(
-        nearest
-    )
-
-    conc_chart = alt.layer(line, selectors, points, rules, text,
-                           data=df,
-                           width=WIDTH, height=HEIGHT)
-    return conc_chart.to_json()
-
-
-@app.route('/graph/anomalies')
-def anomalies_graph():
-    if 'start_date' in session:
-        start_date = datetime.datetime.fromisoformat(session['start_date'])
-        session.pop('start_date')
-    else:
-        start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=3))
-
-    if "end_date" in session:
-        end_date = datetime.datetime.fromisoformat(session['end_date'])
-        session.pop('end_date')
-    else:
-        end_date = datetime.datetime.utcnow()
-    interval = end_date - start_date
-    start_date = start_date.isoformat('T')
-    end_date = end_date.isoformat('T')
-
-    data = requests.get(app.config['API_URL'] + 'sensor_data',
-                        json={"end_time": end_date,
-                              "start_time": start_date}
-                        )
-    data = json.loads(data.text)
-    df = pd.DataFrame(data)
-    df = df[['date', 'p1']]
-    df['date'] = pd.to_datetime(df.date, utc=True)
-    df = df.set_index('date')
-
-    if interval > datetime.timedelta(days=5):
-        df = df.resample('0.5H').mean()
-    if interval > datetime.timedelta(days=15):
-        df = df.resample('1H').mean()
-
-    anom_resp = requests.get(app.config['API_URL'] + 'anomaly',
-                             json={"end_time": end_date,
-                                   "start_time": start_date}
-                             )
-    anom_data = json.loads(anom_resp.text)
-    anom_df = pd.DataFrame(columns=['p1', 'cluster'])
-
-    for item in anom_data:
-        temp = df[item['start_date']:item['end_date']]
-        temp['cluster'] = item['cluster']
-        anom_df = anom_df.append(temp)
-
-    df = df.reset_index()
-    anom_df = anom_df.reset_index()
-
-    line = alt.Chart(data=df).mark_line(interpolate='basis').encode(
-        x=alt.X('date:T', axis=alt.Axis(title='Date')),
-        y=alt.Y('p1:Q', axis=alt.Axis(title='Concentration [g/m^3]'))
-
-    ).interactive()
-
-    range_ = ['green', 'red', 'blue']
-    domain = [0, 1, 2]
-
-    bar = alt.Chart(data=anom_df).mark_bar().encode(
-        x=alt.X('index:T'),
-        y=alt.Y('p1:Q'),
-        color=alt.Color('cluster:N', scale=alt.Scale(domain=domain, range=range_))
-    ).interactive()
-
-    chart = alt.layer(line, bar, width=WIDTH, height=HEIGHT)
-    return chart.to_json()
+    return graph
