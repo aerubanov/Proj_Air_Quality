@@ -23,6 +23,7 @@ def html_graph(
 
         aqi_df = sensor_data[['p1']].interpolate()
         aqi_df['aqi'] = aqi_df.p1.apply(pm25_to_aqius)
+        aqi_df['aqi'] = aqi_df.aqi.fillna(value=0)
         aqi_df['level'] = aqi_df.aqi.apply(aqi_level)
         axes[1, 0].scatter(
             aqi_df.index.to_pydatetime(),
