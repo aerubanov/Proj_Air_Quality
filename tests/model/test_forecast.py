@@ -28,24 +28,11 @@ def test_chunk():
     targets = ['P1_filtr_mean', 'P2_filtr_mean']
     for t in targets:
         chunk = Chunk(train_part, test_part, features, t)
-        assert len(chunk.get_x()) == 8 * 24
+        assert len(chunk.get_x(1)) == 8 * 24 + len(features)
 
         for i in range(len(test_part)):
             assert chunk.get_y(forward_time=i) == test_part[t].values[i]
             assert chunk.get_y(forward_time=i, orig=True) == test_part.P_original.values[i]
-
-        class TestModel:
-            def __init__(self, j):
-                self.j = j
-
-            def predict(self, *args, **kwargs):
-                return [self.j]
-
-        models = [TestModel(i) for i in range(len(test_part))]
-        for i in range(len(test_part)):
-            x = chunk.get_meta_x(i, models)
-            assert len(x) == len(features) + 1
-            assert x[0] == i
 
 
 def test_generate_chunks(monkeypatch):
@@ -77,10 +64,10 @@ def test_prepare_x(monkeypatch):
 
     targets = ['P1_filtr_mean', 'P2_filtr_mean']
     for t in targets:
-        x_train, x_meta_train, x_test = prepare_x(data, chunk_len=48, test_len=24,
-                                                  test_dataset_len=5, num_chunks_factor=factor, target=t)
+        x_train, x_test = prepare_x(data, chunk_len=48, test_len=24,
+                                    test_dataset_len=5, num_chunks_factor=factor, target=t)
         assert len(x_test) == 5
-        assert len(x_train) + len(x_meta_train) == round((len(data) - test_len * 24) / factor)
+        assert len(x_train) == round((len(data) - test_len * 24) / factor)
 
 
 def test_model():
@@ -93,14 +80,12 @@ def test_model():
     for t in targets:
         pref = t.split('_')[0]
 
-        with open(os.path.join(model_path, pref+'_models.obj'), 'rb') as f:
+        with open(os.path.join(model_path, pref + '_models.obj'), 'rb') as f:
             models = pickle.load(f)
-        with open(os.path.join(model_path, pref+'_meta_models.obj'), 'rb') as f:
-            meta_models = pickle.load(f)
         with open(os.path.join(model_path, pref + '_target_transform.obj'), 'rb') as f:
             target_transform = pickle.load(f)
 
-        model = Model(target_transform, models, meta_models)
+        model = Model(target_transform, models)
         chunk = Chunk(train_part, test_part, features, t)
         prediction = model.predict(chunk)
         assert len(prediction) == 24

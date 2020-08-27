@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.base import clone
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.linear_model import Lasso
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.preprocessing import QuantileTransformer
 import pickle
 import json
@@ -53,7 +53,7 @@ class Chunk:
         self.features = feature_names
         self.target = target
 
-    def get_x(self):
+    def get_x(self, forward_time):
         """return X - sensor values from previous 24-hours"""
         x = list(self.train[self.target].values)
         x += list(self.train.P_diff1.values)
@@ -64,7 +64,8 @@ class Chunk:
         x += list(self.train.t_diff.values)
         x += list(self.train.t_diff1.values)
         x += list(self.train.t_diff2.values)
-
+        for feature in self.features:
+            x.append(self.test[feature].values[forward_time])
         return x
 
     def get_y(self, forward_time, orig=False):
@@ -73,16 +74,6 @@ class Chunk:
             return self.test.P_original.values[forward_time]
         y = self.test[self.target].values[forward_time]
         return y
-
-    def get_meta_x(self, forward_time, models):
-        """return X for meta model - consist prediction from first layer model and weather forecast data"""
-        x = self.get_x()
-        model = models[forward_time]
-        prediction = model.predict([x])[0]
-        x_meta = [prediction]
-        for feature in self.features:
-            x_meta.append(self.test[feature].values[forward_time])
-        return x_meta
 
 
 def pp(start: pd.DatetimeIndex, end: pd.DatetimeIndex, n: int) -> pd.DatetimeIndex:
@@ -121,7 +112,7 @@ def generate_chunks(series: pd.DataFrame, n: int, start: pd.DatetimeIndex, end: 
 
 def prepare_x(data: pd.DataFrame, chunk_len: int,
               test_len: int, target, num_chunks_factor=3.2,
-              test_dataset_len=50, meta_train_fraction=0.5) -> (List[Chunk], List[Chunk], List[Chunk]):
+              test_dataset_len=50) -> (List[Chunk], List[Chunk], List[Chunk]):
     """
     Prepare X_train, X_meta_train, X_validation
     :param target: name of target column
@@ -151,29 +142,25 @@ def prepare_x(data: pd.DataFrame, chunk_len: int,
                                  chunk_len, test_len,
                                  features, target)
 
-    train, train_meta = train_test_split(train_chunks, test_size=meta_train_fraction, random_state=42)
-    return train, train_meta, validation
+    return train_chunks, validation
 
 
 class Model:
 
-    def __init__(self, target_transform, models=None, meta_models=None, target='P1_filtr_mean'):
+    def __init__(self, target_transform, models=None, target='P1_filtr_mean'):
         self.target_transform = target_transform
         self.models = models
-        self.meta_models = meta_models
         self.target = target
 
-    def fit(self, x_train, x_meta_train):
-        model = Lasso(alpha=0.005, random_state=42, max_iter=3000)
+    def fit(self, x_train):
+        model = GradientBoostingRegressor(random_state=42, n_estimators=50, verbose=0, n_iter_no_change=4)
         self._train_models(model, x_train, TEST_LEN)
-        meta_model = RandomForestRegressor(min_samples_leaf=3, random_state=42)
-        self._train_meta_models(meta_model, x_meta_train, TEST_LEN)
 
     def predict(self, chunk: Chunk):
         predictions = []
         for i in range(len(self.models)):
-            x = [chunk.get_meta_x(i, self.models)]
-            local_model = self.meta_models[i]
+            x = [chunk.get_x(i)]
+            local_model = self.models[i]
             prediction = local_model.predict(x)
             prediction = self.target_transform.inverse_transform(prediction.reshape(-1, 1))[0][0]
             predictions.append(prediction)
@@ -182,20 +169,8 @@ class Model:
     def get_metric(self, chunks: List[Chunk], metric) -> List[float]:
         scores = []
         for i in range(len(self.models)):
-            x = [chunk.get_x() for chunk in chunks]
+            x = [chunk.get_x(i) for chunk in chunks]
             local_model = self.models[i]
-            prediction = local_model.predict(x)
-            prediction = self.target_transform.inverse_transform(prediction.reshape(-1, 1))
-            y = [chunk.get_y(i, orig=True) for chunk in chunks]
-            mae = metric(y, prediction)
-            scores.append(mae)
-        return scores
-
-    def get_meta_metric(self, chunks: List[Chunk], metric) -> List[float]:
-        scores = []
-        for i in range(len(self.models)):
-            x = [chunk.get_meta_x(i, self.models) for chunk in chunks]
-            local_model = self.meta_models[i]
             prediction = local_model.predict(x)
             prediction = self.target_transform.inverse_transform(prediction.reshape(-1, 1))
             y = [chunk.get_y(i, orig=True) for chunk in chunks]
@@ -206,20 +181,11 @@ class Model:
     def _train_models(self, model, chunks: List[Chunk], num_models):
         self.models = []
         for i in range(num_models):
-            x = [chunk.get_x() for chunk in chunks]
+            x = [chunk.get_x(i) for chunk in chunks]
             local_model = clone(model)
             y = [chunk.get_y(i) for chunk in chunks]
             local_model.fit(x, y)
             self.models.append(local_model)
-
-    def _train_meta_models(self, meta_model, chunks: List[Chunk], num_models):
-        self.meta_models = []
-        for i in range(num_models):
-            x = [chunk.get_meta_x(i, self.models) for chunk in chunks]
-            local_model = clone(meta_model)
-            y = [chunk.get_y(i) for chunk in chunks]
-            local_model.fit(x, y)
-            self.meta_models.append(local_model)
 
 
 def train_model(target):
@@ -230,33 +196,26 @@ def train_model(target):
     target_transform = QuantileTransformer(output_distribution='normal')
     transform = DataTransform(data_transform, target_transform, columns, num_colunms, target)
     data = transform.fit_transform(data)
-    x_train, x_meta_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN, target)
-    print(x_train[0].train.shape, x_train[0].test.shape)
+    x_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN, target)
 
     model = Model(transform.target_transform)
-    model.fit(x_train, x_meta_train)
+    model.fit(x_train)
 
     mae = model.get_metric(x_val, mean_absolute_error)
     mse = model.get_metric(x_val, mean_squared_error)
-    meta_mae = model.get_meta_metric(x_val, mean_absolute_error)
-    meta_mse = model.get_meta_metric(x_val, mean_squared_error)
 
     print('MAE: ;', np.mean(mae))
     print('MSE: ;', np.mean(mse))
-    print('meta_MAE: ;', np.mean(meta_mae))
-    print('meta_MSE: ;', np.mean(meta_mse))
 
     prefix = target.split('_')[0]
     with open(os.path.join(model_path, prefix+'_models.obj'), 'wb') as f:
         pickle.dump(model.models, f)
-    with open(os.path.join(model_path, prefix+'_meta_models.obj'), 'wb') as f:
-        pickle.dump(model.meta_models, f)
     with open(os.path.join(model_path, prefix+'_data_transform.obj'), 'wb') as f:
         pickle.dump(transform.train_transform, f)
     with open(os.path.join(model_path, prefix+'_target_transform.obj'), 'wb') as f:
         pickle.dump(transform.target_transform, f)
 
-    return mae, mse, meta_mae, meta_mse
+    return mae, mse
 
 
 if __name__ == '__main__':
@@ -264,8 +223,8 @@ if __name__ == '__main__':
         os.mkdir('models/forecast/')
     except FileExistsError:
         pass
-    p1_mae, p1_mse, p1_meta_mae, p1_meta_mse = train_model(target='P1_filtr_mean')
-    p2_mae, p2_mse, p2_meta_mae, p2_meta_mse = train_model(target='P2_filtr_mean')
+    p1_mae, p1_mse = train_model(target='P1_filtr_mean')
+    p2_mae, p2_mse = train_model(target='P2_filtr_mean')
     with open(metric_path, 'w') as file:
-        json.dump({'p1_mae': p1_mae, 'p1_mse': p1_mse, 'p1_meta_mae': p1_meta_mae, 'p1_meta_mse': p1_meta_mse,
-                   'p2_mae': p2_mae, 'p2_mse': p2_mse, 'p2_meta_mae': p2_meta_mae, 'p2_meta_mse': p2_meta_mse}, file)
+        json.dump({'p1_mae': p1_mae, 'p1_mse': p1_mse,
+                   'p2_mae': p2_mae, 'p2_mse': p2_mse}, file)

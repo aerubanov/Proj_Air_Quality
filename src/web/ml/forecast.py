@@ -8,12 +8,10 @@ from src.features.preproc_forecast import DataTransform, add_features
 from src.web.ml.data_loading import get_weather_data, get_sensor_data
 
 p1_models_file = "models/forecast/P1_models.obj"
-p1_meta_models_file = "models/forecast/P1_meta_models.obj"
 p1_data_trans_file = "models/forecast/P1_data_transform.obj"
 p1_target_trans_file = "models/forecast/P1_target_transform.obj"
 
 p2_models_file = "models/forecast/P2_models.obj"
-p2_meta_models_file = "models/forecast/P2_meta_models.obj"
 p2_data_trans_file = "models/forecast/P2_data_transform.obj"
 p2_target_trans_file = "models/forecast/P2_target_transform.obj"
 
@@ -57,15 +55,13 @@ def get_chunk(session, transform: DataTransform, target: str) -> Chunk:
 def get_model(target: str, target_transform) -> Model:
     """construct Model from pickled objects"""
     if target == 'P1_filtr_mean':
-        file1 = p1_models_file
-        file2 = p1_meta_models_file
+        file = p1_models_file
     else:
-        file1 = p2_models_file
-        file2 = p2_meta_models_file
-    with open(file1, 'rb') as models_file, open(file2, 'rb') as meta_models_file:
+        file = p2_models_file
+
+    with open(file, 'rb') as models_file:
         models = pickle.load(models_file)
-        meta_models = pickle.load(meta_models_file)
-    model = Model(target_transform, models, meta_models, target)
+    model = Model(target_transform, models, target)
     return model
 
 
