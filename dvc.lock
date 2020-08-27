@@ -51,6 +51,6 @@ train_forecast:
     md5: 4e73cf3d4d3c4bedd93fcf1aad2739e7
   outs:
   - path: DATA/metrics/forecast_metrics.json
-    md5: 5b96d73729af4a905b0e6fe4e4d6b48c
+    md5: 9815a369241c980ce36a6da27da30368
   - path: models/forecast
-    md5: e097a85186a6647da263c17f9466e298.dir
+    md5: 45177e17f168afe29436b7e1bd27ccf1.dir
