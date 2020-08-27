@@ -198,7 +198,7 @@ def train_model(target):
     data = transform.fit_transform(data)
     x_train, x_val = prepare_x(data, CHUNK_LEN, TEST_LEN, target)
 
-    model = Model(transform.target_transform)
+    model = Model(transform.target_transform, target=target)
     model.fit(x_train)
 
     mae = model.get_metric(x_val, mean_absolute_error)

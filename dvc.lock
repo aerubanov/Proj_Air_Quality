@@ -48,9 +48,9 @@ train_forecast:
   - path: src/features/preproc_forecast.py
     md5: ba92aedff072b2d290100eeefaa4e686
   - path: src/model/forecast.py
-    md5: a5ead3435e6f5a7e23666af51e50f15e
+    md5: 4e73cf3d4d3c4bedd93fcf1aad2739e7
   outs:
   - path: DATA/metrics/forecast_metrics.json
-    md5: 0ae39e9d4d696161b2199aca3759d689
+    md5: 5b96d73729af4a905b0e6fe4e4d6b48c
   - path: models/forecast
-    md5: 3aebbcc015c9db51a4c00af180fa9602.dir
+    md5: e097a85186a6647da263c17f9466e298.dir
