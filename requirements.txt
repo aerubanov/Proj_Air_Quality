@@ -24,3 +24,5 @@ matplotlib
 awscli
 graphyte
 appmetrics
+python-telegram-bot
+
