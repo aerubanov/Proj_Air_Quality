@@ -1,9 +1,18 @@
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 from src.web.bot.token import TELEGRAM_TOKEN
+from src.web.bot.model import User, Base
+
+
+def create_session():
+    engine = create_engine('sqlite:///bot.db')
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    return Session()
 
 
 def start(update, context):
@@ -20,6 +29,18 @@ def start(update, context):
         reply_markup=reply_markup,
     )
 
+
+def button(update, context):
+    query = update.callback_query
+
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+    query.answer()
+
+    option = query.data
+
+    if option == 'subscribe':
+        user = User(id=update.message.from_user.id, chat_id=)
 
 class Bot:
 
