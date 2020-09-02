@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import mpld3
 
-from src.web.client.application.helper_functions import aqi_level, pm25_to_aqius
+from src.web.utils.aqi import aqi_level, pm25_to_aqius
 
 WIDTH = 12
 HEIGHT = 6
