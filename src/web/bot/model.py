@@ -12,6 +12,3 @@ class User(Base):
 
     def __str__(self):
         return f'user_id: {self.id}, chat_id: {self.id}'
-
-
-Base.metadata.create_all(engine)
