@@ -2,7 +2,7 @@
 API methods
 ************
 API methods provide access to data. To use it, you should send http-request on
-93.115.20.79:8080. For available options see list bellow:
+93.115.20.79:8000. For available options see list bellow:
 
 /sensor_data, method: GET
 -------------------------
