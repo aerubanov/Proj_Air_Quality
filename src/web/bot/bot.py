@@ -14,10 +14,17 @@ from src.web.utils.aqi import pm25_to_aqius, aqi_level
 
 API_HOST = 'http://93.115.20.79:8000'
 MSK_TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))
+aqi_levels = {
+            'green': 'Good',
+            'gold': 'Moderate',
+            'orange': 'Unhealthy for Sensitive Groups',
+            'red': 'Unhealthy',
+            'purple': 'Very Unhealthy',
+            'brown': 'Hazardous'}
 
 
 def create_session():
-    engine = create_engine('sqlite:///bot.db')
+    engine = create_engine('sqlite:///database/botbot.db')
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     return Session()
@@ -35,14 +42,7 @@ def get_concentration():
     p1 = data[-1]['p1']
     p2 = data[-1]['p2']
     aqi = pm25_to_aqius(p1)
-    levels = {
-        'green': 'Good',
-        'gold': 'Moderate',
-        'orange': 'Unhealthy for Sensitive Groups',
-        'red': 'Unhealthy',
-        'purple': 'Very Unhealthy',
-        'brown': 'Hazardous'}
-    level = levels[aqi_level(aqi)]
+    level = aqi_levels[aqi_level(aqi)]
     return f'PM2.5: {p1:.2f} PM10: {p2:.2f} AQIUS: {aqi:.2f} {level}'
 
 
@@ -58,14 +58,7 @@ def get_forecast():
         p1 = item['p1']
         p2 = item['p2']
         aqi = pm25_to_aqius(p1)
-        levels = {
-            'green': 'Good',
-            'gold': 'Moderate',
-            'orange': 'Unhealthy for Sensitive Groups',
-            'red': 'Unhealthy',
-            'purple': 'Very Unhealthy',
-            'brown': 'Hazardous'}
-        level = levels[aqi_level(aqi)]
+        level = aqi_levels[aqi_level(aqi)]
         s += f'{date.time().strftime("%H:%M")}  {p1:.2f}  {p2:.2f}  {aqi:.2f}  {level} \n'
     return s
 
