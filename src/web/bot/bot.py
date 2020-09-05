@@ -15,12 +15,12 @@ from src.web.utils.aqi import pm25_to_aqius, aqi_level
 API_HOST = 'http://93.115.20.79:8000'
 MSK_TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))
 aqi_levels = {
-            'green': 'Good',
-            'gold': 'Moderate',
-            'orange': 'Unhealthy for Sensitive Groups',
-            'red': 'Unhealthy',
-            'purple': 'Very Unhealthy',
-            'brown': 'Hazardous'}
+    'green': 'Good',
+    'gold': 'Moderate',
+    'orange': 'Unhealthy for Sensitive Groups',
+    'red': 'Unhealthy',
+    'purple': 'Very Unhealthy',
+    'brown': 'Hazardous'}
 
 
 def create_session():
@@ -52,8 +52,7 @@ def get_forecast():
     s = 'Время   PM2.5   PM10   AQIUS \n'
     for item in data:
         s += f''
-        date = datetime.datetime.fromisoformat(item['date']) + \
-               datetime.timedelta(hours=item['forward_time'])
+        date = datetime.datetime.fromisoformat(item['date']) + datetime.timedelta(hours=item['forward_time'])
         date = date.replace(tzinfo=datetime.timezone.utc).astimezone(tz=MSK_TIMEZONE)
         p1 = item['p1']
         p2 = item['p2']
