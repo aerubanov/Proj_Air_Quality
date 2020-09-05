@@ -8,7 +8,10 @@ import json
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
-from src.web.bot.token import TELEGRAM_TOKEN
+try:
+    from src.web.bot.token import TELEGRAM_TOKEN
+except ModuleNotFoundError:
+    pass
 from src.web.bot.model import User, Base
 from src.web.utils.aqi import pm25_to_aqius, aqi_level
 
