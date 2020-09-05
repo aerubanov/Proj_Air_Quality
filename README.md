@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/aerubanov/DS_for_Air.svg?branch=master)](https://travis-ci.org/aerubanov/DS_for_Air)
 [![codecov](https://codecov.io/gh/aerubanov/DS_for_Air/branch/master/graph/badge.svg)](https://codecov.io/gh/aerubanov/DS_for_Air)
-# DS_for_Air
+# Proj_Air_Quality
 Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://93.115.20.79/index).
 # Docs
 ### data
