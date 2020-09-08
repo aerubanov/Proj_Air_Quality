@@ -48,29 +48,27 @@ def get_link(start_date: datetime.date, end_date: datetime.date):
     my_header = {}
     my_header["Accept"] = "text/html, */*; q=0.01"
     my_header["Accept-Encoding"] = "gzip, deflate, br"
-    my_header["Accept-Language"] = "ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.3"
+    my_header["Accept-Language"] = "en-US,en;q=0.5"
     my_header["Connection"] = "keep-alive"
-    my_header["Content-Length"] = "110"
+    my_header["Content-Length"] = "98"
     my_header["Content-Type"] = "application/x-www-form-urlencoded"
     my_header["Host"] = "rp5.ru"
     my_header["Origin"] = "https://rp5.ru"
     my_header["Referer"] = "https://rp5.ru/"
     my_header["User-Agent"] = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0"
     my_header["X-Requested-With"] = "XMLHttpRequest"
-    my_header["Cookie"] = "tab_synop=2; extreme_open=true; ftab=2; full_table=1; tab_metar=1; Day_Selected=30;" \
-                          f" PHPSESSID={php_id}; format=csv; f_enc=utf; located=1; zoom=6;" \
-                          " i=9802%7C510579%7C5332%7C5483%7C152492; iru=9802%7C510579%7C5332%7C5483%7C152492;" \
-                          " ru=%D0%A1%D1%8B%D1%80%D0%B2%D0%B5%7C%D0%9D%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%" \
-                          "D1%8C%D0%BD%D1%8B%D0%B9+%D0%BF%D0%B0%D1%80%D0%BA+%D0%90%D0%B4%D0%B4%D0%BE%7C%D0%9C%D0%" \
-                          "B8%D0%B0%D1%81%D1%81%7C%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0+%28%D0%92%D0%94%D0%9D%D0%A" \
-                          "5%29%7C%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0+%28%D1%86%D0%B5%D0%BD%D1%82%D1%80%2C+%D0%9" \
-                          "1%D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; last_visited_page=http%3A%2F%2Frp5.ru%2F%D0%9F%D0%" \
-                          "BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5_%28%D1%86%D0%B5%" \
-                          "D0%BD%D1%82%D1%80%2C_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; lang=ru"
+    my_header["Cookie"] = f"extreme_open=false; ftab=2; tab_synop=2; PHPSESSID={php_id}; i=152492; iru=152492;" \
+                          f" ru=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0+%28%D1%86%D0%B5%D0%BD%D1%82%D1%80%2C+%D0%91%" \
+                          f"D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; last_visited_page=http%3A%2F%2Frp5.ru%2F%D0%9F%D0%BE%D" \
+                          f"0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5_%28%D1%86%D0%B5%D0%" \
+                          f"BD%D1%82%D1%80%2C_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; format=csv; f_enc=utf; lang=ru"
     lang = 'ru'
-    my_data = {'wmo_id': '27605', 'a_date1': date1, 'a_date2': date2, 'f_ed3': '12', 'f_ed4': '12',
-               'f_ed5': '30', 'f_pe': '1', 'f_pe1': '2', 'lng_id': '2'}
+    my_data = {'wmo_id': '27605', 'a_date1': date1, 'a_date2': date2, 'f_ed3': '9', 'f_ed4': '9',
+               'f_ed5': '8', 'f_pe': '1', 'f_pe1': '2', 'lng_id': '2'}
+    print(my_data)
+    print(my_header)
     response = requests.post(my_url, data=my_data, headers=my_header)
+    print(response.text)
     soup = BeautifulSoup(response.text, 'lxml')
     script = soup.find('script')
     link = re.findall(
