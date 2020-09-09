@@ -1,11 +1,14 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from functools import partial
 import requests
 import datetime
 import json
+import schedule
+import threading
+import time
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Bot
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 try:
@@ -14,8 +17,9 @@ except ModuleNotFoundError:
     pass
 from src.web.bot.model import User, Base
 from src.web.utils.aqi import pm25_to_aqius, aqi_level
+from src.web.bot.level_tracker import ConcentrationTracker, AnomaliesTracker, ForecastTracker
+from src.web.bot.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
 
-API_HOST = 'http://93.115.20.79:8000'
 MSK_TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))
 aqi_levels = {
     'green': 'Good',
@@ -29,8 +33,9 @@ aqi_levels = {
 def create_session():
     engine = create_engine('sqlite:///database/botbot.db')
     Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    return Session()
+    session_factory = sessionmaker(bind=engine)
+    Session = scoped_session(session_factory)
+    return Session
 
 
 def get_concentration():
@@ -65,6 +70,23 @@ def get_forecast():
     return s
 
 
+def get_anomaly(date: datetime.datetime):
+    start_date = date - datetime.timedelta(hours=ANOMALY_LOOK_UP_INTERVAL)
+    r = requests.get(API_HOST + '/anomaly',
+                     json={"end_time": date.isoformat('T'),
+                           "start_time": start_date.isoformat('T'),
+                           }
+                     )
+    data = json.loads(r.text)
+    if data:
+        cluster = data[0]['cluster']
+        text = {0: "Аномалия со снижением концентрации частиц или сохранием невысокого уровня",
+                1: "Повышение концентрации частиц из-за ухудшения условий рассеивания",
+                2: "Повышение значений концентрации частиц при повышенной влажности"}[cluster]
+        return text
+    return ''
+
+
 def keyboard():
     kb = [
         [InlineKeyboardButton('Концентрация частиц сейчас', callback_data='now'),
@@ -85,7 +107,7 @@ def start(update: Update, context):
     )
 
 
-def button(update: Update, context, session):
+def button(update: Update, context, sess):
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -94,6 +116,7 @@ def button(update: Update, context, session):
 
     option = query.data
 
+    session = sess()
     if option == 'subscribe':
         if session.query(User).filter(User.id == query.from_user.id).scalar() is not None:
             query.edit_message_text(text='Вы уже подписаны.', reply_markup=keyboard())
@@ -110,24 +133,60 @@ def button(update: Update, context, session):
         session.commit()
         query.edit_message_text(text='Вы отписались от получения уведомлений.', reply_markup=keyboard())
     if option == 'now':
-        query.edit_message_text(text=get_concentration(), reply_markup=keyboard())
+        query.edit_message_text(text=get_concentration() + ' ' + get_anomaly(datetime.datetime.utcnow()),
+                                reply_markup=keyboard())
     if option == 'forecast':
         query.edit_message_text(text=get_forecast(), reply_markup=keyboard())
 
 
-class Bot:
+def level_tracker_callback(sess, bot, **kwargs):
+    session = sess()
+    event_type = kwargs['event_type']
+    message = ''
+    if event_type == 'concentration':
+        message = f"Измение концентрации частиц до уровня AQI US '{aqi_levels[kwargs['aqi_level']]}'."
+    if event_type == 'anomalies':
+        msq = f"Обнаружена аномалия: "
+        cluster_msg = {
+            0: "снижение или сохранение невысокого уровня концентрации частиц.",
+            1: "повышение концентрации частиц из-за ухудшения условий рассеивания.",
+            2: "повышение концентрации частиц при повышении влажности.",
+        }[kwargs['cluster']]
+        message = msq + cluster_msg
+    if event_type == 'forecast':
+        message = f"В течении {FORECAST_LOOK_UP_INTERVAL} ожидается измение концентрации частиц до" \
+                  f" уровня AQI US: '{aqi_levels[kwargs['aqi_level']]}'."
+
+    users = session.query(User).all()
+    for user in users:
+        bot.send_message(chat_id=user.chat_id, text=message)
+
+
+class ConcentrationBot:
 
     def __init__(self):
         self.updater = Updater(TELEGRAM_TOKEN, use_context=True)
         self.dispatcher = self.updater.dispatcher
         self.dispatcher.add_handler(CommandHandler('start', start))
         session = create_session()
-        self.dispatcher.add_handler(CallbackQueryHandler(partial(button, session=session)))
+        self.dispatcher.add_handler(CallbackQueryHandler(partial(button, sess=session)))
+
+        bot = Bot(token=TELEGRAM_TOKEN)
+        callback = partial(level_tracker_callback, sess=session, bot=bot)
+        concentration_tracker = ConcentrationTracker(callback)
+        anomalies_tracker = AnomaliesTracker(callback)
+        forecast_tracker = ForecastTracker(callback)
+
+        schedule.every(20).minutes.do(concentration_tracker.check)
+        schedule.every().hour.at(':10').do(forecast_tracker.check)
+        schedule.every().hour.at(':15').do(anomalies_tracker.check)
 
     def start(self):
         self.updater.start_polling()
-        self.updater.idle()
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
 
 
 if __name__ == '__main__':
-    Bot().start()
+    ConcentrationBot().start()

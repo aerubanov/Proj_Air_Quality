@@ -1,7 +1,8 @@
-from src.web.bot.bot import get_concentration, get_forecast, keyboard, \
-    API_HOST, start, button
-from tests.web.data.api_test_data import sensor_data, forec_data
+from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
+    API_HOST, start, button, level_tracker_callback
+from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
 from src.web.bot.model import User as DbUser
+from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
 
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
 import datetime
@@ -20,6 +21,12 @@ def test_get_forecast(requests_mock):
     requests_mock.get(API_HOST + '/forecast', text=forec_data)
     answer = get_forecast()
     assert len(answer.splitlines()) == 25
+
+
+def test_get_anomaly(requests_mock):
+    requests_mock.get(API_HOST + '/anomaly', text=anomaly_data)
+    answer = get_anomaly(date=datetime.datetime(2020, 4, 7, 5))
+    assert answer == "Повышение значений концентрации частиц при повышенной влажности"
 
 
 def test_keyboard():
@@ -77,8 +84,9 @@ def test_button_now(bot_db_session, monkeypatch):
     bot = TestBot()
     update = create_update('now', bot, query='now')
     monkeypatch.setattr('src.web.bot.bot.get_concentration', lambda: 'sensor_values')
+    monkeypatch.setattr('src.web.bot.bot.get_anomaly', lambda x: 'anomalies text')
     button(update, None, bot_db_session)
-    assert bot.response == 'sensor_values'
+    assert bot.response == 'sensor_values' + ' ' + 'anomalies text'
 
 
 def test_button_forecast(bot_db_session, monkeypatch):
@@ -122,3 +130,32 @@ def test_button_unsubscribe_not_exist(bot_db_session, monkeypatch):
 
     button(update, None, bot_db_session)
     assert bot.response == 'Вы не подписаны.'
+
+
+def test_level_tracker_callback(bot_db_session):
+    class Bot:
+
+        def __init__(self):
+            self.chat_id = None
+            self.text = ''
+
+        def send_message(self, chat_id, text):
+            self.text = text
+            self.chat_id = chat_id
+
+    bot = Bot()
+    user = DbUser(id=1, chat_id=2)
+    sess = bot_db_session()
+    sess.add(user)
+    sess.commit()
+
+    level_tracker_callback(bot_db_session, bot, event_type='concentration', aqi_level='green')
+    assert bot.text == "Измение концентрации частиц до уровня AQI US 'Good'."
+    assert bot.chat_id == 2
+
+    level_tracker_callback(bot_db_session, bot, event_type='forecast', aqi_level='green')
+    assert bot.text == f"В течении {FORECAST_LOOK_UP_INTERVAL} ожидается измение концентрации частиц до" \
+                       f" уровня AQI US: 'Good'."
+
+    level_tracker_callback(bot_db_session, bot, event_type='anomalies', cluster=0)
+    assert bot.text == "Обнаружена аномалия: снижение или сохранение невысокого уровня концентрации частиц."
