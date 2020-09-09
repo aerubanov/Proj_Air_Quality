@@ -24,6 +24,7 @@ aqi_levels = {
     'red': 'Unhealthy',
     'purple': 'Very Unhealthy',
     'brown': 'Hazardous'}
+ANOMALY_LOOK_UP_INTERVAL = 3  # hours interval for anomalies selecting
 
 
 def create_session():
@@ -63,6 +64,23 @@ def get_forecast():
         level = aqi_levels[aqi_level(aqi)]
         s += f'{date.time().strftime("%H:%M")}  {p1:.2f}  {p2:.2f}  {aqi:.2f}  {level} \n'
     return s
+
+
+def get_anomaly(date: datetime.datetime):
+    start_date = date - datetime.timedelta(hours=ANOMALY_LOOK_UP_INTERVAL)
+    r = requests.get(API_HOST + '/anomaly',
+                     json={"end_time": date.isoformat('T'),
+                           "start_time": start_date.isoformat('T'),
+                           }
+                     )
+    data = json.loads(r.text)
+    if data:
+        cluster = data[0]['cluster']
+        text = {0: "Аномалия со снижением концентрации частиц или сохранием невысокого уровня",
+                1: "Повышение концентрации частиц из-за ухудшения условий рассеивания",
+                2: "Повышение значений концентрации частиц при повышенной влажности"}[cluster]
+        return text
+    return ''
 
 
 def keyboard():
@@ -110,7 +128,8 @@ def button(update: Update, context, session):
         session.commit()
         query.edit_message_text(text='Вы отписались от получения уведомлений.', reply_markup=keyboard())
     if option == 'now':
-        query.edit_message_text(text=get_concentration(), reply_markup=keyboard())
+        query.edit_message_text(text=get_concentration() + ' ' + get_anomaly(datetime.datetime.utcnow()),
+                                reply_markup=keyboard())
     if option == 'forecast':
         query.edit_message_text(text=get_forecast(), reply_markup=keyboard())
 

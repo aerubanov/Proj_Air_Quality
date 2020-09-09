@@ -1,6 +1,6 @@
-from src.web.bot.bot import get_concentration, get_forecast, keyboard, \
+from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
     API_HOST, start, button
-from tests.web.data.api_test_data import sensor_data, forec_data
+from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
 from src.web.bot.model import User as DbUser
 
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
@@ -20,6 +20,12 @@ def test_get_forecast(requests_mock):
     requests_mock.get(API_HOST + '/forecast', text=forec_data)
     answer = get_forecast()
     assert len(answer.splitlines()) == 25
+
+
+def test_get_anomaly(requests_mock):
+    requests_mock.get(API_HOST + '/anomaly', text=anomaly_data)
+    answer = get_anomaly(date=datetime.datetime(2020, 4, 7, 5))
+    assert answer == "Повышение значений концентрации частиц при повышенной влажности"
 
 
 def test_keyboard():
@@ -77,8 +83,9 @@ def test_button_now(bot_db_session, monkeypatch):
     bot = TestBot()
     update = create_update('now', bot, query='now')
     monkeypatch.setattr('src.web.bot.bot.get_concentration', lambda: 'sensor_values')
+    monkeypatch.setattr('src.web.bot.bot.get_anomaly', lambda x: 'anomalies text')
     button(update, None, bot_db_session)
-    assert bot.response == 'sensor_values'
+    assert bot.response == 'sensor_values' + ' ' + 'anomalies text'
 
 
 def test_button_forecast(bot_db_session, monkeypatch):
