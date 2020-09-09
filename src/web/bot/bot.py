@@ -139,7 +139,7 @@ def button(update: Update, context, sess):
         query.edit_message_text(text=get_forecast(), reply_markup=keyboard())
 
 
-def level_tracker_callback(sess, **kwargs):
+def level_tracker_callback(sess, bot, **kwargs):
     session = sess()
     event_type = kwargs['event_type']
     message = ''
@@ -148,15 +148,15 @@ def level_tracker_callback(sess, **kwargs):
     if event_type == 'anomalies':
         msq = f"Обнаружена аномалия: "
         cluster_msg = {
-            0: "снижение или сохранение невысокого уровня концентрации частиц",
-            1: "повышение концентрации частиц из-за ухудшения условий рассеивания",
-            2: "повышение концентрации частиц при повышении влажности",
+            0: "снижение или сохранение невысокого уровня концентрации частиц.",
+            1: "повышение концентрации частиц из-за ухудшения условий рассеивания.",
+            2: "повышение концентрации частиц при повышении влажности.",
         }[kwargs['cluster']]
         message = msq + cluster_msg
     if event_type == 'forecast':
         message = f"В течении {FORECAST_LOOK_UP_INTERVAL} ожидается измение концентрации частиц до" \
-                  f" уровня AQI US: '{aqi_levels[kwargs['aqi_level']]}"
-    bot = Bot(token=TELEGRAM_TOKEN)
+                  f" уровня AQI US: '{aqi_levels[kwargs['aqi_level']]}'."
+
     users = session.query(User).all()
     for user in users:
         bot.send_message(chat_id=user.chat_id, text=message)
@@ -171,7 +171,8 @@ class ConcentrationBot:
         session = create_session()
         self.dispatcher.add_handler(CallbackQueryHandler(partial(button, sess=session)))
 
-        callback = partial(level_tracker_callback, sess=session)
+        bot = Bot(token=TELEGRAM_TOKEN)
+        callback = partial(level_tracker_callback, sess=session, bot=bot)
         concentration_tracker = ConcentrationTracker(callback)
         anomalies_tracker = AnomaliesTracker(callback)
         forecast_tracker = ForecastTracker(callback)

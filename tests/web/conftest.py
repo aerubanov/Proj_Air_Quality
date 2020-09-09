@@ -1,6 +1,6 @@
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 
 @pytest.fixture()
@@ -21,9 +21,9 @@ def bot_db_session():
     from src.web.bot.model import Base
     engine = create_engine('sqlite:///test_db.db')
     Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    sess = Session()
+    session_factory = sessionmaker(bind=engine)
+    Session = scoped_session(session_factory)
 
-    yield sess
-    sess.close()
+    yield Session
+    Session.remove()
     Base.metadata.drop_all(engine)

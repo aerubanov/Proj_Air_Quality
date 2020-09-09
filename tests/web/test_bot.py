@@ -1,7 +1,8 @@
 from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
-    API_HOST, start, button
+    API_HOST, start, button, level_tracker_callback
 from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
 from src.web.bot.model import User as DbUser
+from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
 
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
 import datetime
@@ -129,3 +130,32 @@ def test_button_unsubscribe_not_exist(bot_db_session, monkeypatch):
 
     button(update, None, bot_db_session)
     assert bot.response == 'Вы не подписаны.'
+
+
+def test_level_tracker_callback(bot_db_session):
+    class Bot:
+
+        def __init__(self):
+            self.chat_id = None
+            self.text = ''
+
+        def send_message(self, chat_id, text):
+            self.text = text
+            self.chat_id = chat_id
+
+    bot = Bot()
+    user = DbUser(id=1, chat_id=2)
+    sess = bot_db_session()
+    sess.add(user)
+    sess.commit()
+
+    level_tracker_callback(bot_db_session, bot, event_type='concentration', aqi_level='green')
+    assert bot.text == "Измение концентрации частиц до уровня AQI US 'Good'."
+    assert bot.chat_id == 2
+
+    level_tracker_callback(bot_db_session, bot, event_type='forecast', aqi_level='green')
+    assert bot.text == f"В течении {FORECAST_LOOK_UP_INTERVAL} ожидается измение концентрации частиц до" \
+                       f" уровня AQI US: 'Good'."
+
+    level_tracker_callback(bot_db_session, bot, event_type='anomalies', cluster=0)
+    assert bot.text == "Обнаружена аномалия: снижение или сохранение невысокого уровня концентрации частиц."
