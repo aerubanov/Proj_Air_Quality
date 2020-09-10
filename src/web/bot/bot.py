@@ -5,8 +5,9 @@ import requests
 import datetime
 import json
 import schedule
-import threading
 import time
+import graphyte
+from appmetrics import metrics, reporter
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Bot
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
@@ -19,6 +20,8 @@ from src.web.bot.model import User, Base
 from src.web.utils.aqi import pm25_to_aqius, aqi_level
 from src.web.bot.level_tracker import ConcentrationTracker, AnomaliesTracker, ForecastTracker
 from src.web.bot.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
+from src.web.config import metrics_host
+from src.web.utils.metrics_reporter import GraphyteReporter
 
 MSK_TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))
 aqi_levels = {
@@ -38,6 +41,18 @@ def create_session():
     return Session
 
 
+graphyte.init(metrics_host, prefix='bot')
+graphite_reporter = GraphyteReporter(graphyte)
+reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
+user_counter = metrics.new_counter('bot_users')
+Session = create_session()
+sess = Session()
+num_user = len(sess.query(User).all())
+user_counter.notify(num_user)
+Session.remove()
+
+
+@metrics.with_meter('concentration')
 def get_concentration():
     start_date = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
     end_date = datetime.datetime.utcnow()
@@ -54,6 +69,7 @@ def get_concentration():
     return f'PM2.5: {p1:.2f} PM10: {p2:.2f} AQIUS: {aqi:.2f} {level}'
 
 
+@metrics.with_meter('forecast')
 def get_forecast():
     r = requests.get(API_HOST + '/forecast', json={})
     data = json.loads(r.text)
@@ -107,7 +123,7 @@ def start(update: Update, context):
     )
 
 
-def button(update: Update, context, sess):
+def button(update: Update, context, sess, with_metrics=False):
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -125,6 +141,8 @@ def button(update: Update, context, sess):
         session.add(user)
         session.commit()
         query.edit_message_text(text='Вы подписались на получение уведомлений.', reply_markup=keyboard())
+        if with_metrics:
+            user_counter.notify(1)
     if option == 'unsubscribe':
         if session.query(User).filter(User.id == query.from_user.id).scalar() is None:
             query.edit_message_text(text='Вы не подписаны.', reply_markup=keyboard())
@@ -132,6 +150,8 @@ def button(update: Update, context, sess):
         session.query(User).filter(User.id == query.from_user.id).delete()
         session.commit()
         query.edit_message_text(text='Вы отписались от получения уведомлений.', reply_markup=keyboard())
+        if with_metrics:
+            user_counter.notify(-1)
     if option == 'now':
         query.edit_message_text(text=get_concentration() + ' ' + get_anomaly(datetime.datetime.utcnow()),
                                 reply_markup=keyboard())
