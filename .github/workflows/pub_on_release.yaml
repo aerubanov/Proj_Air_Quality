@@ -26,6 +26,9 @@ jobs:
     - name: Build web_client
       run: docker-compose build web_client
       working-directory: ./src/web
+    - name: Build bot
+      run: docker-compose build bot
+      working-directory: ./src/web
     - name: Push image loader
       run: docker-compose push loader
       working-directory: ./src/web
@@ -37,4 +40,7 @@ jobs:
       working-directory: ./src/web
     - name: Push image web_client
       run: docker-compose push web_client
+      working-directory: ./src/web
+    - name: Push image bot
+      run: docker-compose push bot
       working-directory: ./src/web
