@@ -3,6 +3,7 @@ loader_logs_file = 'logs/loader_log.txt'
 api_logs_file = 'logs/api_log.txt'
 ml_logs_file = 'logs/ml_log.txt'
 client_logs_file = 'logs/client_log.txt'
+bot_logs_file = 'logs/bot_log.txt'
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -45,6 +46,14 @@ LOGGING_CONFIG = {
             'maxBytes': 1000000,
             'backupCount': 3,
         },
+        'bot_file_handler': {
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': bot_logs_file,
+            'maxBytes': 1000000,
+            'backupCount': 3,
+        },
     },
     'loggers': {
         'LoaderLogger': {
@@ -67,5 +76,10 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'propagate': False
         },
+        'BotLogger': {
+            'handlers': ['bot_file_handler'],
+            'level': 'INFO',
+            'propagate': False
+        }
     }
 }
