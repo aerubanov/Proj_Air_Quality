@@ -3,3 +3,5 @@ python-telegram-bot
 sqlalchemy
 psycopg2
 schedule
+graphyte
+appmetrics

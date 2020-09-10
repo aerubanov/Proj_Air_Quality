@@ -5,9 +5,10 @@ import requests
 import datetime
 import json
 import schedule
-import threading
 import time
-
+import graphyte
+from appmetrics import metrics, reporter
+import logging.config
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Bot
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
@@ -19,6 +20,9 @@ from src.web.bot.model import User, Base
 from src.web.utils.aqi import pm25_to_aqius, aqi_level
 from src.web.bot.level_tracker import ConcentrationTracker, AnomaliesTracker, ForecastTracker
 from src.web.bot.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
+from src.web.config import metrics_host
+from src.web.utils.metrics_reporter import GraphyteReporter
+from src.web.logger.logging_config import LOGGING_CONFIG
 
 MSK_TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))
 aqi_levels = {
@@ -38,6 +42,13 @@ def create_session():
     return Session
 
 
+graphyte.init(metrics_host, prefix='bot')
+graphite_reporter = GraphyteReporter(graphyte)
+reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
+user_counter = metrics.new_counter('bot_users')
+
+
+@metrics.with_meter('concentration')
 def get_concentration():
     start_date = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
     end_date = datetime.datetime.utcnow()
@@ -54,6 +65,7 @@ def get_concentration():
     return f'PM2.5: {p1:.2f} PM10: {p2:.2f} AQIUS: {aqi:.2f} {level}'
 
 
+@metrics.with_meter('forecast')
 def get_forecast():
     r = requests.get(API_HOST + '/forecast', json={})
     data = json.loads(r.text)
@@ -107,7 +119,7 @@ def start(update: Update, context):
     )
 
 
-def button(update: Update, context, sess):
+def button(update: Update, context, sess, with_metrics=False, logger=None):
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -125,6 +137,10 @@ def button(update: Update, context, sess):
         session.add(user)
         session.commit()
         query.edit_message_text(text='Вы подписались на получение уведомлений.', reply_markup=keyboard())
+        if with_metrics:
+            user_counter.notify(1)
+        if logger is not None:
+            logger.info(f'subscribe button - user_id: {query.from_user.id} - chat_id: {query.message.chat.id}')
     if option == 'unsubscribe':
         if session.query(User).filter(User.id == query.from_user.id).scalar() is None:
             query.edit_message_text(text='Вы не подписаны.', reply_markup=keyboard())
@@ -132,6 +148,10 @@ def button(update: Update, context, sess):
         session.query(User).filter(User.id == query.from_user.id).delete()
         session.commit()
         query.edit_message_text(text='Вы отписались от получения уведомлений.', reply_markup=keyboard())
+        if with_metrics:
+            user_counter.notify(-1)
+        if logger is not None:
+            logger.info(f'unsubscribe button - user_id: {query.from_user.id} - chat_id: {query.message.chat.id}')
     if option == 'now':
         query.edit_message_text(text=get_concentration() + ' ' + get_anomaly(datetime.datetime.utcnow()),
                                 reply_markup=keyboard())
@@ -139,7 +159,8 @@ def button(update: Update, context, sess):
         query.edit_message_text(text=get_forecast(), reply_markup=keyboard())
 
 
-def level_tracker_callback(sess, bot, **kwargs):
+@metrics.with_meter('notification')
+def level_tracker_callback(sess, bot, logger=None, **kwargs):
     session = sess()
     event_type = kwargs['event_type']
     message = ''
@@ -160,19 +181,24 @@ def level_tracker_callback(sess, bot, **kwargs):
     users = session.query(User).all()
     for user in users:
         bot.send_message(chat_id=user.chat_id, text=message)
+    if logger is not None:
+        logger.info(f'notification: {message}')
 
 
 class ConcentrationBot:
 
     def __init__(self):
+        logging.config.dictConfig(LOGGING_CONFIG)
+        logger = logging.getLogger()
+
         self.updater = Updater(TELEGRAM_TOKEN, use_context=True)
         self.dispatcher = self.updater.dispatcher
         self.dispatcher.add_handler(CommandHandler('start', start))
         session = create_session()
-        self.dispatcher.add_handler(CallbackQueryHandler(partial(button, sess=session)))
+        self.dispatcher.add_handler(CallbackQueryHandler(partial(button, sess=session, logger=logger)))
 
         bot = Bot(token=TELEGRAM_TOKEN)
-        callback = partial(level_tracker_callback, sess=session, bot=bot)
+        callback = partial(level_tracker_callback, sess=session, bot=bot, logger=logger)
         concentration_tracker = ConcentrationTracker(callback)
         anomalies_tracker = AnomaliesTracker(callback)
         forecast_tracker = ForecastTracker(callback)
@@ -180,6 +206,10 @@ class ConcentrationBot:
         schedule.every(20).minutes.do(concentration_tracker.check)
         schedule.every().hour.at(':10').do(forecast_tracker.check)
         schedule.every().hour.at(':15').do(anomalies_tracker.check)
+
+        sess = session()
+        num_user = len(sess.query(User).all())
+        user_counter.notify(num_user)
 
     def start(self):
         self.updater.start_polling()
