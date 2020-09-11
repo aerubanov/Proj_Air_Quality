@@ -64,13 +64,15 @@ def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85
     anomaly = time_series[time_series['anomaly']]
 
     # split anomaly on separate dataframe
-    anomaly['gap'] = (anomaly.index.to_series().diff()) > pd.Timedelta(10, 'm')
+    min_gap = pd.Timedelta(10, 'm')  # because time step is 5 min
+    anomaly['gap'] = (anomaly.index.to_series().diff()) > min_gap
     l_mod = pd.to_datetime(anomaly[anomaly.gap].index)
     l_mod = l_mod.insert(0, anomaly.index[0])
     l_mod = l_mod.insert(len(l_mod), anomaly.index[-1])
     ls = [anomaly[l_mod[n]:l_mod[n + 1]] for n in range(0, len(l_mod) - 1, 1)]
     ls = [i[:-1] for i in ls]
-    ls = [i for i in ls if len(i) > 12]
+    len_limit = 12  # anomaly len limit (1 hour for 5 minute time step)
+    ls = [i for i in ls if len(i) > len_limit]
     return ls
 
 

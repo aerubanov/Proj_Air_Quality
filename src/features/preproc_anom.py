@@ -54,6 +54,7 @@ def add_features(data: pd.DataFrame) -> pd.DataFrame:
 
     data["wind_sin"] = np.sin(np.radians(data.wind_direction))
     data["wind_cos"] = np.cos(np.radians(data.wind_direction))
+    # typical value in range [-1, 1], so use 2 to indicate missing value
     data['wind_sin'] = data.wind_sin.fillna(value=2)
     data['wind_cos'] = data.wind_cos.fillna(value=2)
 

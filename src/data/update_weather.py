@@ -9,8 +9,7 @@ import re
 from src.data.config import WEATHER_DATA_FOLDER, WEATHER_FILE
 from src.data.config import WEATHER_URL1, WEATHER_URL2
 
-# DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
-DEFAULT_DATE = datetime.date(2019, 4, 1)
+DEFAULT_DATE = datetime.date(2019, 4, 1)  # the start point of data loading interval
 
 
 def check_file(fname, data_folder=WEATHER_DATA_FOLDER):

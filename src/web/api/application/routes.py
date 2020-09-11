@@ -135,7 +135,7 @@ def before_request():
 def after_request(response):
     if app.config['DEBUG']:
         return response
-    resp_time = (time.time() - g.start) * 1000  # время ответа сервера в миллисекндах
+    resp_time = (time.time() - g.start) * 1000  # response time in milliseconds
     logger = get_logger()
     logger.info(f'path: {request.path} - method: {request.method} - remote: {request.remote_addr} '
                 f'- json: {request.json} - status: {response.status} - time: {resp_time}')

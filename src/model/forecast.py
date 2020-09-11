@@ -2,11 +2,9 @@ import pandas as pd
 import datetime
 from typing import List
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.base import clone
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn.linear_model import Lasso
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import QuantileTransformer
 import pickle
 import json
@@ -16,10 +14,7 @@ from src.features.preproc_forecast import DataTransform
 
 pd.options.mode.chained_assignment = None  # disable SettingWithCopyWarning
 
-# Build models for PM2.5 and PM10 forecast for next 24-hours, separate model for each hour. We use model
-# ansamble from two models. Firstly, Linear model take sensor data from previous 24-hours and predict PM. Next,
-# Random Forest take this prediction and weather forecast (from external source) as input and make final prediction.
-
+# Build models for PM2.5 and PM10 forecast for next 24-hours, separate model for each hour.
 
 # ------------------- constants ----------------------------------------------------------------------------
 # columns of dataset which will be used
