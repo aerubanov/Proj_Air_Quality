@@ -195,7 +195,8 @@ class ConcentrationBot:
         self.dispatcher = self.updater.dispatcher
         self.dispatcher.add_handler(CommandHandler('start', start))
         session = create_session()
-        self.dispatcher.add_handler(CallbackQueryHandler(partial(button, sess=session, logger=logger)))
+        self.dispatcher.add_handler(CallbackQueryHandler(partial(button, sess=session, logger=logger,
+                                                                 with_metrics=True)))
 
         bot = Bot(token=TELEGRAM_TOKEN)
         callback = partial(level_tracker_callback, sess=session, bot=bot, logger=logger)

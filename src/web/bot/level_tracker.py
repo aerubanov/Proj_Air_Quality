@@ -23,7 +23,7 @@ class LevelTracker(ABC):
 
 class ConcentrationTracker(LevelTracker):
     def check(self):
-        start_date = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+        start_date = datetime.datetime.utcnow() - datetime.timedelta(hours=6)
         end_date = datetime.datetime.utcnow()
         r = requests.get(API_HOST + '/sensor_data',
                          json={"end_time": end_date.isoformat('T'),
