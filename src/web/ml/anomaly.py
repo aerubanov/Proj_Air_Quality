@@ -9,6 +9,7 @@ from src.model.anom_clustering import Model
 pca_model_file = 'models/anomalies/dim_red.obj'
 kmean_model_file = 'models/anomalies/clustering.obj'
 cluster_map_file = 'models/anomalies/cluster_map.obj'
+anomaly_detection_interval = datetime.timedelta(days=7)
 
 
 def clear_anomalies_table(start_date: datetime.datetime, end_date: datetime.datetime, session):
@@ -24,7 +25,7 @@ def write_data(session, anomalies: pd.DataFrame):
 
 
 def perform_anomaly_detection(session, logger=None):
-    delta = datetime.timedelta(days=7)
+    delta = anomaly_detection_interval
     weather_data = get_weather_data(session, delta=delta)
     sensor_data = get_sensor_data(session, delta=delta)
     data = pd.concat((weather_data, sensor_data), axis=1)

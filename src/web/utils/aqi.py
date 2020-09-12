@@ -36,14 +36,14 @@ def pm25_to_aqius(pm: float) -> float:
 
 def aqi_level(aqi: float) -> str:
     if aqi <= 50:
-        return 'green'
+        return 'Good'
     if 50 < aqi <= 100:
-        return 'gold'
+        return 'Moderate'
     if 100 < aqi <= 150:
-        return 'orange'
+        return 'Unhealthy for Sensitive Groups'
     if 150 < aqi <= 200:
-        return 'red'
+        return 'Unhealthy'
     if 200 < aqi <= 300:
-        return 'purple'
+        return 'Very Unhealthy'
     if aqi > 300:
-        return 'brown'
+        return 'Hazardous'

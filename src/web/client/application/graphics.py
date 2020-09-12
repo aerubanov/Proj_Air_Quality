@@ -7,33 +7,46 @@ from src.web.utils.aqi import aqi_level, pm25_to_aqius
 WIDTH = 12
 HEIGHT = 6
 
+anom_colors = {0: 'g', 1: 'r', 2: 'b'}
+aqi_colors = {
+    'Good': 'green',
+    'Moderate': 'gold',
+    'Unhealthy for Sensitive Groups': 'orange',
+    'Unhealthy': 'red',
+    'Very Unhealthy': 'purple',
+    'Hazardous': 'brown',
+}
+
 
 def html_graph(
         sensor_data: pd.DataFrame,
         anomalies_data: pd.DataFrame,
         forecast_data: pd.DataFrame,
         with_forecast=True):
-    anom_colors = {0: 'g', 1: 'r', 2: 'b'}
 
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(WIDTH, HEIGHT), gridspec_kw={'width_ratios': [2, 1]})
 
     if not sensor_data.empty:
+        # concentration plot
         axes[0, 0].plot(sensor_data.index.to_pydatetime(), sensor_data.p1.values, label='PM2.5')
         axes[0, 0].plot(sensor_data.index.to_pydatetime(), sensor_data.p2.values, label='PM10')
 
+        # aqi_level plot
         aqi_df = sensor_data[['p1']].interpolate()
         aqi_df['aqi'] = aqi_df.p1.apply(pm25_to_aqius)
         aqi_df['aqi'] = aqi_df.aqi.fillna(value=0)
         aqi_df['level'] = aqi_df.aqi.apply(aqi_level)
+        aqi_df['level'] = aqi_df.level.map(aqi_colors)
         axes[1, 0].scatter(
             aqi_df.index.to_pydatetime(),
             aqi_df.aqi.values,
             c=aqi_df.level.values,
             edgecolor='none',
         )
-        axes[1, 0].plot(aqi_df.index.to_pydatetime(), aqi_df.aqi.values,)
+        axes[1, 0].plot(aqi_df.index.to_pydatetime(), aqi_df.aqi.values, )
 
     if not anomalies_data.empty:
+        # anomalies plot (points on concentration plot)
         anomalies_data['cluster'] = anomalies_data.cluster.map(anom_colors)
         axes[0, 0].scatter(
             anomalies_data.index.to_pydatetime(),
@@ -43,6 +56,7 @@ def html_graph(
         )
 
     if not forecast_data.empty and with_forecast:
+        # forecast concentration plot
         axes[0, 1].plot(
             forecast_data.index.to_pydatetime(),
             forecast_data.p1.values,
@@ -56,9 +70,11 @@ def html_graph(
             label='PM10'
         )
 
+        # forecast aqi level plot
         aqi_forecst = forecast_data[['p1']]
         aqi_forecst['aqi'] = aqi_forecst.p1.apply(pm25_to_aqius)
         aqi_forecst['level'] = aqi_forecst.aqi.apply(aqi_level)
+        aqi_forecst['level'] = aqi_forecst.level.map(aqi_colors)
         axes[1, 1].scatter(
             aqi_forecst.index.to_pydatetime(),
             aqi_forecst.aqi.values,

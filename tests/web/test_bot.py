@@ -149,11 +149,11 @@ def test_level_tracker_callback(bot_db_session):
     sess.add(user)
     sess.commit()
 
-    level_tracker_callback(bot_db_session, bot, event_type='concentration', aqi_level='green')
+    level_tracker_callback(bot_db_session, bot, event_type='concentration', aqi_level='Good')
     assert bot.text == "Измение концентрации частиц до уровня AQI US 'Good'."
     assert bot.chat_id == 2
 
-    level_tracker_callback(bot_db_session, bot, event_type='forecast', aqi_level='green')
+    level_tracker_callback(bot_db_session, bot, event_type='forecast', aqi_level='Good')
     assert bot.text == f"В течении {FORECAST_LOOK_UP_INTERVAL} часов ожидается измение концентрации частиц до" \
                        f" уровня AQI US: 'Good'."
 

@@ -37,17 +37,24 @@ def get_chunk(session, transform: DataTransform, target: str) -> Chunk:
     weather_data = get_weather_data(session)
     train_part = pd.concat((sensor_data, weather_data), axis=1)
     train_data = transform.transform(train_part)
+
     test_part = get_weather_data(session, date=datetime.datetime.utcnow()+datetime.timedelta(days=1))
+    # fill missing sensor data in test part to use transform
+    # we will not this data for any other tasks
     for c in ['P1_filtr_mean', 'P2_filtr_mean', 'humidity_filtr_mean', 'temperature_filtr_mean']:
         test_part[c] = train_part[c].mean()
     test_data = transform.transform(test_part)
+
     train_data = add_features(train_data, target)
     test_data = add_features(test_data, target)
+
     train_data = train_data.interpolate()
     test_data = test_data.interpolate()
+
     train_data = train_data.fillna(train_data.mean())
     train_data = train_data[:24]
     test_data = test_data.fillna(train_data.mean())
+
     chunk = Chunk(train_data, test_data, features, target)
     return chunk
 

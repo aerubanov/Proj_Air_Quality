@@ -67,7 +67,7 @@ def average_data(data: typing.List[typing.Dict]):
             }
 
 
-def load_sensors() -> dict:
+def load_sensors() -> (dict, int):
     """get current average values from sensors"""
     sensor_id = read_sensor_id(sensor_file)
     data = load_data(sensor_id)

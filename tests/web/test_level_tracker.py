@@ -19,7 +19,7 @@ def test_concentration_tracker(requests_mock):
     requests_mock.get(API_HOST + '/sensor_data', text='[{"p1":3.5600970873786406},{"p1":30.733960396039604}]\n')
     conc_tr.check()
     assert cb.kw['event_type'] == 'concentration'
-    assert cb.kw['aqi_level'] == 'gold'
+    assert cb.kw['aqi_level'] == 'Moderate'
 
 
 def test_anomalies_tracker(requests_mock):
@@ -47,4 +47,4 @@ def test_forecast_tracker(requests_mock):
                                                    f'"forward_time":2,"p1":30.10}}]\n')
     forec_tr.check()
     assert cb.kw['event_type'] == 'forecast'
-    assert cb.kw['aqi_level'] == 'gold'
+    assert cb.kw['aqi_level'] == 'Moderate'

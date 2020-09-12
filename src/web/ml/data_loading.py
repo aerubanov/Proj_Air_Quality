@@ -4,6 +4,12 @@ import re
 
 from src.web.models.model import Sensors, Weather
 
+sensors_columns_names = {'p1': 'P1_filtr_mean', 'p2': 'P2_filtr_mean', 'temperature': 'temperature_filtr_mean',
+                         'humidity': 'humidity_filtr_mean', 'pressure': 'pressure_filtr_mean'}
+weather_columns_names = {'temp': 'temp_meteo', 'press': 'pres_meteo',
+                         'prec': 'prec_amount', 'wind_speed': 'wind_speed',
+                         'wind_dir': 'wind_direction', 'hum': 'hum_meteo'}
+
 
 def get_sensor_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd.DataFrame:
     """get sensor data for time interval [date-delta, date]"""
@@ -11,11 +17,10 @@ def get_sensor_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd.
         date = datetime.datetime.utcnow()
 
     # get sensor data for Chunk.train
-    result = session.query(Sensors).filter(Sensors.date.between(date-delta, date)).all()
+    result = session.query(Sensors).filter(Sensors.date.between(date - delta, date)).all()
     data = [i.serialize for i in result]
     data = pd.DataFrame(data)
-    data = data.rename(columns={'p1': 'P1_filtr_mean', 'p2': 'P2_filtr_mean', 'temperature': 'temperature_filtr_mean',
-                                'humidity': 'humidity_filtr_mean', 'pressure': 'pressure_filtr_mean'})
+    data = data.rename(columns=sensors_columns_names)
     data['date'] = pd.to_datetime(data.date)
     data = data.set_index('date')
     return data.resample('5T').mean()
@@ -46,13 +51,11 @@ def get_weather_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd
     """ get weather data for time interval [date-delta, date]"""
     if date is None:
         date = datetime.datetime.utcnow()
-    res = session.query(Weather).filter(Weather.date.between(date-delta, date)).all()
+    res = session.query(Weather).filter(Weather.date.between(date - delta, date)).all()
     data = [i.serialize for i in res]
     data = pd.DataFrame(data)
     data['date'] = pd.to_datetime(data.date)
-    data = data.rename(columns={'temp': 'temp_meteo', 'press': 'pres_meteo',
-                                'prec': 'prec_amount', 'wind_speed': 'wind_speed',
-                                'wind_dir': 'wind_direction', 'hum': 'hum_meteo'})
+    data = data.rename(columns=weather_columns_names)
     data['prec_amount'] = data.prec_amount.apply(transform_prec_amount).astype(float)
     data['prec_time'] = 3.0  # time step of weather forecast from rp5.ru
     data['wind_direction'] = data.wind_direction.map(wind_dir)
