@@ -10,8 +10,11 @@ from src.web.utils.aqi import aqi_level, pm25_to_aqius
 class LevelTracker(ABC):
     def __init__(self, callback):
         self.previous_level = None
-        self.callback = callback
+        # to prevent user notification here firstly set callback None
+        self.callback = None
         self.check()
+        # and now set actual callback value
+        self.callback = callback
 
     @abstractmethod
     def check(self):
@@ -36,7 +39,8 @@ class ConcentrationTracker(LevelTracker):
         level = aqi_level(aqi)
         if level != self.previous_level:
             self.previous_level = level
-            self.callback(event_type='concentration', aqi_level=level)
+            if self.callback is not None:
+                self.callback(event_type='concentration', aqi_level=level)
 
 
 class AnomaliesTracker(LevelTracker):
@@ -52,7 +56,8 @@ class AnomaliesTracker(LevelTracker):
         cluster = data[0]['cluster'] if data else None
         if cluster != self.previous_level:
             self.previous_level = cluster
-            self.callback(event_type='anomalies', cluster=cluster)
+            if self.callback is not None:
+                self.callback(event_type='anomalies', cluster=cluster)
 
 
 class ForecastTracker(LevelTracker):
@@ -70,4 +75,5 @@ class ForecastTracker(LevelTracker):
             level = aqi_level(aqi)
             if level != self.previous_level:
                 self.previous_level = level
-                self.callback(event_type='forecast', aqi_level=level)
+                if self.callback is not None:
+                    self.callback(event_type='forecast', aqi_level=level)

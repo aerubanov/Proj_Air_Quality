@@ -93,8 +93,9 @@ services:
     networks:
       - backend
     volumes:
-      - "./bot/database:/code/database"
+      - "../../src:/code/src"
       - "./logs:/code/logs"
+      - "./bot/database:/code/database"
     command: python -m src.web.bot.bot -u
 
 networks:
