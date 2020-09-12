@@ -154,7 +154,7 @@ def test_level_tracker_callback(bot_db_session):
     assert bot.chat_id == 2
 
     level_tracker_callback(bot_db_session, bot, event_type='forecast', aqi_level='green')
-    assert bot.text == f"В течении {FORECAST_LOOK_UP_INTERVAL} ожидается измение концентрации частиц до" \
+    assert bot.text == f"В течении {FORECAST_LOOK_UP_INTERVAL} часов ожидается измение концентрации частиц до" \
                        f" уровня AQI US: 'Good'."
 
     level_tracker_callback(bot_db_session, bot, event_type='anomalies', cluster=0)

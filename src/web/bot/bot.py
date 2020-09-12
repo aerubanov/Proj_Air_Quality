@@ -175,7 +175,7 @@ def level_tracker_callback(sess, bot, logger=None, **kwargs):
         }[kwargs['cluster']]
         message = msq + cluster_msg
     if event_type == 'forecast':
-        message = f"В течении {FORECAST_LOOK_UP_INTERVAL} ожидается измение концентрации частиц до" \
+        message = f"В течении {FORECAST_LOOK_UP_INTERVAL} часов ожидается измение концентрации частиц до" \
                   f" уровня AQI US: '{aqi_levels[kwargs['aqi_level']]}'."
 
     users = session.query(User).all()

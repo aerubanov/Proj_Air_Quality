@@ -12,7 +12,7 @@ class GraphyteMock:
 
 def test_metrics_sensors():
     graphyte = GraphyteMock()
-    metrics = {'sensors': {'five': 1, 'day': 1}}
+    metrics = {'sensors': {'kind': 'meter', 'five': 1, 'day': 1}}
     graphite_reporter = GraphyteReporter(graphyte=graphyte)
     graphite_reporter(metrics)
     sended = graphyte.sended
@@ -22,7 +22,7 @@ def test_metrics_sensors():
 
 def test_metrics_forecast():
     graphyte = GraphyteMock()
-    metrics = {'forecast': {'five': 1, 'day': 1}}
+    metrics = {'forecast': {'kind': 'meter', 'five': 1, 'day': 1}}
     graphite_reporter = GraphyteReporter(graphyte=graphyte)
     graphite_reporter(metrics)
     sended = graphyte.sended
@@ -32,7 +32,7 @@ def test_metrics_forecast():
 
 def test_metrics_anomalies():
     graphyte = GraphyteMock()
-    metrics = {'anomalies': {'five': 1, 'day': 1}}
+    metrics = {'anomalies': {'kind': 'meter', 'five': 1, 'day': 1}}
     graphite_reporter = GraphyteReporter(graphyte=graphyte)
     graphite_reporter(metrics)
     sended = graphyte.sended
@@ -42,7 +42,7 @@ def test_metrics_anomalies():
 
 def test_metrics_status_200(monkeypatch):
     graphyte = GraphyteMock()
-    metrics = {'status_200': {'five': 1, 'day': 1}}
+    metrics = {'status_200': {'kind': 'meter', 'five': 1, 'day': 1}}
     graphite_reporter = GraphyteReporter(graphyte=graphyte)
     graphite_reporter(metrics)
     sended = graphyte.sended
@@ -52,7 +52,7 @@ def test_metrics_status_200(monkeypatch):
 
 def test_metrics_status_400(monkeypatch):
     graphyte = GraphyteMock()
-    metrics = {'status_400': {'five': 1, 'day': 1}}
+    metrics = {'status_400': {'kind': 'meter', 'five': 1, 'day': 1}}
     graphite_reporter = GraphyteReporter(graphyte=graphyte)
     graphite_reporter(metrics)
     sended = graphyte.sended
@@ -62,9 +62,18 @@ def test_metrics_status_400(monkeypatch):
 
 def test_metrics_status_404(monkeypatch):
     graphyte = GraphyteMock()
-    metrics = {'status_404': {'five': 1, 'day': 1}}
+    metrics = {'status_404': {'kind': 'meter', 'five': 1, 'day': 1}}
     graphite_reporter = GraphyteReporter(graphyte=graphyte)
     graphite_reporter(metrics)
     sended = graphyte.sended
     assert sended['status_404_five_minute'] == 1
     assert sended['status_404_day'] == 1
+
+
+def test_metrics_counter(monkeypatch):
+    graphyte = GraphyteMock()
+    metrics = {'bot_users': {'kind': 'counter', 'value': 10}}
+    graphite_reporter = GraphyteReporter(graphyte=graphyte)
+    graphite_reporter(metrics)
+    sended = graphyte.sended
+    assert sended['bot_users'] == 10
