@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/aerubanov/Proj_Air_Quality.svg?branch=master)](https://travis-ci.org/aerubanov/Proj_Air_Quality)
 [![codecov](https://codecov.io/gh/aerubanov/Proj_Air_Quality/branch/master/graph/badge.svg)](https://codecov.io/gh/aerubanov/Proj_Air_Quality)
 # Proj_Air_Quality
-Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://air-quality-moscow.net/).
+Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://air-quality-moscow.net/). Так же вы можете использовать [Telegram-бот](https://t.me/lskjhgoiuh9887_bot?start=666) получения информации концентрации частиц и уведомлений о её измениях.
 # Docs
 ### data
 [raw_data.rst](docs/data/raw_data.rst)
@@ -23,7 +23,7 @@
 
 
 ## Notebooks
-Выделение и кластеризация аномалий в данных
+Эксперименты с данными
  
  [Anomaly detection.ipynb](notebooks/Anomaly%20detection.ipynb)
  
