@@ -198,8 +198,8 @@ class ConcentrationBot:
         forecast_tracker = ForecastTracker(callback)
 
         schedule.every(20).minutes.do(concentration_tracker.check)
-        schedule.every().hour.at(':10').do(forecast_tracker.check)
-        schedule.every().hour.at(':15').do(anomalies_tracker.check)
+        schedule.every(20).minutes.do(forecast_tracker.check)
+        schedule.every().hour.at(':10').do(anomalies_tracker.check)
 
         sess = session()
         num_user = len(sess.query(User).all())

@@ -18,7 +18,7 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     sess = Session()
-    schedule.every().hour.at(":01").do(perform_forecast, session=sess, logger=logger)
+    schedule.every(20).minutes.do(perform_forecast, session=sess, logger=logger)
     schedule.every().hour.at(":02").do(perform_anomaly_detection, session=sess, logger=logger)
     logger.info("ml started")
     while True:
