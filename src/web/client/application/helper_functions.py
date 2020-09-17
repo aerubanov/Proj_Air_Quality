@@ -23,7 +23,7 @@ def get_sensor_data(
     df = df[['date', 'p1', 'p2']]
     df['date'] = pd.to_datetime(df.date, utc=True)
     df = df.set_index('date')
-    df = df.tz_convert('Europe/Moscow')
+    df = df.set_index(df.index.tz_convert('Europe/Moscow'))
 
     if interval > datetime.timedelta(days=5):
         df = df.resample('0.5H').mean()
@@ -65,5 +65,5 @@ def get_forecast_data() -> Optional[pd.DataFrame]:
     df['date'] += pd.to_timedelta(df['forward_time'], unit='h')
     df = df[['date', 'p1', 'p2']]
     df = df.set_index('date')
-    df = df.tz_convert('Europe/Moscow')
+    df = df.set_index(df.index.tz_convert('Europe/Moscow'))
     return df
