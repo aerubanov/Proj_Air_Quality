@@ -58,7 +58,7 @@ def get_rows_numb(rows):
         t = r.find('td').text
         if 'Местное время' in t:
             rows_nomb['time_row'] = i
-        if 'Явления погоды' in t:
+        if 'Осадки, мм' in t:
             rows_nomb['prec_row'] = i
         if 'Температура' in t:
             rows_nomb['temp_row'] = i
