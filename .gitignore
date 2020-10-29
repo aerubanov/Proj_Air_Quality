@@ -9,3 +9,5 @@ __pycache__/
 /last_weather_update.txt
 test_db.db
 bot.db
+env
+venv
