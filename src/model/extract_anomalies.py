@@ -1,10 +1,11 @@
 import pickle
-import pandas as pd
-import matplotlib.pyplot as plt
 from typing import List
 
-from src.model.anom_clustering import Model, num_clusters, sensor_columns, meteo_columns
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from src.features.preproc_anom import prepare_sensors_data, prepare_meteo_data
+from src.model.anom_clustering import Model, num_clusters, sensor_columns, meteo_columns
 
 # ------ constants --------------------------------------------------------------------------------------
 data_file = 'DATA/processed/dataset.csv'
@@ -46,8 +47,8 @@ def plot_distribution(anomalies):
     axs[3].set_title('residual')
     axs[3].legend(loc='best')
 
-    plt.savefig(image_file,
-                clear=True, bbox_inches='tight')
+    print('plot distribution has been saved:', image_file)
+    plt.savefig(image_file, bbox_inches='tight')
 
 
 def extract_anom(data: pd.DataFrame, model: Model) -> (pd.DataFrame, List[pd.DataFrame]):
