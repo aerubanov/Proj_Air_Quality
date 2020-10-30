@@ -38,7 +38,7 @@ def test_keyboard():
     assert len(kb.inline_keyboard[1]) == 2
 
 
-class TestBot:
+class MyBot:
     def __init__(self):
         self.response = None
         self.markup = None
@@ -61,7 +61,7 @@ class TestBot:
         self.markup = reply_markup
 
 
-def create_update(text: str, bot: TestBot, query=None):
+def create_update(text: str, bot: MyBot, query=None):
     user = User(id=1, first_name='Anatoly', is_bot=False)
     message = Message(message_id=1, from_user=user, date=datetime.datetime.utcnow(),
                       text=text, chat=Chat(id=1, type='chat'), bot=bot)
@@ -75,7 +75,7 @@ def create_update(text: str, bot: TestBot, query=None):
 
 
 def test_start():
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('/start', bot)
     start(update, context=None)
     assert bot.response == 'Чтобы получать уведомления об измении концентрации частиц в воздухе, подпишитесь на бота'
@@ -83,7 +83,7 @@ def test_start():
 
 
 def test_button_now(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('now', bot, query='now')
     monkeypatch.setattr('src.web.bot.bot.get_concentration', lambda: 'sensor_values')
     monkeypatch.setattr('src.web.bot.bot.get_anomaly', lambda x: 'anomalies text')
@@ -92,7 +92,7 @@ def test_button_now(bot_db_session, monkeypatch):
 
 
 def test_button_forecast(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('forecast', bot, query='forecast')
     monkeypatch.setattr('src.web.bot.bot.get_forecast', lambda: 'forecast_values')
     button(update, None, bot_db_session)
@@ -100,14 +100,14 @@ def test_button_forecast(bot_db_session, monkeypatch):
 
 
 def test_button_subscribe(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('subscribe', bot, query='subscribe')
     button(update, None, bot_db_session)
     assert bot.response == 'Вы подписались на получение уведомлений.'
 
 
 def test_button_subscribe_exist(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('subscribe', bot, query='subscribe')
     user = DbUser(id=1, chat_id=1)
     bot_db_session.add(user)
@@ -117,7 +117,7 @@ def test_button_subscribe_exist(bot_db_session, monkeypatch):
 
 
 def test_button_unsubscribe(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('unsubscribe', bot, query='unsubscribe')
     user = DbUser(id=1, chat_id=1)
     bot_db_session.add(user)
@@ -127,7 +127,7 @@ def test_button_unsubscribe(bot_db_session, monkeypatch):
 
 
 def test_button_unsubscribe_not_exist(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('unsubscribe', bot, query='unsubscribe')
 
     button(update, None, bot_db_session)
