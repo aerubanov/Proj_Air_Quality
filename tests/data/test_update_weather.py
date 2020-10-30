@@ -38,10 +38,13 @@ def test_check_file(tmpdir):
 def test_parse_link():
     mocked_response = '''
     <script type="text/javascript">
-        $("#f_result").empty().append('<a href=http://37.9.3.253/download/files.synop/27/27605.29.10.2020.31.10.2020.1.0.0.ru.utf8.00000000.csv.gz>Скачать</a>').css("display","none").css('opacity',0).css("display","block").animate({opacity:"1"},1500);
+        $("#f_result").empty().append('
+        <a href=http://37.9.3.253/download/files.synop/27/27605.29.10.2020.31.10.2020.1.0.0.ru.utf8.00000000.csv.gz>
+        Скачать</a>').css("display","none").css('opacity',0).css("display","block").
+        animate({opacity:"1"},1500);
     </script>
     '''
     link = parse_response_link(mocked_response)
-    expected_link = 'http://37.9.3.253/download/files.synop/27/27605.29.10.2020.31.10.2020.1.0.0.ru.utf8.00000000.csv.gz'
-
+    expected_link = 'http://37.9.3.253/download/files.synop/27/27605.29.10.2020.31.10.2020.1.0.0.ru.utf8.' + \
+                    '00000000.csv.gz'
     assert link == expected_link
