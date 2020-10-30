@@ -50,7 +50,7 @@ class MyBot:
         self.response = text
         self.markup = reply_markup
 
-    def answer_callback_query(self, callback_query_id, text=None,
+    def answerCallbackQuery(self, callback_query_id, text=None,
                               show_alert=False, url=None, cache_time=None, timeout=None, **kwargs):
         pass
 
