@@ -88,3 +88,6 @@ python -m src.data.update_weather
   Для графиков там [altair](https://altair-viz.github.io/), гененрируется json с данными для gitграфика, который
   уже рендерится на стороне пользователя в браузере
  - bot - telegram-бот для отслеживания измения концентрации частиц.
+
+# Tests
+Запуск тестов: `pytest -V`

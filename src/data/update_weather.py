@@ -20,20 +20,17 @@ def check_file(fname, data_folder=WEATHER_DATA_FOLDER):
     :return: (True, last_date) if file with data exist, (False, None) otherwise
     """
     try:
-        f = open(os.path.join(data_folder, fname), 'r', encoding="utf-8")
-        reader = csv.DictReader(f, delimiter=";")
-        try:
-            row = next(reversed(list(reader)))
-        except StopIteration:
-            return False, None
-        t = row['Местное время в Москве (центр, Балчуг)']
-        t = t.split()[0].split('.')
-        day = int(t[0])
-        month = int(t[1])
-        year = int(t[2])
-        dt = datetime.datetime(year, month, day)
-        f.close()
-        return True, dt.date() + datetime.timedelta(days=1)
+        with open(os.path.join(data_folder, fname), 'r', encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter=";")
+            try:
+                row = next(reversed(list(reader)))
+            except StopIteration:
+                return False, None
+            t = row['Местное время в Москве (центр, Балчуг)']
+            t = t.split()[0].split('.')
+            day, month, year = int(t[0]), int(t[1]), int(t[2])
+            dt = datetime.datetime(year, month, day)
+            return True, dt.date() + datetime.timedelta(days=1)
     except FileNotFoundError:
         return False, None
 
@@ -98,17 +95,26 @@ def download_data(link):
 
 def main(datafile: str):
     file_exist, start_date = check_file(datafile)
+
     if start_date is None:
         start_date = DEFAULT_DATE
+
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
+
     if start_date >= yesterday:
         return
+
     link = get_link(start_date, yesterday)
     data = download_data(link).splitlines()
     data = data[6:]  # skip header
+
+    if not os.path.exists(WEATHER_DATA_FOLDER):
+        os.mkdir(WEATHER_DATA_FOLDER)
+
     if not file_exist:
         with open(os.path.join(WEATHER_DATA_FOLDER, datafile), "w") as f:
             f.write(data[0])
+
     with open(os.path.join(WEATHER_DATA_FOLDER, datafile), 'a', encoding='utf-8') as f:
         for i in reversed(data[1:]):
             f.write(i+'\n')
