@@ -1,11 +1,12 @@
-from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
-    API_HOST, start, button, level_tracker_callback
-from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
-from src.web.bot.model import User as DbUser
-from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
+import datetime
 
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
-import datetime
+
+from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
+    API_HOST, start, button, level_tracker_callback
+from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
+from src.web.bot.model import User as DbUser
+from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
 
 
 def test_get_concentration(requests_mock):
@@ -41,6 +42,7 @@ class TestBot:
     def __init__(self):
         self.response = None
         self.markup = None
+        self.defaults = None
 
     def send_message(self, chat_id, text, parse_mode=None, disable_web_page_preview=None,
                      disable_notification=False, reply_to_message_id=None,
@@ -48,8 +50,8 @@ class TestBot:
         self.response = text
         self.markup = reply_markup
 
-    def answerCallbackQuery(self, callback_query_id, text=None,
-                            show_alert=False, url=None, cache_time=None, timeout=None, **kwargs):
+    def answer_callback_query(self, callback_query_id, text=None,
+                              show_alert=False, url=None, cache_time=None, timeout=None, **kwargs):
         pass
 
     def edit_message_text(self, text, chat_id=None, message_id=None, inline_message_id=None,
@@ -65,7 +67,7 @@ def create_update(text: str, bot: TestBot, query=None):
                       text=text, chat=Chat(id=1, type='chat'), bot=bot)
 
     if query is not None:
-        cb = CallbackQuery(id=1, from_user=user, chat_instance='chat', data=query, bot=bot, message=message)
+        cb = CallbackQuery(id='1', from_user=user, chat_instance='chat', data=query, bot=bot, message=message)
     else:
         cb = None
     update = Update(update_id=1, message=message, callback_query=cb)
