@@ -50,8 +50,8 @@ class MyBot:
         self.response = text
         self.markup = reply_markup
 
-    def answerCallbackQuery(self, callback_query_id, text=None, show_alert=False, url=None, cache_time=None,
-                            timeout=None, **kwargs):
+    def answer_callback_query(self, callback_query_id, text=None, show_alert=False, url=None, cache_time=None,
+                              timeout=None, **kwargs):
         pass
 
     def edit_message_text(self, text, chat_id=None, message_id=None, inline_message_id=None,
