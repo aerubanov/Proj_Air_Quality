@@ -1,14 +1,15 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
-from functools import partial
-import requests
 import datetime
 import json
-import schedule
-import time
-import graphyte
-from appmetrics import metrics, reporter
 import logging.config
+import time
+from functools import partial
+
+import graphyte
+import requests
+import schedule
+from appmetrics import metrics, reporter
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Bot
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
@@ -31,8 +32,8 @@ def create_session():
     engine = create_engine('sqlite:///database/botbot.db')
     Base.metadata.create_all(engine)
     session_factory = sessionmaker(bind=engine)
-    Session = scoped_session(session_factory)
-    return Session
+    session = scoped_session(session_factory)
+    return session
 
 
 graphyte.init(metrics_host, prefix='bot')
