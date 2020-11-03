@@ -1,3 +1,4 @@
+import os
 import pickle
 from typing import List
 
@@ -13,7 +14,8 @@ dim_red_file = 'models/anomalies/dim_red.obj'
 clustering_file = 'models/anomalies/clustering.obj'
 map_file = 'models/anomalies/cluster_map.obj'
 anomalies_file = 'DATA/processed/anomalies.csv'
-image_file = 'src/web/client/application/static/images/clusters_distribution.png'
+image_folder = 'src/web/client/application/static/images/'
+image_file = 'clusters_distribution.png'
 
 
 # ------ constants --------------------------------------------------------------------------------------
@@ -47,8 +49,12 @@ def plot_distribution(anomalies):
     axs[3].set_title('residual')
     axs[3].legend(loc='best')
 
-    print('plot distribution has been saved:', image_file)
-    plt.savefig(image_file, bbox_inches='tight')
+    if not os.path.exists(image_folder):
+        os.makedirs(image_folder)
+
+    image_path = os.path.join(image_folder, image_file)
+    print('plot distribution has been saved:', image_path)
+    plt.savefig(image_path, bbox_inches='tight')
 
 
 def extract_anom(data: pd.DataFrame, model: Model) -> (pd.DataFrame, List[pd.DataFrame]):
