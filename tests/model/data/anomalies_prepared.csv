@@ -1,4 +1,4 @@
-git date,P1_filtr_mean,P2_filtr_mean,temperature_filtr_mean,humidity_filtr_mean,temp_meteo,pres_meteo,hum_meteo,wind_speed,prec_amount,dew_point_temp,dew_point_diff,prec_time,wind_sin,wind_cos,wind_direction
+date,P1_filtr_mean,P2_filtr_mean,temperature_filtr_mean,humidity_filtr_mean,temp_meteo,pres_meteo,hum_meteo,wind_speed,prec_amount,dew_point_temp,dew_point_diff,prec_time,wind_sin,wind_cos,wind_direction
 2020-03-01 00:00:00+00:00,8.658271851851854,5.1238722222222215,-0.4216615226337449,71.48576388888887,-0.8,99524.873,80,1,0.0,-3.8,3.0,12.0,1.2246467991473532e-16,-1.0,180.0
 2020-03-01 00:05:00+00:00,9.146357037037038,5.248576296296297,-0.4754492455418382,71.74441152263374,-1.0,99658.195,84,0,0.0,-3.4,2.4,12.0,2.0,2.0,
 2020-03-01 00:10:00+00:00,9.237107407407407,5.304092592592593,-0.5517901234567901,72.07725720164609,-1.0,99658.195,84,0,0.0,-3.4,2.4,12.0,2.0,2.0,
