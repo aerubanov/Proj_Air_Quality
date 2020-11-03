@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from src.features.common_features_handler import configure_prec_amount
+
 
 def prepare_data(data: pd.DataFrame) -> pd.DataFrame:
     data['P1_filtr_mean'] = data.P1_filtr_mean.interpolate()
@@ -16,12 +18,11 @@ def prepare_data(data: pd.DataFrame) -> pd.DataFrame:
     data['humidity_filtr_mean'] = data.humidity_filtr_mean.interpolate()
     data['temperature_filtr_mean'] = data.temperature_filtr_mean.interpolate()
 
-    data['prec_amount'] = data.prec_amount.fillna(method='bfill')
+    configure_prec_amount(data)
+
     data['prec_time'] = data.prec_time.fillna(method='bfill')
-    data.loc[data.prec_amount == 'Осадков нет', 'prec_amount'] = 0
-    data.loc[data.prec_amount == 'Следы осадков', 'prec_amount'] = 0
-    data['prec_amount'] = data.prec_amount.astype(float)
     data['prec_time'] = data.prec_time.interpolate()
+
     data['prec_amount'] = data.prec_amount.interpolate()
     data['wind_direction'] = data.wind_direction.fillna(method='bfill')
     data['wind_speed'] = data.wind_speed.fillna(method='bfill')

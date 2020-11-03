@@ -91,7 +91,3 @@ python -m src.data.update_weather
 
 # Tests
 Запуск тестов: `pytest -vs`
-
-
-python -m src.web.loader.trafic_loader
-pytest -vs tests/web/test_traffic_loader.py
