@@ -1,4 +1,4 @@
-from src.web.api.application import app
+from src.web.api.application.routes import app
 
 if __name__ == '__main__':
     app.run(host="127.0.0.1", port="5000")
