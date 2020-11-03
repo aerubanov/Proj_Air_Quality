@@ -3,6 +3,6 @@ python:
     - "3.7.4"
 install: pip install -r requirements.txt
 script:
-    - python -m pytest --pep8 && python -m pytest -v --cov-report term --cov=./src
+    - python -m pytest --flake8 && python -m pytest -v --cov-report term --cov=./src
 after_success:
   - codecov

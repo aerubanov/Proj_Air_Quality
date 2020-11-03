@@ -3,10 +3,10 @@ requests==2.24.0
 dvc==1.9.1
 beautifulsoup4==4.9.3
 lxml==4.6.1
-pytest== 5.0
+pytest==6.1.2
 pandas==1.0.5
 requests-mock==1.8.0
-pytest-pep8==1.0.6
+pytest-flake8==1.0.6
 pytest-cov==2.10.1
 boto3==1.16.9
 scikit-learn==0.23.2
@@ -25,4 +25,3 @@ awscli==1.18.169
 graphyte==1.6.0
 appmetrics==0.5.0
 python-telegram-bot==13.0
-

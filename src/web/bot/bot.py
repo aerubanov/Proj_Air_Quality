@@ -65,7 +65,7 @@ def get_forecast():
     data = json.loads(r.text)
     s = 'Время   PM2.5   PM10   AQIUS \n'
     for item in data:
-        s += f''
+        s += ''
         date = datetime.datetime.fromisoformat(item['date']) + datetime.timedelta(hours=item['forward_time'])
         date = date.replace(tzinfo=datetime.timezone.utc).astimezone(tz=MSK_TIMEZONE)
         p1 = item['p1']
@@ -161,7 +161,7 @@ def level_tracker_callback(sess, bot, logger=None, **kwargs):
     if event_type == 'concentration':
         message = f"Измение концентрации частиц до уровня AQI US '{kwargs['aqi_level']}'."
     if event_type == 'anomalies':
-        msq = f"Обнаружена аномалия: "
+        msq = "Обнаружена аномалия: "
         cluster_msg = {
             0: "снижение или сохранение невысокого уровня концентрации частиц.",
             1: "повышение концентрации частиц из-за ухудшения условий рассеивания.",

@@ -4,7 +4,6 @@ import json
 
 import requests
 from bs4 import BeautifulSoup
-from requests.cookies import RequestsCookieJar
 
 from src.web.loader.config import TRAFFIC_MAP_URL, TRAFFIC_LEVEL_URL
 
