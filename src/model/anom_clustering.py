@@ -1,13 +1,14 @@
-import pandas as pd
-import pickle
 import json
-import statsmodels.api as sm
 import os
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-from typing import List
+import pickle
 import warnings
+from typing import List
+
+import pandas as pd
+import statsmodels.api as sm
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score
 
 from src.features.preproc_anom import prepare_meteo_data, prepare_sensors_data, add_features
 
@@ -53,7 +54,8 @@ def anom_detector(time_series: pd.DataFrame, freq=round(60 * 25 / 5), quant=0.85
     """
     time_series['P1_filtr_mean'] = time_series.P1_filtr_mean.interpolate()
     time_series['P1_filtr_mean'] = time_series.P1_filtr_mean.rolling(4, min_periods=1).mean()
-    decomp = sm.tsa.seasonal_decompose(time_series.P1_filtr_mean, model='additive', freq=freq, extrapolate_trend='freq')
+    decomp = sm.tsa.seasonal_decompose(time_series.P1_filtr_mean, model='additive', period=freq,
+                                       extrapolate_trend='freq')
     q = decomp.resid.quantile(quant)
 
     # find anomaly

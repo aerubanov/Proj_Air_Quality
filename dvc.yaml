@@ -5,6 +5,7 @@ stages:
       - DATA/raw/weather
       - DATA/raw/sensors
       - src/data/create_dataset.py
+      - requirements.txt
     outs:
       - DATA/processed/dataset.csv
       - DATA/processed/sensors.csv

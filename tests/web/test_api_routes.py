@@ -2,7 +2,7 @@ import pytest
 import datetime
 import json
 
-from src.web.api.application import app, routes
+from src.web.api.application import app
 from src.web.models.model import Sensors, Forecast, Anomaly
 
 

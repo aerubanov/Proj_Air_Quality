@@ -1,10 +1,12 @@
+import os
 import pickle
-import pandas as pd
-import matplotlib.pyplot as plt
 from typing import List
 
-from src.model.anom_clustering import Model, num_clusters, sensor_columns, meteo_columns
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from src.features.preproc_anom import prepare_sensors_data, prepare_meteo_data
+from src.model.anom_clustering import Model, num_clusters, sensor_columns, meteo_columns
 
 # ------ constants --------------------------------------------------------------------------------------
 data_file = 'DATA/processed/dataset.csv'
@@ -12,7 +14,8 @@ dim_red_file = 'models/anomalies/dim_red.obj'
 clustering_file = 'models/anomalies/clustering.obj'
 map_file = 'models/anomalies/cluster_map.obj'
 anomalies_file = 'DATA/processed/anomalies.csv'
-image_file = 'src/web/client/application/static/images/clusters_distribution.png'
+image_folder = 'src/web/client/application/static/images/'
+image_file = 'clusters_distribution.png'
 
 
 # ------ constants --------------------------------------------------------------------------------------
@@ -46,8 +49,12 @@ def plot_distribution(anomalies):
     axs[3].set_title('residual')
     axs[3].legend(loc='best')
 
-    plt.savefig(image_file,
-                clear=True, bbox_inches='tight')
+    if not os.path.exists(image_folder):
+        os.makedirs(image_folder)
+
+    image_path = os.path.join(image_folder, image_file)
+    print('plot distribution has been saved:', image_path)
+    plt.savefig(image_path, bbox_inches='tight')
 
 
 def extract_anom(data: pd.DataFrame, model: Model) -> (pd.DataFrame, List[pd.DataFrame]):

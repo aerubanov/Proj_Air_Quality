@@ -1,8 +1,9 @@
-import pandas as pd
 import pickle
 
-from src.model.extract_anomalies import extract_anom, dim_red_file, clustering_file, map_file, main
+import pandas as pd
+
 from src.model.anom_clustering import Model
+from src.model.extract_anomalies import extract_anom, dim_red_file, clustering_file, map_file, main
 
 
 def test_extract_anomalies():

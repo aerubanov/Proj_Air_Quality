@@ -17,9 +17,10 @@ def test_prepare_data():
     data = pd.read_csv(test_data, parse_dates=['date'])
     data = data.set_index('date')
     data = prepare_data(data)
-    print(data.head(15))
+
     for c in model_columns:
         assert c in data.columns
+
     for c in model_columns:
         assert not data[c].isna().any()
 
@@ -29,10 +30,10 @@ def test_add_features():
     data = data.set_index('date')
 
     data = add_features(data.iloc[:2], target='P1_filtr_mean')
-    assert set(data.columns) == set(new_features + model_columns+['dew_point_temp'])
+    assert set(data.columns) == set(new_features + model_columns + ['dew_point_temp'])
 
     data = add_features(data.iloc[:2], target='P2_filtr_mean')
-    assert set(data.columns) == set(new_features + model_columns+['dew_point_temp'])
+    assert set(data.columns) == set(new_features + model_columns + ['dew_point_temp'])
 
 
 def test_data_transform():
@@ -41,8 +42,9 @@ def test_data_transform():
     target = ['P1_filtr_mean', 'P2_filtr_mean']
 
     for t in target:
-        data_transform = QuantileTransformer(output_distribution='normal')
-        target_transform = QuantileTransformer(output_distribution='normal')
+        n_samples = data[[t]].shape[0]
+        data_transform = QuantileTransformer(output_distribution='normal', n_quantiles=n_samples)
+        target_transform = QuantileTransformer(output_distribution='normal', n_quantiles=n_samples)
 
         transform = DataTransform(data_transform, target_transform, model_columns, num_colunms, t)
         data = transform.fit_transform(data)

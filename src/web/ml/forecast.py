@@ -91,4 +91,4 @@ def perform_forecast(session, date=None, logger=None):
         session.add(forec)
         session.commit()
     if logger is not None:
-        logger.info(f'Make forecast update')
+        logger.info('Make forecast update')

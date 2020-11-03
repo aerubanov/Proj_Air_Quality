@@ -1,10 +1,11 @@
-import pandas as pd
 import pickle
 
-from src.web.ml.forecast import perform_forecast, get_transforms, get_model, get_chunk
+import pandas as pd
+
 from src.features.preproc_forecast import DataTransform
-from src.web.models.model import Forecast
 from src.model.forecast import Model, Chunk, features, columns
+from src.web.ml.forecast import perform_forecast, get_transforms, get_model, get_chunk
+from src.web.models.model import Forecast
 
 test_data = 'tests/web/data/forecast_prepared.csv'
 
@@ -34,13 +35,13 @@ def test_get_model():
 
 def test_get_transform():
     targets = ['P1_filtr_mean', 'P2_filtr_mean']
-    for targ in targets:
-        tranform = get_transforms(targ)
+    for target in targets:
+        transform = get_transforms(target)
         data = pd.read_csv(test_data, parse_dates=['date'])
         data = data.set_index('date')
         data = data['2020-02-03':'2020-02-04']
 
-        data = tranform.transform(data)
+        data = transform.transform(data)
         new_features = ['day_of_week', 'hour', 'sin_day', 'cos_day', 'sin_hour', 'cos_hour', 'P_diff1', 'P_diff2',
                         'P_diff3', 't_diff', 't_diff1', 't_diff2', 'h_diff', 'h_diff1', 'h_diff2', 'wind_direction',
                         "wind_sin", "wind_cos", 'wind_sin', 'wind_cos', 'temp_diff', 'humidity_diff', 'pressure_diff',
@@ -103,7 +104,7 @@ def test_perform_forecast(database_session, monkeypatch):
     class MockModel:
         @staticmethod
         def predict(data):
-            return [i for i in range(24)]
+            return list(range(24))
 
     def mock_get_model(*args, **kwargs):
         return MockModel()

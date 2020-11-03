@@ -1,8 +1,9 @@
 import datetime
+
 import pandas as pd
 
-from src.web.models.model import Anomaly
 from src.web.ml.anomaly import clear_anomalies_table, write_data, perform_anomaly_detection
+from src.web.models.model import Anomaly
 
 
 def test_clear_table(database_session):
@@ -54,8 +55,8 @@ def test_perform_anomaly_detection(monkeypatch, database_session):
         data = pd.read_csv('tests/model/data/anomalies_prepared.csv', parse_dates=['date'])
         data = data.set_index('date')
         data = data['2020-03-01':'2020-03-07']
-        sensor_columns = sensor_columns = ['P1_filtr_mean', 'P2_filtr_mean', 'temperature_filtr_mean',
-                                           'humidity_filtr_mean']
+        sensor_columns = ['P1_filtr_mean', 'P2_filtr_mean', 'temperature_filtr_mean',
+                          'humidity_filtr_mean']
         return data[sensor_columns]
 
     def mock_meteo(*args, **kwargs):

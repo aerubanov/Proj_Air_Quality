@@ -1,19 +1,20 @@
-from flask import render_template, request, session, g
 import datetime
-from flask_wtf import FlaskForm
-from wtforms.fields.html5 import DateField
-from wtforms.fields import SubmitField
 import logging.config
 import time
+
 import graphyte
 from appmetrics import metrics, reporter
+from flask import render_template, request, session, g
+from flask_wtf import FlaskForm
+from wtforms.fields import SubmitField
+from wtforms.fields.html5 import DateField
 
 from src.web.client.application import app
-from src.web.client.application.helper_functions import get_sensor_data, get_anomaly_data, get_forecast_data
 from src.web.client.application.graphics import html_graph
+from src.web.client.application.helper_functions import get_sensor_data, get_anomaly_data, get_forecast_data
+from src.web.config import metrics_host
 from src.web.logger.logging_config import LOGGING_CONFIG
 from src.web.utils.metrics_reporter import GraphyteReporter
-from src.web.config import metrics_host
 
 meter_200 = metrics.new_meter('client_status_200')
 meter_400 = metrics.new_meter('client_status_400')
@@ -46,7 +47,7 @@ def before_request():
 def after_request(response):
     if app.config['DEBUG']:
         return response
-    resp_time = (time.time() - g.start) * 1000  # время ответа сервера в миллисекндах
+    resp_time = (time.time() - g.start) * 1000  # время ответа сервера в миллисекундах
     logger = get_logger()
     logger.info(f'path: {request.path} - method: {request.method} - remote: {request.remote_addr} '
                 f'- json: {request.json} - status: {response.status} - time: {resp_time}')

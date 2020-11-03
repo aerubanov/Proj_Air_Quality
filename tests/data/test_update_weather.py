@@ -1,7 +1,6 @@
 import datetime
 
-from src.data.update_weather import check_file, get_link
-import re
+from src.data.update_weather import check_file, parse_response_link
 
 
 def test_check_file(tmpdir):
@@ -34,3 +33,18 @@ def test_check_file(tmpdir):
              )
     res = check_file(f2, data_folder=dir_name)
     assert res == (True, datetime.datetime(2019, 12, 10).date())
+
+
+def test_parse_link():
+    mocked_response = '''
+    <script type="text/javascript">
+        $("#f_result").empty().append('
+        <a href=http://37.9.3.253/download/files.synop/27/27605.29.10.2020.31.10.2020.1.0.0.ru.utf8.00000000.csv.gz>
+        Скачать</a>').css("display","none").css('opacity',0).css("display","block").
+        animate({opacity:"1"},1500);
+    </script>
+    '''
+    link = parse_response_link(mocked_response)
+    expected_link = 'http://37.9.3.253/download/files.synop/27/27605.29.10.2020.31.10.2020.1.0.0.ru.utf8.' + \
+                    '00000000.csv.gz'
+    assert link == expected_link

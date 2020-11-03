@@ -1,18 +1,15 @@
+import time
+import graphyte
+from appmetrics import metrics, reporter
 from flask import request, abort, g, jsonify
 from marshmallow import ValidationError
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-import logging.config
-import time
-from appmetrics import metrics, reporter
-import graphyte
 
 from src.web.api.application import app
+from src.web.api.application.utils import get_db, get_logger
 from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
-from src.web.models.model import Base, Sensors, Forecast, Anomaly
-from src.web.logger.logging_config import LOGGING_CONFIG
-from src.web.utils.metrics_reporter import GraphyteReporter
 from src.web.config import metrics_host
+from src.web.models.model import Sensors, Forecast, Anomaly
+from src.web.utils.metrics_reporter import GraphyteReporter
 
 sensor_data_schema = SensorDataSchema()
 forecast_schema = ForecastRequestSchema()
@@ -26,28 +23,6 @@ graphite_reporter = GraphyteReporter(graphyte)
 reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 
 
-def get_logger():
-    if 'log' not in g:
-        logging.config.dictConfig(LOGGING_CONFIG)
-        logger = logging.getLogger('ApiLogger')
-        g.log = logger
-    return g.log
-
-
-def create_db():
-    engine = create_engine(app.config['DATABASE'])
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    return Session()
-
-
-def get_db():
-    if 'db' not in g:
-        session = create_db()
-        g.db = session
-    return g.db
-
-
 @app.route('/sensor_data', methods=['GET'])
 @metrics.with_meter('sensors')
 def get_sensor_data():
@@ -56,7 +31,7 @@ def get_sensor_data():
     except ValidationError as e:
         abort(400, str(e))
         return
-    session = get_db()
+    session = get_db(app)
     res = session.query(Sensors)
     '''else:
         columns_map = {
@@ -85,7 +60,7 @@ def get_forecast():
     except ValidationError as e:
         abort(400, str(e))
         return
-    session = get_db()
+    session = get_db(app)
     res = session.query(Forecast)
     if 'start_time' in args:
         res = res.filter(Forecast.date >= args['start_time'])
@@ -108,7 +83,7 @@ def get_anomaly():
     except ValidationError as e:
         abort(400, str(e))
         return
-    session = get_db()
+    session = get_db(app)
     res = session.query(Anomaly).filter(Anomaly.end_date >= args['start_time']). \
         filter(Anomaly.start_date <= args['end_time'])
     res.order_by(Anomaly.start_date)

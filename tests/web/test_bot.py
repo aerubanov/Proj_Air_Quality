@@ -1,11 +1,12 @@
-from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
-    API_HOST, start, button, level_tracker_callback
-from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
-from src.web.bot.model import User as DbUser
-from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
+import datetime
 
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
-import datetime
+
+from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
+    API_HOST, start, button, level_tracker_callback
+from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
+from src.web.bot.model import User as DbUser
+from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
 
 
 def test_get_concentration(requests_mock):
@@ -37,10 +38,11 @@ def test_keyboard():
     assert len(kb.inline_keyboard[1]) == 2
 
 
-class TestBot:
+class MyBot:
     def __init__(self):
         self.response = None
         self.markup = None
+        self.defaults = None
 
     def send_message(self, chat_id, text, parse_mode=None, disable_web_page_preview=None,
                      disable_notification=False, reply_to_message_id=None,
@@ -48,8 +50,8 @@ class TestBot:
         self.response = text
         self.markup = reply_markup
 
-    def answerCallbackQuery(self, callback_query_id, text=None,
-                            show_alert=False, url=None, cache_time=None, timeout=None, **kwargs):
+    def answer_callback_query(self, callback_query_id, text=None, show_alert=False, url=None, cache_time=None,
+                              timeout=None, **kwargs):
         pass
 
     def edit_message_text(self, text, chat_id=None, message_id=None, inline_message_id=None,
@@ -59,13 +61,13 @@ class TestBot:
         self.markup = reply_markup
 
 
-def create_update(text: str, bot: TestBot, query=None):
+def create_update(text: str, bot: MyBot, query=None):
     user = User(id=1, first_name='Anatoly', is_bot=False)
     message = Message(message_id=1, from_user=user, date=datetime.datetime.utcnow(),
                       text=text, chat=Chat(id=1, type='chat'), bot=bot)
 
     if query is not None:
-        cb = CallbackQuery(id=1, from_user=user, chat_instance='chat', data=query, bot=bot, message=message)
+        cb = CallbackQuery(id='1', from_user=user, chat_instance='chat', data=query, bot=bot, message=message)
     else:
         cb = None
     update = Update(update_id=1, message=message, callback_query=cb)
@@ -73,7 +75,7 @@ def create_update(text: str, bot: TestBot, query=None):
 
 
 def test_start():
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('/start', bot)
     start(update, context=None)
     assert bot.response == 'Чтобы получать уведомления об измении концентрации частиц в воздухе, подпишитесь на бота'
@@ -81,7 +83,7 @@ def test_start():
 
 
 def test_button_now(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('now', bot, query='now')
     monkeypatch.setattr('src.web.bot.bot.get_concentration', lambda: 'sensor_values')
     monkeypatch.setattr('src.web.bot.bot.get_anomaly', lambda x: 'anomalies text')
@@ -90,7 +92,7 @@ def test_button_now(bot_db_session, monkeypatch):
 
 
 def test_button_forecast(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('forecast', bot, query='forecast')
     monkeypatch.setattr('src.web.bot.bot.get_forecast', lambda: 'forecast_values')
     button(update, None, bot_db_session)
@@ -98,14 +100,14 @@ def test_button_forecast(bot_db_session, monkeypatch):
 
 
 def test_button_subscribe(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('subscribe', bot, query='subscribe')
     button(update, None, bot_db_session)
     assert bot.response == 'Вы подписались на получение уведомлений.'
 
 
 def test_button_subscribe_exist(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('subscribe', bot, query='subscribe')
     user = DbUser(id=1, chat_id=1)
     bot_db_session.add(user)
@@ -115,7 +117,7 @@ def test_button_subscribe_exist(bot_db_session, monkeypatch):
 
 
 def test_button_unsubscribe(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('unsubscribe', bot, query='unsubscribe')
     user = DbUser(id=1, chat_id=1)
     bot_db_session.add(user)
@@ -125,7 +127,7 @@ def test_button_unsubscribe(bot_db_session, monkeypatch):
 
 
 def test_button_unsubscribe_not_exist(bot_db_session, monkeypatch):
-    bot = TestBot()
+    bot = MyBot()
     update = create_update('unsubscribe', bot, query='unsubscribe')
 
     button(update, None, bot_db_session)
