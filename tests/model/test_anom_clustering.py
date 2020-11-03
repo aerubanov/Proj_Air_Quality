@@ -1,8 +1,9 @@
-import pandas as pd
 import pickle
 
-from src.model.anom_clustering import anom_detector, detect_anomalies, get_anomaly_features, sel_columns,\
-    Model, kmean, pca
+import pandas as pd
+
+from src.model.anom_clustering import anom_detector, detect_anomalies, get_anomaly_features, Model, kmean, pca
+
 test_data = 'tests/model/data/anomalies_prepared.csv'
 
 
