@@ -90,4 +90,5 @@ python -m src.data.update_weather
  - bot - telegram-бот для отслеживания измения концентрации частиц.
 
 # Tests
-Запуск тестов: `pytest -vs`
+* Запуск всех тестов (перед отправкой на PR): `python -m pytest --flake8 -v --cov-report term --cov=./src`
+* Запуск единичных тестов: `python -m pytest -vs tests/model/test_extract_anomalies.py::test_main`
