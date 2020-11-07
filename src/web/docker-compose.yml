@@ -2,7 +2,7 @@ version: "2"
 services:
   PostgreSQL:
     restart: always
-    image: postgres
+    image: postgres:12.4
     container_name: postgres
     environment:
       - DEBUG=false
