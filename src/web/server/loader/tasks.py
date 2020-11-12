@@ -8,7 +8,6 @@ from src.web.server.loader.weather_loading import parse_weather
 from src.web.server.common.model import Sensors, Weather
 from src.web.server.loader.validation import SensorSchema, WeatherSchema
 from src.web.server.loader.mosecom_loading import load_data, write_processed, write_raw_data
-from src.web.server.loader.traffic_loader import TrafficLoader
 from src.web.config import metrics_host
 
 sensor_schema = SensorSchema()
@@ -94,9 +93,3 @@ def mosecom_task(logger=None, metrics=False):
         logger.info('%s', 'write mosecom data in file')
     if metrics:
         graphyte.send('mosecom', len(p1_data))
-
-
-def traffic_task(logger):
-    traffic_loader = TrafficLoader()
-    is_success = traffic_loader.process_traffic_level()
-    logger.info('write traffic level in file. success: ', is_success)
