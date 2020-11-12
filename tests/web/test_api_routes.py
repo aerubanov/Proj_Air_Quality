@@ -2,8 +2,8 @@ import pytest
 import datetime
 import json
 
-from src.web.api.application import app
-from src.web.models.model import Sensors, Forecast, Anomaly
+from src.web.server.api.application import app
+from src.web.server.common.model import Sensors, Forecast, Anomaly
 
 
 @pytest.fixture()

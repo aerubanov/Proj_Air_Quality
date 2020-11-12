@@ -3,12 +3,12 @@ import datetime
 from marshmallow import ValidationError
 import graphyte
 
-from src.web.loader.sensor_loading import load_sensors
-from src.web.loader.weather_loading import parse_weather
-from src.web.models.model import Sensors, Weather
-from src.web.loader.validation import SensorSchema, WeatherSchema
-from src.web.loader.mosecom_loading import load_data, write_processed, write_raw_data
-from src.web.loader.traffic_loader import TrafficLoader
+from src.web.server.loader.sensor_loading import load_sensors
+from src.web.server.loader.weather_loading import parse_weather
+from src.web.server.common.model import Sensors, Weather
+from src.web.server.loader.validation import SensorSchema, WeatherSchema
+from src.web.server.loader.mosecom_loading import load_data, write_processed, write_raw_data
+from src.web.server.loader.traffic_loader import TrafficLoader
 from src.web.config import metrics_host
 
 sensor_schema = SensorSchema()

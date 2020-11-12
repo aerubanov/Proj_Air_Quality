@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.web.loader.sensor_loading import read_sensor_id, average_data, load_data, api_url, filter_average
+from src.web.server.loader.sensor_loading import read_sensor_id, average_data, load_data, api_url, filter_average
 
 
 def test_read_sensor_id(tmpdir):

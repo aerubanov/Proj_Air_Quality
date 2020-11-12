@@ -1,7 +1,7 @@
 import datetime
 
-from src.web.bot.config import API_HOST
-from src.web.bot.level_tracker import ConcentrationTracker, ForecastTracker, AnomaliesTracker
+from src.web.bot.application.config import API_HOST
+from src.web.bot.application.level_tracker import ConcentrationTracker, ForecastTracker, AnomaliesTracker
 
 
 class TrackerCallback:

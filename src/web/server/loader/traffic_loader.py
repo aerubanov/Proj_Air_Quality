@@ -5,7 +5,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
-from src.web.loader.config import TRAFFIC_MAP_URL, TRAFFIC_LEVEL_URL
+from src.web.server.loader.config import TRAFFIC_MAP_URL, TRAFFIC_LEVEL_URL
 
 DATA_PATH = 'DATA/processed/trafic_level.csv'
 REQUEST_HEADER = {

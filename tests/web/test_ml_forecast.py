@@ -4,14 +4,14 @@ import pandas as pd
 
 from src.features.preproc_forecast import DataTransform
 from src.model.forecast import Model, Chunk, features, columns
-from src.web.ml.forecast import perform_forecast, get_transforms, get_model, get_chunk
-from src.web.models.model import Forecast
+from src.web.server.ml.forecast import perform_forecast, get_transforms, get_model, get_chunk
+from src.web.server.common.model import Forecast
 
 test_data = 'tests/web/data/forecast_prepared.csv'
 
 
 def test_get_model():
-    from src.web.ml.forecast import p1_target_trans_file, p2_target_trans_file
+    from src.web.server.ml.forecast import p1_target_trans_file, p2_target_trans_file
 
     def helper(file, target):
         with open(file, 'rb') as f:

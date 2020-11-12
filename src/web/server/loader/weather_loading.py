@@ -4,7 +4,7 @@ import datetime
 import typing
 import pytz
 
-from src.web.loader.config import weather_url
+from src.web.server.loader.config import weather_url
 
 
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:

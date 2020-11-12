@@ -21,7 +21,7 @@ services:
     restart: always
     build:
       context: ../../src
-      dockerfile: ./web/loader/Dockerfile
+      dockerfile: server/loader/Dockerfile
     image: aerubanov/loader
     container_name: loader
     networks:
@@ -37,7 +37,7 @@ services:
     restart: always
     build:
       context: ../../src
-      dockerfile: ./web/api/Dockerfile
+      dockerfile: server/api/Dockerfile
     image: aerubanov/api
     container_name: api
     networks:
@@ -54,7 +54,7 @@ services:
     restart: always
     build:
       context: ../../src
-      dockerfile: ./web/ml/Dockerfile
+      dockerfile: server/ml/Dockerfile
     image: aerubanov/ml
     container_name: ml
     networks:

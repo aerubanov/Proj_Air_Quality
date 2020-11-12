@@ -4,7 +4,7 @@ import pandas as pd
 
 from src.web.utils.fill_database import load_sensor_data, get_last_date_sensors, clear_sensors_table, write_data,\
     get_last_date_anomalies, clear_anomalies_table
-from src.web.models.model import Sensors, Anomaly
+from src.web.server.common.model import Sensors, Anomaly
 
 
 def test_load_data():

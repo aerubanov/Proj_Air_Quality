@@ -1,7 +1,7 @@
 import datetime
 
-from src.web.models.model import Weather, Sensors
-import src.web.loader.tasks as tasks
+from src.web.server.common.model import Weather, Sensors
+import src.web.server.loader.tasks as tasks
 
 
 def test_sensor_task_correct_data(monkeypatch, database_session):

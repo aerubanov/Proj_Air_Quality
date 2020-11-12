@@ -1,4 +1,3 @@
-client_logs_file = 'logs/client_log.txt'
 bot_logs_file = 'logs/bot_log.txt'
 
 LOGGING_CONFIG = {
@@ -10,14 +9,6 @@ LOGGING_CONFIG = {
         },
     },
     'handlers': {
-        'client_file_handler': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': client_logs_file,
-            'maxBytes': 1000000,
-            'backupCount': 3,
-        },
         'bot_file_handler': {
             'level': 'INFO',
             'formatter': 'standard',
@@ -28,11 +19,6 @@ LOGGING_CONFIG = {
         },
     },
     'loggers': {
-        'ClientLogger': {
-            'handlers': ['client_file_handler'],
-            'level': 'INFO',
-            'propagate': False
-        },
         'BotLogger': {
             'handlers': ['bot_file_handler'],
             'level': 'INFO',

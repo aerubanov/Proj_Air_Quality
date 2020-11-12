@@ -2,10 +2,10 @@ import datetime
 
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
 
-from src.web.bot.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
+from src.web.bot.application.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
     API_HOST, start, button, level_tracker_callback
-from src.web.bot.config import FORECAST_LOOK_UP_INTERVAL
-from src.web.bot.model import User as DbUser
+from src.web.bot.application.config import FORECAST_LOOK_UP_INTERVAL
+from src.web.bot.application.model import User as DbUser
 from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
 
 

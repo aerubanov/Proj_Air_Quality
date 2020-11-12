@@ -1,4 +1,4 @@
-from src.web.loader.traffic_loader import TrafficLoader
+from src.web.server.loader import TrafficLoader
 
 
 def test_prepare_api_call(requests_mock):

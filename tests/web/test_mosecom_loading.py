@@ -1,8 +1,8 @@
 import os
 import numpy as np
 
-from src.web.loader.mosecom_loading import load_data, write_raw_data, write_processed, avarege_data
-from src.web.loader.config import mosecom_url
+from src.web.server.loader.mosecom_loading import load_data, write_raw_data, write_processed, avarege_data
+from src.web.server.loader.config import mosecom_url
 
 
 def test_load_data(requests_mock):
