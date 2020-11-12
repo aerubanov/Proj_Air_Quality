@@ -6,4 +6,4 @@ WORKDIR /code
 COPY . ./src
 
 
-RUN pip install -r ./src/web/ml/requirements.txt
+RUN pip install -r ./src/web/server/ml/requirements.txt
