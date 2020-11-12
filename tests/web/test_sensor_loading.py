@@ -36,7 +36,7 @@ def test_average_data(monkeypatch):
         assert isinstance(d, np.ndarray)
         return 1
 
-    monkeypatch.setattr('src.web.loader.sensor_loading.filter_average', mockreturn)
+    monkeypatch.setattr('src.web.server.loader.sensor_loading.filter_average', mockreturn)
 
     data = average_data(test_data)
     assert 'p1' in data

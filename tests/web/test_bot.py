@@ -85,8 +85,8 @@ def test_start():
 def test_button_now(bot_db_session, monkeypatch):
     bot = MyBot()
     update = create_update('now', bot, query='now')
-    monkeypatch.setattr('src.web.bot.bot.get_concentration', lambda: 'sensor_values')
-    monkeypatch.setattr('src.web.bot.bot.get_anomaly', lambda x: 'anomalies text')
+    monkeypatch.setattr('src.web.bot.application.bot.get_concentration', lambda: 'sensor_values')
+    monkeypatch.setattr('src.web.bot.application.bot.get_anomaly', lambda x: 'anomalies text')
     button(update, None, bot_db_session)
     assert bot.response == 'sensor_values' + ' ' + 'anomalies text'
 
@@ -94,7 +94,7 @@ def test_button_now(bot_db_session, monkeypatch):
 def test_button_forecast(bot_db_session, monkeypatch):
     bot = MyBot()
     update = create_update('forecast', bot, query='forecast')
-    monkeypatch.setattr('src.web.bot.bot.get_forecast', lambda: 'forecast_values')
+    monkeypatch.setattr('src.web.bot.application.bot.get_forecast', lambda: 'forecast_values')
     button(update, None, bot_db_session)
     assert bot.response == 'forecast_values'
 

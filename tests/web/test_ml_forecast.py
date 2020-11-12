@@ -72,8 +72,8 @@ def test_get_chunk(monkeypatch):
         def transform(d):
             return d
 
-    monkeypatch.setattr('src.web.ml.forecast.get_sensor_data', mock_get_sensor)
-    monkeypatch.setattr('src.web.ml.forecast.get_weather_data', mock_get_weather)
+    monkeypatch.setattr('src.web.server.ml.forecast.get_sensor_data', mock_get_sensor)
+    monkeypatch.setattr('src.web.server.ml.forecast.get_weather_data', mock_get_weather)
 
     chunk = get_chunk(None, MockTransform, 'P1_filtr_mean')
 
@@ -109,9 +109,9 @@ def test_perform_forecast(database_session, monkeypatch):
     def mock_get_model(*args, **kwargs):
         return MockModel()
 
-    monkeypatch.setattr('src.web.ml.forecast.get_transforms', mock_get_transform)
-    monkeypatch.setattr('src.web.ml.forecast.get_chunk', mock_get_chunk)
-    monkeypatch.setattr('src.web.ml.forecast.get_model', mock_get_model)
+    monkeypatch.setattr('src.web.server.ml.forecast.get_transforms', mock_get_transform)
+    monkeypatch.setattr('src.web.server.ml.forecast.get_chunk', mock_get_chunk)
+    monkeypatch.setattr('src.web.server.ml.forecast.get_model', mock_get_model)
 
     perform_forecast(database_session)
 

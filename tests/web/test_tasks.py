@@ -20,7 +20,7 @@ def test_sensor_task_correct_data(monkeypatch, database_session):
                 'hum': hum,
                 }, 10
 
-    monkeypatch.setattr('src.web.loader.tasks.load_sensors', mockreturn)
+    monkeypatch.setattr('src.web.server.loader.tasks.load_sensors', mockreturn)
 
     tasks.sensor_task(database_session)
 
@@ -53,7 +53,7 @@ def test_sensor_task_incorrect_data(monkeypatch, database_session):
         def mockreturn():
             return data, 10
 
-        monkeypatch.setattr('src.web.loader.tasks.load_sensors', mockreturn)
+        monkeypatch.setattr('src.web.server.loader.tasks.load_sensors', mockreturn)
 
         tasks.sensor_task(database_session)
         row = database_session.query(Sensors).first()
@@ -82,7 +82,7 @@ def test_weather_task_correct_data(monkeypatch, database_session):
             'humidity': hum,
         }
 
-    monkeypatch.setattr('src.web.loader.tasks.parse_weather', mockreturn)
+    monkeypatch.setattr('src.web.server.loader.tasks.parse_weather', mockreturn)
 
     tasks.weather_task(database_session)
 
@@ -127,7 +127,7 @@ def test_weather_task_incorrect_data(monkeypatch, database_session):
         def mockreturn():
             return data
 
-        monkeypatch.setattr('src.web.loader.tasks.parse_weather', mockreturn)
+        monkeypatch.setattr('src.web.server.loader.tasks.parse_weather', mockreturn)
 
         tasks.weather_task(database_session)
 
