@@ -7,7 +7,7 @@ import logging.config
 from src.web.server.common.model import Base
 from src.web.server.loader.config import sensor_time_interval
 from src.web.logger.logging_config import LOGGING_CONFIG
-from src.web.server.loader.tasks import sensor_task, weather_task, mosecom_task
+from src.web.server.loader.application.tasks import sensor_task, weather_task, mosecom_task
 from src.web.config import DATABASE
 
 logging.config.dictConfig(LOGGING_CONFIG)

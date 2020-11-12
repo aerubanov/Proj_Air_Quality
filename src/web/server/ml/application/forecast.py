@@ -5,7 +5,7 @@ import pickle
 from src.web.server.common.model import Forecast
 from src.model.forecast import Model, Chunk, columns, num_colunms, features
 from src.features.preproc_forecast import DataTransform, add_features
-from src.web.server.ml.data_loading import get_weather_data, get_sensor_data
+from src.web.server.ml.application.data_loading import get_weather_data, get_sensor_data
 
 p1_models_file = "models/forecast/P1_models.obj"
 p1_data_trans_file = "models/forecast/P1_data_transform.obj"

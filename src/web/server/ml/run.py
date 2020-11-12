@@ -4,8 +4,8 @@ import schedule
 import time
 import logging.config
 
-from src.web.server.ml.forecast import perform_forecast
-from src.web.server.ml.anomaly import perform_anomaly_detection
+from src.web.server.ml.application.forecast import perform_forecast
+from src.web.server.ml.application.anomaly import perform_anomaly_detection
 from src.web.server.common.model import Base
 from src.web.logger.logging_config import LOGGING_CONFIG
 from src.web.config import DATABASE

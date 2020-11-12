@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 
-from src.web.server.ml.anomaly import clear_anomalies_table, write_data, perform_anomaly_detection
+from src.web.server.ml.application.anomaly import clear_anomalies_table, write_data, perform_anomaly_detection
 from src.web.server.common.model import Anomaly
 
 
