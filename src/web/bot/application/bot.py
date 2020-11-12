@@ -23,7 +23,7 @@ from src.web.bot.application.level_tracker import ConcentrationTracker, Anomalie
 from src.web.bot.application.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
 from src.web.config import metrics_host
 from src.web.utils.metrics_reporter import GraphyteReporter
-from src.web.logger.logging_config import LOGGING_CONFIG
+from src.web.bot.logging_config import LOGGING_CONFIG
 
 MSK_TIMEZONE = datetime.timezone(datetime.timedelta(hours=3))
 

@@ -13,7 +13,7 @@ from src.web.client.application import app
 from src.web.client.application.graphics import html_graph
 from src.web.client.application.helper_functions import get_sensor_data, get_anomaly_data, get_forecast_data
 from src.web.config import metrics_host
-from src.web.logger.logging_config import LOGGING_CONFIG
+from src.web.client.logging_config import LOGGING_CONFIG
 from src.web.utils.metrics_reporter import GraphyteReporter
 
 meter_200 = metrics.new_meter('client_status_200')
