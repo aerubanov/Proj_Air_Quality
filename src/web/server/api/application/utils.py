@@ -4,8 +4,8 @@ from flask import g
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.web.logger.logging_config import LOGGING_CONFIG
-from src.web.models.model import Base
+from src.web.server.logging_config import LOGGING_CONFIG
+from src.web.server.common.model import Base
 
 
 def get_logger():

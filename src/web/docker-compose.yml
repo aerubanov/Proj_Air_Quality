@@ -21,12 +21,12 @@ services:
     restart: always
     build:
       context: ../../src
-      dockerfile: ./web/loader/Dockerfile
+      dockerfile: ./web/server/loader/Dockerfile
     image: aerubanov/loader
     container_name: loader
     networks:
       - backend
-    command: python -m src.web.loader.app -u
+    command: python -m src.web.server.loader.app -u
     depends_on:
             - PostgreSQL
     volumes:
@@ -37,7 +37,7 @@ services:
     restart: always
     build:
       context: ../../src
-      dockerfile: ./web/api/Dockerfile
+      dockerfile: ./web/server/api/Dockerfile
     image: aerubanov/api
     container_name: api
     networks:
@@ -48,18 +48,18 @@ services:
       - PostgreSQL
     volumes:
       - "./logs:/code/logs"
-    command: gunicorn src.web.api.run:app -b 0.0.0.0:8000
+    command: gunicorn src.web.server.api.run:app -b 0.0.0.0:8000
 
   ml:
     restart: always
     build:
       context: ../../src
-      dockerfile: ./web/ml/Dockerfile
+      dockerfile: ./web/server/ml/Dockerfile
     image: aerubanov/ml
     container_name: ml
     networks:
       - backend
-    command: python -m src.web.ml.run -u
+    command: python -m src.web.server.ml.run -u
     depends_on:
       - PostgreSQL
     volumes:

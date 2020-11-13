@@ -2,7 +2,7 @@ import datetime
 import pandas as pd
 import re
 
-from src.web.models.model import Sensors, Weather
+from src.web.server.common.model import Sensors, Weather
 
 sensors_columns_names = {'p1': 'P1_filtr_mean', 'p2': 'P2_filtr_mean', 'temperature': 'temperature_filtr_mean',
                          'humidity': 'humidity_filtr_mean', 'pressure': 'pressure_filtr_mean'}

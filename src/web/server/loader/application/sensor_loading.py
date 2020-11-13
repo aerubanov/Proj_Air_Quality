@@ -4,7 +4,7 @@ import json
 import typing
 import numpy as np
 
-from src.web.loader.config import api_url, sensor_file
+from src.web.server.loader.config import api_url, sensor_file
 
 
 def read_sensor_id(file: str) -> typing.Set:

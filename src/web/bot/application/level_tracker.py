@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from src.web.bot.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
+from src.web.bot.application.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
 from src.web.utils.aqi import aqi_level, pm25_to_aqius
 
 

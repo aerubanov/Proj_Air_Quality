@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 import datetime
 import pandas as pd
 
-from src.web.models.model import Base, Sensors, Anomaly
+from src.web.server.common.model import Base, Sensors, Anomaly
 
 DATABASE = 'postgresql://postgres:postgres@localhost:5432/pgdb'
 dataset = 'DATA/processed/dataset.csv'
