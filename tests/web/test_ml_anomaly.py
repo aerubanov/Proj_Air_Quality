@@ -2,8 +2,8 @@ import datetime
 
 import pandas as pd
 
-from src.web.ml.anomaly import clear_anomalies_table, write_data, perform_anomaly_detection
-from src.web.models.model import Anomaly
+from src.web.server.ml.application.anomaly import clear_anomalies_table, write_data, perform_anomaly_detection
+from src.web.server.common.model import Anomaly
 
 
 def test_clear_table(database_session):
@@ -68,8 +68,8 @@ def test_perform_anomaly_detection(monkeypatch, database_session):
                          'wind_direction', 'hum_meteo', 'prec_time']
         return data[meteo_columns]
 
-    monkeypatch.setattr('src.web.ml.anomaly.get_weather_data', mock_meteo)
-    monkeypatch.setattr('src.web.ml.anomaly.get_sensor_data', mock_sensor)
+    monkeypatch.setattr('src.web.server.ml.application.anomaly.get_weather_data', mock_meteo)
+    monkeypatch.setattr('src.web.server.ml.application.anomaly.get_sensor_data', mock_sensor)
     perform_anomaly_detection(database_session)
     result = database_session.query(Anomaly).all()
     assert len(result) > 0

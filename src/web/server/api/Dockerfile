@@ -7,4 +7,4 @@ WORKDIR /code
 COPY . ./src
 
 
-RUN pip install -r ./src/web/api/requirements.txt
+RUN pip install -r ./src/web/server/api/requirements.txt

@@ -1,8 +1,8 @@
 import os
 import numpy as np
 
-from src.web.loader.mosecom_loading import load_data, write_raw_data, write_processed, avarege_data
-from src.web.loader.config import mosecom_url
+from src.web.server.loader.application.mosecom_loading import load_data, write_raw_data, write_processed, avarege_data
+from src.web.server.loader.config import mosecom_url
 
 
 def test_load_data(requests_mock):
@@ -54,8 +54,8 @@ def test_write_raw(tmpdir, monkeypatch):
     f2 = d2.join('Сухаревская площадьP1.csv')
     f2.write('''date,pdk,norma\n2020-04-21T11:56:06.743291,0.0352,0.16\n''')
 
-    monkeypatch.setattr('src.web.loader.mosecom_loading.raw_path', d2)
-    monkeypatch.setattr('src.web.loader.mosecom_loading.processed_path', d1)
+    monkeypatch.setattr('src.web.server.loader.application.mosecom_loading.raw_path', d2)
+    monkeypatch.setattr('src.web.server.loader.application.mosecom_loading.processed_path', d1)
 
     write_raw_data(data, 'P1')
 
@@ -155,8 +155,8 @@ def test_write_processed(tmpdir, monkeypatch):
             'len': 3,
         }
 
-    monkeypatch.setattr('src.web.loader.mosecom_loading.processed_path', d)
-    monkeypatch.setattr('src.web.loader.mosecom_loading.avarege_data', mockreturn)
+    monkeypatch.setattr('src.web.server.loader.application.mosecom_loading.processed_path', d)
+    monkeypatch.setattr('src.web.server.loader.application.mosecom_loading.avarege_data', mockreturn)
 
     write_processed(data, data)
 

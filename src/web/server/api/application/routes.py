@@ -4,11 +4,11 @@ from appmetrics import metrics, reporter
 from flask import request, abort, g, jsonify
 from marshmallow import ValidationError
 
-from src.web.api.application import app
-from src.web.api.application.utils import get_db, get_logger
-from src.web.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
+from src.web.server.api.application import app
+from src.web.server.api.application.utils import get_db, get_logger
+from src.web.server.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
 from src.web.config import metrics_host
-from src.web.models.model import Sensors, Forecast, Anomaly
+from src.web.server.common.model import Sensors, Forecast, Anomaly
 from src.web.utils.metrics_reporter import GraphyteReporter
 
 sensor_data_schema = SensorDataSchema()

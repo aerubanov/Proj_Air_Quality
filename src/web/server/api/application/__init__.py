@@ -11,4 +11,4 @@ app.config['DATABASE'] = DATABASE
 app.config['TEST_DATABASE'] = 'sqlite:///test_db.db'
 app.config['DEBUG'] = False
 
-from src.web.api.application import routes  # noqa: E402,F401
+from src.web.server.api.application import routes  # noqa: E402,F401

@@ -1,7 +1,7 @@
 import datetime
 
-from src.web.models.model import Sensors, Weather
-from src.web.ml.data_loading import get_sensor_data, get_weather_data, transform_prec_amount
+from src.web.server.common.model import Sensors, Weather
+from src.web.server.ml.application.data_loading import get_sensor_data, get_weather_data, transform_prec_amount
 
 
 def test_get_sensor_data(database_session):

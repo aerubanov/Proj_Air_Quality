@@ -1,6 +1,7 @@
 import numpy as np
 
-from src.web.loader.sensor_loading import read_sensor_id, average_data, load_data, api_url, filter_average
+from src.web.server.loader.application.sensor_loading import read_sensor_id, average_data,\
+    load_data, api_url, filter_average
 
 
 def test_read_sensor_id(tmpdir):
@@ -36,7 +37,7 @@ def test_average_data(monkeypatch):
         assert isinstance(d, np.ndarray)
         return 1
 
-    monkeypatch.setattr('src.web.loader.sensor_loading.filter_average', mockreturn)
+    monkeypatch.setattr('src.web.server.loader.application.sensor_loading.filter_average', mockreturn)
 
     data = average_data(test_data)
     assert 'p1' in data

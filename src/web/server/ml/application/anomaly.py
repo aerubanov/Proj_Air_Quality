@@ -2,8 +2,8 @@ import pandas as pd
 import datetime
 import pickle
 
-from src.web.models.model import Anomaly
-from src.web.ml.data_loading import get_weather_data, get_sensor_data
+from src.web.server.common.model import Anomaly
+from src.web.server.ml.application.data_loading import get_weather_data, get_sensor_data
 from src.model.anom_clustering import Model
 
 pca_model_file = 'models/anomalies/dim_red.obj'

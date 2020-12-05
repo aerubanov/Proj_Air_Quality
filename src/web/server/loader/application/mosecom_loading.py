@@ -6,7 +6,7 @@ from typing import List, Dict
 import datetime
 import os
 
-from src.web.loader.config import mosecom_url
+from src.web.server.loader.config import mosecom_url
 raw_path = 'DATA/raw/mosecom/'
 processed_path = 'DATA/processed/'
 

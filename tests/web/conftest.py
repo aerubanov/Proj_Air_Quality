@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 @pytest.fixture()
 def database_session():
-    from src.web.models.model import Base
+    from src.web.server.common.model import Base
     engine = create_engine('sqlite:///test_db.db')
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
@@ -18,7 +18,7 @@ def database_session():
 
 @pytest.fixture()
 def bot_db_session():
-    from src.web.bot.model import Base
+    from src.web.bot.application.model import Base
     engine = create_engine('sqlite:///test_db.db')
     Base.metadata.create_all(engine)
     session_factory = sessionmaker(bind=engine)
