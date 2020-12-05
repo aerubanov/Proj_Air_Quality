@@ -25,3 +25,5 @@ awscli==1.18.170
 graphyte==1.6.0
 appmetrics==0.5.0
 python-telegram-bot==13.0
+python-dotenv==0.15.0
+environ-config==20.1.0
