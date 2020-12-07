@@ -1,6 +1,9 @@
 import environ
 
 
+secret_file = environ.secrets.INISecrets( "APP_SECRETS_INI", "src/web/secret.env")
+
+
 @environ.config
 class AppConfig:
     metrichost = environ.var()
@@ -15,9 +18,10 @@ class AppConfig:
 
     @environ.config
     class ServerConfig:
-        database = environ.var()
         modelp1 = environ.var()
         modelp2 = environ.var()
+
+        db_string = secret_file.secret()
 
         @environ.config
         class LoaderConfig:

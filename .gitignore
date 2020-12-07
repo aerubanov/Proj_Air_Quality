@@ -11,3 +11,5 @@ test_db.db
 bot.db
 env
 venv
+src/web/secret.env
+src/web/secret.ini

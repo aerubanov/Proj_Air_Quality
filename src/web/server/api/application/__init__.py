@@ -1,13 +1,16 @@
 from flask import Flask
+from dotenv import load_dotenv
+import os
+import environ
+from src.web.utils.env_config import AppConfig
+
+load_dotenv('src/web/config.env')
 
 app = Flask(__name__)
 
-try:
-    from src.web.config import DATABASE
-except ModuleNotFoundError:
-    DATABASE = 'postgresql://postgres:postgres@PostgreSQL/pgdb'
+config = AppConfig.from_environ(os.environ)
 
-app.config['DATABASE'] = DATABASE
+app.config['DATABASE'] = config.server.dbsting
 app.config['TEST_DATABASE'] = 'sqlite:///test_db.db'
 app.config['DEBUG'] = False
 
