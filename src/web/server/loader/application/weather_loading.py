@@ -4,7 +4,7 @@ import datetime
 import typing
 import pytz
 
-from src.web.server.loader.config import weather_url
+from src.web.server.loader import config
 
 
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
@@ -75,7 +75,7 @@ def get_rows_numb(rows):
 
 
 def parse_weather():
-    rows = parse_page(weather_url)
+    rows = parse_page(config.weatherurl)
     r = get_rows_numb(rows)
     times = get_times(rows[r['time_row']])
     prec = get_prec(rows[r['prec_row']])

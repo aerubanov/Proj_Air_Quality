@@ -2,11 +2,11 @@ import os
 import numpy as np
 
 from src.web.server.loader.application.mosecom_loading import load_data, write_raw_data, write_processed, avarege_data
-from src.web.server.loader.config import mosecom_url
+from src.web.server.loader import config
 
 
 def test_load_data(requests_mock):
-    requests_mock.post(mosecom_url,
+    requests_mock.post(config.mosecomurl,
                        text='''{"able": [{"item1": "1"}, {"item2": "2"}], "other": []}''')
     data1, data2 = load_data()
     print(data1)

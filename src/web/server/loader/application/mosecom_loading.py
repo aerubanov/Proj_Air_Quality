@@ -6,17 +6,21 @@ from typing import List, Dict
 import datetime
 import os
 
-from src.web.server.loader.config import mosecom_url
+from src.web.server.loader import config
 raw_path = 'DATA/raw/mosecom/'
 processed_path = 'DATA/processed/'
 
 
 def load_data():
     """ download json data for PM2.5 and PM10"""
-    resp = requests.post(mosecom_url, data={'locale': 'ru_RU', 'mapType': 'air', 'element': 'PM2.5'}, verify=False)
+    resp = requests.post(config.mosecomurl,
+                         data={'locale': 'ru_RU', 'mapType': 'air', 'element': 'PM2.5'},
+                         verify=False)
     data = json.loads(resp.text)
     p1_data = data['able']
-    resp = requests.post(mosecom_url, data={'locale': 'ru_RU', 'mapType': 'air', 'element': 'PM10'}, verify=False)
+    resp = requests.post(config.mosecomurl,
+                         data={'locale': 'ru_RU', 'mapType': 'air', 'element': 'PM10'},
+                         verify=False)
     data = json.loads(resp.text)
     p2_data = data['able']
     return p1_data, p2_data

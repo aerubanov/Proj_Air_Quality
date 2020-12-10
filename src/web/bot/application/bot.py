@@ -20,8 +20,8 @@ except ModuleNotFoundError:
 from src.web.bot.application.model import User, Base
 from src.web.utils.aqi import pm25_to_aqius, aqi_level
 from src.web.bot.application.level_tracker import ConcentrationTracker, AnomaliesTracker, ForecastTracker
-from src.web.bot.application.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
-from src.web.config import metrics_host
+from src.web.bot import config
+from src.web import config as app_config
 from src.web.utils.metrics_reporter import GraphyteReporter
 from src.web.bot.logging_config import LOGGING_CONFIG
 
@@ -36,7 +36,7 @@ def create_session():
     return session
 
 
-graphyte.init(metrics_host, prefix='bot')
+graphyte.init(app_config.metrichost, prefix='bot')
 graphite_reporter = GraphyteReporter(graphyte)
 reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 user_counter = metrics.new_counter('bot_users')
@@ -46,7 +46,7 @@ user_counter = metrics.new_counter('bot_users')
 def get_concentration():
     start_date = datetime.datetime.utcnow() - datetime.timedelta(hours=6)
     end_date = datetime.datetime.utcnow()
-    r = requests.get(API_HOST + '/sensor_data',
+    r = requests.get(config.host + '/sensor_data',
                      json={"end_time": end_date.isoformat('T'),
                            "start_time": start_date.isoformat('T'),
                            "columns": ['date', 'p1', 'p2']}
@@ -61,7 +61,7 @@ def get_concentration():
 
 @metrics.with_meter('forecast')
 def get_forecast():
-    r = requests.get(API_HOST + '/forecast', json={})
+    r = requests.get(config.host + '/forecast', json={})
     data = json.loads(r.text)
     s = 'Время   PM2.5   PM10   AQIUS \n'
     for item in data:
@@ -77,8 +77,8 @@ def get_forecast():
 
 
 def get_anomaly(date: datetime.datetime):
-    start_date = date - datetime.timedelta(hours=ANOMALY_LOOK_UP_INTERVAL)
-    r = requests.get(API_HOST + '/anomaly',
+    start_date = date - datetime.timedelta(hours=config.anominterval)
+    r = requests.get(config.host + '/anomaly',
                      json={"end_time": date.isoformat('T'),
                            "start_time": start_date.isoformat('T'),
                            }
@@ -169,7 +169,7 @@ def level_tracker_callback(sess, bot, logger=None, **kwargs):
         }[kwargs['cluster']]
         message = msq + cluster_msg
     if event_type == 'forecast':
-        message = f"В течении {FORECAST_LOOK_UP_INTERVAL} часов ожидается измение концентрации частиц до" \
+        message = f"В течении {config.forecastinterval} часов ожидается измение концентрации частиц до" \
                   f" уровня AQI US: '{kwargs['aqi_level']}'."
 
     users = session.query(User).all()

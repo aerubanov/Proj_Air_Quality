@@ -1,7 +1,7 @@
 import environ
 
 
-secret_file = environ.secrets.INISecrets( "APP_SECRETS_INI", "src/web/secret.env")
+secret_file = environ.secrets.INISecrets.from_path_in_env("APP_SECRETS_INI", "src/web/secret")
 
 
 @environ.config
@@ -21,7 +21,7 @@ class AppConfig:
         modelp1 = environ.var()
         modelp2 = environ.var()
 
-        db_string = secret_file.secret()
+        dbstring = secret_file.secret()
 
         @environ.config
         class LoaderConfig:

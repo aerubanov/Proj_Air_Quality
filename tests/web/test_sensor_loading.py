@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.web.server.loader.application.sensor_loading import read_sensor_id, average_data,\
-    load_data, api_url, filter_average
+    load_data, filter_average, config
 
 
 def test_read_sensor_id(tmpdir):
@@ -72,7 +72,7 @@ def test_load_data(requests_mock):
     {"id":13109431619,"value":"5.50","value_type":"temperature"},
     {"id":13109434257,"value":"102927.78","value_type":"pressure"}]}]"""
     s_id = {36, 1356, 14850}
-    requests_mock.get(api_url,
+    requests_mock.get(config.apiurl,
                       text=test_data)
     data = load_data(s_id)
     assert set([i['id'] for i in data]) == {1356, 14850}  # id 36 is indoor!
