@@ -8,11 +8,11 @@ from src.web.server.loader.application.weather_loading import parse_weather
 from src.web.server.common.model import Sensors, Weather
 from src.web.server.loader.application.validation import SensorSchema, WeatherSchema
 from src.web.server.loader.application.mosecom_loading import load_data, write_processed, write_raw_data
-from src.web.config import metrics_host
+from src.web import config
 
 sensor_schema = SensorSchema()
 weather_schema = WeatherSchema()
-graphyte.init(metrics_host, prefix='loader')
+graphyte.init(config.metrichost, prefix='loader')
 
 
 def sensor_task(session, logger=None, metrics=False):

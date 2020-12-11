@@ -7,7 +7,7 @@ from marshmallow import ValidationError
 from src.web.server.api.application import app
 from src.web.server.api.application.utils import get_db, get_logger
 from src.web.server.api.application.validation import SensorDataSchema, ForecastRequestSchema, AnomalyRequestSchema
-from src.web.config import metrics_host
+from src.web import config
 from src.web.server.common.model import Sensors, Forecast, Anomaly
 from src.web.utils.metrics_reporter import GraphyteReporter
 
@@ -18,7 +18,7 @@ anomaly_schema = AnomalyRequestSchema()
 meter_200 = metrics.new_meter('status_200')
 meter_400 = metrics.new_meter('status_400')
 meter_404 = metrics.new_meter('status_404')
-graphyte.init(metrics_host, prefix='api')
+graphyte.init(config.metrichost, prefix='api')
 graphite_reporter = GraphyteReporter(graphyte)
 reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 

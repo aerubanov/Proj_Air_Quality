@@ -3,14 +3,14 @@ import datetime
 from telegram import InlineKeyboardMarkup, Update, Message, Chat, CallbackQuery, User
 
 from src.web.bot.application.bot import get_concentration, get_forecast, get_anomaly, keyboard, \
-    API_HOST, start, button, level_tracker_callback
-from src.web.bot.application.config import FORECAST_LOOK_UP_INTERVAL
+     start, button, level_tracker_callback
 from src.web.bot.application.model import User as DbUser
 from tests.web.data.api_test_data import sensor_data, forec_data, anomaly_data
+from src.web.bot import config
 
 
 def test_get_concentration(requests_mock):
-    requests_mock.get(API_HOST + '/sensor_data', text=sensor_data)
+    requests_mock.get(config.host + '/sensor_data', text=sensor_data)
     answer = get_concentration()
     assert answer.split()[1] == '11.23'
     assert answer.split()[3] == '5.42'
@@ -19,13 +19,13 @@ def test_get_concentration(requests_mock):
 
 
 def test_get_forecast(requests_mock):
-    requests_mock.get(API_HOST + '/forecast', text=forec_data)
+    requests_mock.get(config.host + '/forecast', text=forec_data)
     answer = get_forecast()
     assert len(answer.splitlines()) == 25
 
 
 def test_get_anomaly(requests_mock):
-    requests_mock.get(API_HOST + '/anomaly', text=anomaly_data)
+    requests_mock.get(config.host + '/anomaly', text=anomaly_data)
     answer = get_anomaly(date=datetime.datetime(2020, 4, 7, 5))
     assert answer == "Повышение значений концентрации частиц при повышенной влажности"
 
@@ -156,7 +156,7 @@ def test_level_tracker_callback(bot_db_session):
     assert bot.chat_id == 2
 
     level_tracker_callback(bot_db_session, bot, event_type='forecast', aqi_level='Good')
-    assert bot.text == f"В течении {FORECAST_LOOK_UP_INTERVAL} часов ожидается измение концентрации частиц до" \
+    assert bot.text == f"В течении {config.forecastinterval} часов ожидается измение концентрации частиц до" \
                        f" уровня AQI US: 'Good'."
 
     level_tracker_callback(bot_db_session, bot, event_type='anomalies', cluster=0)

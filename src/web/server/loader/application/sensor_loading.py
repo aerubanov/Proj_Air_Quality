@@ -4,7 +4,7 @@ import json
 import typing
 import numpy as np
 
-from src.web.server.loader.config import api_url, sensor_file
+from src.web.server.loader import config
 
 
 def read_sensor_id(file: str) -> typing.Set:
@@ -19,7 +19,7 @@ def read_sensor_id(file: str) -> typing.Set:
         return set(id_list)
 
 
-def load_data(s_id: typing.Set, url=api_url) -> typing.List[typing.Dict]:
+def load_data(s_id: typing.Set, url=config.apiurl) -> typing.List[typing.Dict]:
     """
     load data using api
     :param s_id: set of sensors ID which will be downloaded
@@ -69,7 +69,7 @@ def average_data(data: typing.List[typing.Dict]):
 
 def load_sensors() -> (dict, int):
     """get current average values from sensors"""
-    sensor_id = read_sensor_id(sensor_file)
+    sensor_id = read_sensor_id(config.sensorfile)
     data = load_data(sensor_id)
     loaded = len(data)
     avg_data = average_data(data)

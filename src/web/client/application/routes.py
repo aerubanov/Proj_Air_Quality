@@ -12,14 +12,14 @@ from wtforms.fields.html5 import DateField
 from src.web.client.application import app
 from src.web.client.application.graphics import html_graph
 from src.web.client.application.helper_functions import get_sensor_data, get_anomaly_data, get_forecast_data
-from src.web.config import metrics_host
+from src.web import config
 from src.web.client.logging_config import LOGGING_CONFIG
 from src.web.utils.metrics_reporter import GraphyteReporter
 
 meter_200 = metrics.new_meter('client_status_200')
 meter_400 = metrics.new_meter('client_status_400')
 meter_404 = metrics.new_meter('client_status_404')
-graphyte.init(metrics_host, prefix='client')
+graphyte.init(config.metrichost, prefix='client')
 graphite_reporter = GraphyteReporter(graphyte)
 reporter.register(graphite_reporter, reporter.fixed_interval_scheduler(5 * 60))  # send metrics every 5 minutes
 

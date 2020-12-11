@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from src.web.bot.application.config import API_HOST, ANOMALY_LOOK_UP_INTERVAL, FORECAST_LOOK_UP_INTERVAL
+from src.web.bot import config
 from src.web.utils.aqi import aqi_level, pm25_to_aqius
 
 
@@ -29,7 +29,7 @@ class ConcentrationTracker(LevelTracker):
     def check(self):
         start_date = datetime.datetime.utcnow() - datetime.timedelta(hours=6)
         end_date = datetime.datetime.utcnow()
-        r = requests.get(API_HOST + '/sensor_data',
+        r = requests.get(config.host + '/sensor_data',
                          json={"end_time": end_date.isoformat('T'),
                                "start_time": start_date.isoformat('T'),
                                "columns": ['p1']}
@@ -47,8 +47,8 @@ class ConcentrationTracker(LevelTracker):
 class AnomaliesTracker(LevelTracker):
     def check(self):
         end_date = datetime.datetime.utcnow()
-        start_date = end_date - datetime.timedelta(hours=ANOMALY_LOOK_UP_INTERVAL)
-        r = requests.get(API_HOST + '/anomaly',
+        start_date = end_date - datetime.timedelta(hours=config.anominterval)
+        r = requests.get(config.host + '/anomaly',
                          json={"end_time": end_date.isoformat('T'),
                                "start_time": start_date.isoformat('T'),
                                }
@@ -63,12 +63,12 @@ class AnomaliesTracker(LevelTracker):
 
 class ForecastTracker(LevelTracker):
     def check(self):
-        r = requests.get(API_HOST + '/forecast', json={})
+        r = requests.get(config.host + '/forecast', json={})
         data = json.loads(r.text)
         data = [{'date': datetime.datetime.fromisoformat(item['date']) + datetime.timedelta(hours=item['forward_time']),
                  'p1': item['p1']} for item in data]
         start_date = datetime.datetime.utcnow()
-        end_date = start_date + datetime.timedelta(hours=FORECAST_LOOK_UP_INTERVAL)
+        end_date = start_date + datetime.timedelta(hours=config.forecastinterval)
         data = [item['p1'] for item in data if start_date <= item['date'] <= end_date]
         if data:
             p1 = max(data)

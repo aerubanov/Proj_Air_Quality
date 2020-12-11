@@ -8,7 +8,6 @@ from src.web.server.common.model import Sensors, Forecast, Anomaly
 
 @pytest.fixture()
 def api_test_client():
-    app.config['DATABASE'] = app.config['TEST_DATABASE']
     app.config['DEBUG'] = True
     testing_client = app.test_client()
     ctx = app.app_context()
