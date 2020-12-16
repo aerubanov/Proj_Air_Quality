@@ -4,8 +4,12 @@ services:
     restart: always
     image: postgres:12.4
     container_name: postgres
-    env_file:
-      - secret.env
+    environment:
+      - DEBUG=false
+
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pgdb
     volumes:
       - ./database:/var/lib/postgresql/data
     networks:
