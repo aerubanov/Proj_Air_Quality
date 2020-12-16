@@ -1,7 +1,7 @@
 import environ
 
 
-secret_file = environ.secrets.INISecrets.from_path_in_env("APP_SECRETS_INI", "src/web/secret")
+secret_file = environ.secrets.INISecrets.from_path_in_env("APP_SECRETS_INI", "src/web/secret.ini")
 
 
 @environ.config
@@ -30,6 +30,7 @@ class AppConfig:
             sensortimeinterval = environ.var(converter=int)
             weatherurl = environ.var()
             mosecomurl = environ.var()
+            weathermaxcol = environ.var(converter=int)
 
         loader = environ.group(LoaderConfig)
     server = environ.group(ServerConfig)

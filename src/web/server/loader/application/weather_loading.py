@@ -6,12 +6,14 @@ import pytz
 
 from src.web.server.loader import config
 
+max_col = config.weathermaxcol
+
 
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
 
-    table = soup.find("table", {"id": "forecastTable_1"})
+    table = soup.find("table", {"id": "forecastTable"})
     rows = table.find_all('tr')
     return rows
 
@@ -20,10 +22,11 @@ def get_times(row: 'BeautifulSoup.Tag') -> typing.List[datetime.datetime]:
     cells = row.find_all('td')
     result = list()
     days = 0
-    for i in cells[1:]:
+    for i in cells[1:max_col]:
         h = int(i.text)
-        dt = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=1*days), datetime.time(h),
-                                       tzinfo=pytz.timezone('Europe/Moscow'))
+        dt = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=1*days),
+                                       datetime.time(h))
+        dt = pytz.timezone('Europe/Moscow').localize(dt)
         dt = dt.astimezone(pytz.utc)
         result.append(dt)
         if h == 23:
@@ -41,13 +44,13 @@ def get_prec(row: 'BeautifulSoup.Tag') -> typing.List[str]:
 
 def get_row_val(row: 'BeautifulSoup.Tag') -> typing.List[float]:
     cells = row.find_all('td')
-    result = [float(i.text.split()[0]) for i in cells[1:]]
+    result = [float(i.text.split()[0]) for i in cells[1:max_col]]
     return result
 
 
 def get_row_text(row: 'BeautifulSoup.Tag') -> typing.List[float]:
     cells = row.find_all('td')
-    result = [i.text.split()[0] for i in cells[1:]]
+    result = [i.text.split()[0] for i in cells[1:max_col]]
     return result
 
 
