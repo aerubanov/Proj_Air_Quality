@@ -87,21 +87,21 @@ services:
       - "./secret.ini:/code/src/web/secret.ini"
     command: gunicorn src.web.client.run:app -b 0.0.0.0:5000
 
-  #bot:
-  #  restart: always
-  #  build:
-  #    context: ../../src
-  #    dockerfile: ./web/bot/Dockerfile
-  #  image: aerubanov/bot
-  #  container_name: bot
-  #  networks:
-  #    - backend
-  #  volumes:
-  #    - "../../src:/code/src"
-  #    - "./logs:/code/logs"
-  #    - "./bot/database:/code/database"
-  #    - "./secret.ini:/code/src/web/secret.ini"
-  #  command: python -m src.web.bot.application.bot -u
+  bot:
+    restart: always
+    build:
+      context: ../../src
+      dockerfile: ./web/bot/Dockerfile
+    image: aerubanov/bot
+    container_name: bot
+    networks:
+      - backend
+    volumes:
+      - "../../src:/code/src"
+      - "./logs:/code/logs"
+      - "./bot/database:/code/database"
+      - "./secret.ini:/code/src/web/secret.ini"
+    command: python -m src.web.bot.application.bot -u
 
 networks:
   backend:
