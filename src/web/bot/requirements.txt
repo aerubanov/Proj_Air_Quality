@@ -5,3 +5,5 @@ psycopg2==2.8.6
 schedule==0.6.0
 graphyte==1.6.0
 appmetrics==0.5.0
+python-dotenv==0.15.0
+environ-config==20.1.0

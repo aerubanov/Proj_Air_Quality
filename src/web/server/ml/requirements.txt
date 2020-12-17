@@ -5,3 +5,5 @@ scikit-learn==0.23.2
 psycopg2==2.8.6
 statsmodels==0.12.1
 matplotlib==3.3.2
+python-dotenv==0.15.0
+environ-config==20.1.0

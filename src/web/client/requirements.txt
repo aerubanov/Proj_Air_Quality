@@ -8,3 +8,5 @@ graphyte==1.6.0
 mpld3==0.5.1
 matplotlib==3.3.2
 pandas==1.0.5
+python-dotenv==0.15.0
+environ-config==20.1.0

@@ -8,3 +8,5 @@ lxml==4.6.1
 marshmallow==3.9.0
 pytz==2020.4
 graphyte==1.6.0
+python-dotenv==0.15.0
+environ-config==20.1.0
