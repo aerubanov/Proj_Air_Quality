@@ -32,6 +32,7 @@ services:
     volumes:
       - "../../DATA:/code/DATA"
       - "./logs:/code/logs"
+      - "./secret.ini:/code/src/web/secret.ini"
 
   api:
     restart: always
@@ -48,6 +49,7 @@ services:
       - PostgreSQL
     volumes:
       - "./logs:/code/logs"
+      - "./secret.ini:/code/src/web/secret.ini"
     command: gunicorn src.web.server.api.run:app -b 0.0.0.0:8000
 
   ml:
@@ -65,6 +67,7 @@ services:
     volumes:
         - "../../models:/code/models"
         - "./logs:/code/logs"
+        - "./secret.ini:/code/src/web/secret.ini"
 
   web_client:
     restart: always
@@ -81,6 +84,7 @@ services:
       - api
     volumes:
       - "./logs:/code/logs"
+      - "./secret.ini:/code/src/web/secret.ini"
     command: gunicorn src.web.client.run:app -b 0.0.0.0:5000
 
   bot:
@@ -96,6 +100,7 @@ services:
       - "../../src:/code/src"
       - "./logs:/code/logs"
       - "./bot/database:/code/database"
+      - "./secret.ini:/code/src/web/secret.ini"
     command: python -m src.web.bot.bot -u
 
 networks:
