@@ -57,7 +57,7 @@ def get_weather_data(session, date=None, delta=datetime.timedelta(days=1)) -> pd
     data['date'] = pd.to_datetime(data.date)
     data = data.rename(columns=weather_columns_names)
     data['prec_amount'] = data.prec_amount.apply(transform_prec_amount).astype(float)
-    data['prec_time'] = 3.0  # time step of weather forecast from rp5.ru
+    data['prec_time'] = 1.0  # time step of weather forecast from rp5.ru
     data['wind_direction'] = data.wind_direction.map(wind_dir)
     data = data.set_index('date')
     return data.resample('5T').bfill()
