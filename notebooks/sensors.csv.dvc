@@ -1,0 +1,3 @@
+outs:
+- md5: ec9eab330ecf0b7a9e374319df50608b
+  path: sensors.csv
