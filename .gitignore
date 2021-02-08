@@ -13,3 +13,4 @@ env
 venv
 src/web/secret.env
 src/web/secret.ini
+notebooks/cache/

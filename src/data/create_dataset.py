@@ -32,7 +32,7 @@ def combine_data(files_list: typing.List[str], column: str,
             local_data = local_data.reindex(idx, fill_value=None)
             data_comb[file] = local_data[column]
         except (pd.errors.ParserError, pd.errors.EmptyDataError,
-                pd.core.groupby.groupby.DataError, KeyError) as e:
+                pd.core.groupby.groupby.DataError, KeyError, AssertionError) as e:
             print(str(e), file)
     return data_comb
 
@@ -92,7 +92,7 @@ def get_sensors_loc(sensors_list: typing.List[str]) -> pd.DataFrame:
             lon = data.iloc[-1].lon
             sensors_data.append([s_id, s_type, lat, lon])
         except (pd.errors.ParserError, pd.errors.EmptyDataError,
-                pd.core.groupby.groupby.DataError, KeyError):
+                pd.core.groupby.groupby.DataError, KeyError, AssertionError):
             pass
     sens_loc = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
     return sens_loc
