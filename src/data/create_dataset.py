@@ -5,6 +5,7 @@ import typing
 import numpy as np
 
 from src.data.config import SENSOR_ID_FILE, SENSOR_DATA_FOLDER, WEATHER_FILE, WEATHER_DATA_FOLDER
+from src.data.utils import get_sensors_loc, get_weather_data
 
 # This script create dataset with sensor average data and weather data from raw downloaded data
 
@@ -76,28 +77,6 @@ def get_file_list(data_folder: str, sensor_type: str):
     return sensor_list
 
 
-def get_sensors_loc(sensors_list: typing.List[str]) -> pd.DataFrame:
-    """
-    get location of sensors from sensors_list
-    :param sensors_list: list of sensor file paths
-    :return: dataframe with sensor locations
-    """
-    sensors_data = []
-    for i in sensors_list:
-        try:
-            data = pd.read_csv(i, delimiter=';')
-            s_id = data.iloc[-1].sensor_id
-            s_type = data.iloc[-1].sensor_type
-            lat = data.iloc[-1].lat
-            lon = data.iloc[-1].lon
-            sensors_data.append([s_id, s_type, lat, lon])
-        except (pd.errors.ParserError, pd.errors.EmptyDataError,
-                pd.core.groupby.groupby.DataError, KeyError, AssertionError):
-            pass
-    sens_loc = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
-    return sens_loc
-
-
 def get_sensor_data(data_folder: str) -> (pd.DataFrame, pd.DataFrame):
     sds_files = get_file_list(data_folder, 'sds011')
     bme_files = get_file_list(data_folder, 'bme280')
@@ -117,34 +96,6 @@ def get_sensor_data(data_folder: str) -> (pd.DataFrame, pd.DataFrame):
     sensor_data = pd.concat((perc_p1, perc_p2, perc_temp, perc_hum, perc_press), axis=1)
     sensors_location = get_sensors_loc(sds_files+bme_files)
     return sensor_data, sensors_location
-
-
-def get_weather_data(weather_file: str) -> pd.DataFrame:
-    """
-    Select and resample weather data
-    :param weather_file: path to raw data file
-    :return: processed data
-    """
-    def parser(date): return pd.to_datetime(date, format='%d.%m.%Y %H:%M')
-    data = pd.read_csv(weather_file, delimiter=';', parse_dates=['Местное время в Москве (центр, Балчуг)'],
-                       date_parser=parser,
-                       index_col=False)
-    data = data.rename(columns={'Местное время в Москве (центр, Балчуг)': 'date'})
-    data = data.set_index('date')
-    data.index = data.index.tz_localize(tz="Europe/Moscow").tz_convert('UTC')
-    sel_data = pd.DataFrame(index=data.index)
-    sel_data['temp_meteo'] = data['T']
-    sel_data['pres_meteo'] = data.Po * 133.322  # transform mmHg in Pa
-    sel_data['hum_meteo'] = data.U
-    sel_data['wind_direction'] = data.DD
-    sel_data['wind_speed'] = data.Ff
-    sel_data['precipitation'] = data.W1
-    sel_data['prec_amount'] = data.RRR
-    sel_data['prec_time'] = data.tR
-    sel_data['visibility'] = data.VV
-    sel_data['dew_point_temp'] = data.Td
-    meteo_data = sel_data.resample('5T').bfill()
-    return meteo_data
 
 
 def main():
