@@ -85,8 +85,3 @@ def get_weather_data(weather_file: str) -> pd.DataFrame:
     sel_data['dew_point_temp'] = data.Td
     meteo_data = sel_data.resample('5T').bfill()
     return meteo_data
-
-
-def get_surface_level_alts(locations: typing.List[(float, float)]):
-
-
