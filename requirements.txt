@@ -28,3 +28,6 @@ python-telegram-bot==13.0
 python-dotenv==0.15.0
 environ-config==20.1.0
 sqlalchemy-migrate==0.13.0
+geopandas == 0.8.1
+pyrosm==0.6.0
+shapely==1.7.1
