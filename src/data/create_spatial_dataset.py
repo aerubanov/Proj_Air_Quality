@@ -21,4 +21,4 @@ def sensors_locations() -> pd.DataFrame:
 
 if __name__ == '__main__':
     sensors = sensors_locations()
-    sensors.to_csv("DATA/processed/sensors")
+    sensors.to_csv("DATA/processed/sensors.csv")

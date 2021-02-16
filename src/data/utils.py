@@ -83,5 +83,5 @@ def get_weather_data(weather_file: str) -> pd.DataFrame:
     sel_data['prec_time'] = data.tR
     sel_data['visibility'] = data.VV
     sel_data['dew_point_temp'] = data.Td
-    meteo_data = sel_data.resample('5T').bfill()
+    meteo_data = sel_data.resample('1H').bfill()
     return meteo_data
