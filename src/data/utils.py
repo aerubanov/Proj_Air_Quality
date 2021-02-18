@@ -49,7 +49,7 @@ def get_sealevel_alt(bme_id: int, press_meteo: pd.Series) -> float:
     See details https://ru.wikipedia.org/wiki/Барометрическая_ступень"""
     file_name = f'{bme_id}_bme280_sensor_.csv'
     bme_data = pd.read_csv(os.path.join(SENSOR_DATA_FOLDER, file_name), sep=';', parse_dates=['timestamp'])
-    bme_data = bme_data.set_index('timestamp').resample('5T').mean()
+    bme_data = bme_data.set_index('timestamp').resample('1H').mean()
     bme_data = bme_data.tz_localize(timezone.utc)
     bme_data['press_diff'] = (bme_data['pressure'] - press_meteo) / 1000
     bme_data['Q'] = 8000/(bme_data.pressure/1000) * (1 + 0.00366*bme_data.temperature)
