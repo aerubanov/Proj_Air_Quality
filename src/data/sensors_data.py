@@ -17,14 +17,18 @@ def load_data(filename: str) -> pd.DataFrame:
     return data
 
 
-def get_sensor_data(bme_sensor_id: int, sds_sensor_id: int) -> pd.DataFrame:
+def get_sensor_data(bme_sensor_id: int, sds_sensor_id: int, sensors: pd.DataFrame) -> pd.DataFrame:
     file_name = f'{bme_sensor_id}_bme280_sensor_.csv'
     bme_data = load_data(file_name)
     file_name = f'{sds_sensor_id}_sds011_sensor_.csv'
     sds_data = load_data(file_name)
     bme_data = bme_data[["pressure", "temperature", "humidity"]]
     sds_data = sds_data[["P1", "P2"]]
-    return sds_data.join(bme_data)
+    data = sds_data.join(bme_data)
+    for c in ['lat', 'lon', 'sealevel_alt',
+              'surface_alt', 'nearest_park', 'nearest_road', 'nearest_indust']:
+        data[c] = sensors[sensors.sds_sensor == sds_sensor_id][c].values[0]
+    return data
 
 
 def add_weather_data(sensor_data: pd.DataFrame, weather_data: pd.DataFrame) -> pd.DataFrame:
@@ -32,18 +36,19 @@ def add_weather_data(sensor_data: pd.DataFrame, weather_data: pd.DataFrame) -> p
     return sensor_data.join(weather_data)
 
 
-def worker(bme_id: int, sds_id: int, weather_data: pd.DataFrame) -> pd.DataFrame:
-    sensor_data = get_sensor_data(bme_id, sds_id)
+def worker(bme_id: int, sds_id: int, weather_data: pd.DataFrame, sensors: pd.DataFrame) -> pd.DataFrame:
+    sensor_data = get_sensor_data(bme_id, sds_id, sensors)
     sensor_data = add_weather_data(sensor_data, weather_data)
     return sensor_data.reset_index()
 
 
 if __name__ == '__main__':
-    sensors = pd.read_csv("DATA/processed/sensors.csv")
-    bme_sensor = sensors.bme_sensor.values
-    sds_sensor = sensors.sds_sensor.values
+    sens = pd.read_csv("DATA/processed/sensors.csv")
+    bme_sensor = sens.bme_sensor.values
+    sds_sensor = sens.sds_sensor.values
     weather = get_weather_data(os.path.join(WEATHER_DATA_FOLDER, WEATHER_FILE))
     with multiprocessing.Pool(processes=4) as pool:
-        results = pool.starmap(partial(worker, weather_data=weather), zip(bme_sensor, sds_sensor))
+        results = pool.starmap(partial(worker, weather_data=weather, sensors=sens), zip(bme_sensor, sds_sensor))
     dataset = pd.concat(results)
     dataset.to_csv('DATA/processed/dataset.csv')
+    print(dataset.head())
