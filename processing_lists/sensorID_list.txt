@@ -478,3 +478,13 @@ _sds011_sensor_56259.csv
 _sds011_sensor_56263.csv
 _sds011_sensor_56437.csv
 _sds011_sensor_57053.csv
+_bme280_sensor_28301.csv
+_bme280_sensor_47785.csv
+_bme280_sensor_57761.csv
+_bme280_sensor_57813.csv
+_bme280_sensor_58032.csv
+_sds011_sensor_47784.csv
+_sds011_sensor_57760.csv
+_sds011_sensor_57812.csv
+_sds011_sensor_58025.csv
+_sds011_sensor_58031.csv
