@@ -8,8 +8,6 @@
 
 [dataset.rst](docs/data/dataset.rst)
 
-### api
-[api.rst](docs/api/api.rst)
 # ML
 ## Источники данных
 В проекте используются проекта данные общественного мониторнга воздуха проекта
@@ -21,15 +19,6 @@
 
 Для версионирования данных и построения pipline в проекте используется [Data Version Control (DVC)](https://dvc.org/ "Open-source Version Control System for Machine Learning Projects").  
 
-
-## Notebooks
-Эксперименты с данными
- 
- [Anomaly detection.ipynb](notebooks/Anomaly%20detection.ipynb)
- 
- [Forecasting](notebooks/forecast_ansamble.ipynb)
-
-[EDA](notebooks/EDA.ipynb)
 
 ## Загрузка новых данных
 - получение списка новых сенсоров
@@ -46,29 +35,22 @@ python -m src.data.update_weather
 ```
 ## DVC-pipline
 <!-- language: lang-none -->
-          | DATA/raw/weather |      | DATA/raw/sensors | 
-                      *****                   *****                                                
-                           ***             ***                           
-                              ***       ***                              
-                    +-------------------------------+                    
-                    | dvc_stages/create_dataset.dvc |                    
-                    +-------------------------------+                                                      
-                              ***       ***                                                                  
-                            ***             *** 
-                        *****                   *****                                                                                             
-    +-------------------------------+      +---------------------------------+          
-    | dvc_stages/train_forecast.dvc |      | dvc_stages/train_clustering.dvc |          
-    +-------------------------------+      +---------------------------------+  
-                    *                          *                   *
-                    *                          *                   * 
-                    *                          *                   *
-          |models/p1_forecast.obj|     |models/pca.obj|     +----------------------------------+ 
-          |models/p2_forecast.obj|     |models/kmean.obj|   | dvc_stages/extract_anomalies.dvc | 
-                                                            +----------------------------------+
-                                                                            *
-                                                                            *
-                                                                            *
-                                                                |DATA/processed/anomalies.csv| 
+            +----------------------+                  +----------------------+         
+            | DATA/raw/sensors.dvc |                  | DATA/raw/weather.dvc |         
+            +----------------------+                  +----------------------+         
+             ***                 ***                  ***                  ***         
+         ****                       ****          ****                        ***      
+      ***                               **      **                               ****  
+    ****                           +-----------------+                             ****
+         *******                    | extract_sensors |                      *******    
+               *******             +-----------------+                ******           
+                      ******                 *                 *******                 
+                            *******          *          *******                        
+                                   ****      *      ****                               
+                                    +----------------+                                 
+                                    | create_dataset |                                 
+                                    +----------------+  
+
 <!-- language: lang-none -->
 Для запуска стадий pipline используйте dvc repro <stage.dvc> ([подробнее](https://dvc.org/doc/tutorials/pipelines))
 
