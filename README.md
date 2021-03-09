@@ -72,17 +72,7 @@ python -m src.data.update_weather
 <!-- language: lang-none -->
 Для запуска стадий pipline используйте dvc repro <stage.dvc> ([подробнее](https://dvc.org/doc/tutorials/pipelines))
 
-# Web
-Веб часть проекта состоит из нескольких сервисов, запускаемых docker-compose
- ([docker-compouse.yml](src/web/docker-compose.yml))  
-- bot - telegram-бот для отслеживания измения концентрации частиц.
-- client - web-клиент для отображения информации в виде графиков
-- server - код сервера проекта. Загрузка данных, запуск моделей, база данных (PostgresSQL)
-    - api - сервис реализующий API для доступа к данным БД ([дока](docs/api/api.rst))
-    - common - модуль с общим кодом для разных компонентов сервера (модель БД и т.д.)
-    - loader - загрузка новых данных в БД
-    - ml - запуск моделей на данных из БД
-- utils - модуль со вспомогательными функциями
+
 
 # Tests
 * Запуск всех тестов (перед отправкой на PR): `python -m pytest --flake8 -v --cov-report term --cov=./src`
