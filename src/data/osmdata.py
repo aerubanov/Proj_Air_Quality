@@ -9,6 +9,7 @@ fp = 'DATA/raw/planet_37.15_55.486_4cd95583.osm.pbf'
 
 
 def get_osm_gata(protobuf: str) -> typing.Tuple:
+    """get osm-data from protobuf for parks, roads, industrials areas"""
     osm = OSM(protobuf)
     msk_parks = osm.get_data_by_custom_criteria(
         custom_filter={'leisure': ['park', 'garden'], 'natural': ['wood']},
@@ -24,11 +25,13 @@ def get_osm_gata(protobuf: str) -> typing.Tuple:
 
 
 def nearest(row, geom):
+    """get nearest point to row from geom"""
     nearest = nearest_points(row, geom)[1]
     return nearest
 
 
 def add_osm_data(sensors: pd.DataFrame) -> pd.DataFrame:
+    """add osm features to pandas dataframe"""
     sensors = sensors[37.1 <= sensors.lon]
     sensors = sensors[sensors.lon <= 38.05]
     sensors = sensors[55.48 <= sensors.lat]

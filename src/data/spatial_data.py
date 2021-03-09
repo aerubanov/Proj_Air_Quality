@@ -8,6 +8,7 @@ from src.data.config import SENSOR_DATA_FOLDER, WEATHER_DATA_FOLDER, WEATHER_FIL
 
 
 def sensors_locations() -> pd.DataFrame:
+    """Combine sds011 and bme280 sensors together and add spatial features"""
     meteo_data = get_weather_data(os.path.join(WEATHER_DATA_FOLDER, WEATHER_FILE))
     sensors_file_list = [os.path.join(SENSOR_DATA_FOLDER, i) for i in os.listdir(SENSOR_DATA_FOLDER)]
     sensors = get_sensors_loc(sensors_file_list)
