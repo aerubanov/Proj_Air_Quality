@@ -2,16 +2,16 @@ create_dataset:
   cmd: python -m src.data.sensors_data
   deps:
   - path: DATA/processed/sensors.csv
-    md5: 83f7ef27d321b7666c4e63e2c7b1e1b2
+    md5: 850dd99ae73b891cc6eb5cb99596a328
   - path: DATA/raw/sensors
-    md5: 5ab8a1ec37137b7a2e2369ec8ccc7eb2.dir
+    md5: edca8d765856a44350ecc4d71e3194d0.dir
   - path: DATA/raw/weather
-    md5: 8110317f7bee0bfbb55e4add0cca8fc0.dir
+    md5: 41e2af93cc0509005e2bf2cd99de4793.dir
   - path: src/data/utils.py
     md5: 54e3fe85eefa7a0380190774fbae7827
   outs:
   - path: DATA/processed/dataset.csv
-    md5: eefd5793e1e238ea83ac3cba0f84af26
+    md5: 81c359df87c10dcf7b362e7afd53d146
 train_clustering:
   cmd: python -m src.model.anom_clustering
   deps:
@@ -58,9 +58,9 @@ extract_sensors:
   cmd: python -m src.data.spatial_data
   deps:
   - path: DATA/raw/sensors
-    md5: 5ab8a1ec37137b7a2e2369ec8ccc7eb2.dir
+    md5: edca8d765856a44350ecc4d71e3194d0.dir
   - path: DATA/raw/weather
-    md5: 8110317f7bee0bfbb55e4add0cca8fc0.dir
+    md5: 41e2af93cc0509005e2bf2cd99de4793.dir
   - path: requirements.txt
     md5: 8fe8e3231d51dda03ae4eae853d74c22
   - path: src/data/opentopodata.py
@@ -71,4 +71,4 @@ extract_sensors:
     md5: 54e3fe85eefa7a0380190774fbae7827
   outs:
   - path: DATA/processed/sensors.csv
-    md5: 83f7ef27d321b7666c4e63e2c7b1e1b2
+    md5: 850dd99ae73b891cc6eb5cb99596a328
