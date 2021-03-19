@@ -66,7 +66,7 @@ extract_sensors:
   - path: src/data/opentopodata.py
     md5: 9d824da3053f862ca361217e2bec164c
   - path: src/data/osmdata.py
-    md5: efc660c77d45691eea06d9d5bfb9cb22
+    md5: c776baf8998a8b2bfe7ae7c224b5fbcc
   - path: src/data/utils.py
     md5: 54e3fe85eefa7a0380190774fbae7827
   outs:
