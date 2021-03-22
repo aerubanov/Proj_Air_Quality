@@ -49,7 +49,6 @@ class Dataset:
         """
         Select random sds_sensors id
         """
-<<<<<<< HEAD
         np.random.seed(random_seed)
         all_ids = self.data.sds_sensor.unique()
         if len(all_ids) <= n:
@@ -57,8 +56,6 @@ class Dataset:
         selected = np.random.choice(all_ids, n, replace=False)
         self.data = self.data[self.data['sds_sensor'].isin(selected)]
         return self
-=======
-        pass
 
     def plot_series(self,  column: str):
         series = [(i, x)
@@ -76,17 +73,12 @@ class Dataset:
         gdata['geometry'] = gdata.geometry.set_crs(epsg=4326)
         gdata.plot(ax=ax, color='black')
         plt.show()
->>>>>>> 796b2ab (add plots)
 
 
 if __name__ == '__main__':
     ds = Dataset('DATA/processed/dataset.csv', ['surface_alt'], 'P1')
-<<<<<<< HEAD
-    # print(ds.tloc['2020-07-23':].x.head())
-    print(ds.random_sensors(10).x.head())
-=======
     ds = ds.tloc['2020-07-1':'2020-07-20']
     ds = ds.sploc[55.6: 55.8, 37.2:37.4]
     # ds.plot_series('P1')
     ds.plot_locations()
->>>>>>> 796b2ab (add plots)
+
