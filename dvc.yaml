@@ -16,6 +16,7 @@ stages:
       - DATA/raw/weather
       - DATA/raw/sensors
       - src/data/utils.py
+      - src/data/sensors_data.py
       - DATA/processed/sensors.csv
     outs:
       - DATA/processed/dataset.csv

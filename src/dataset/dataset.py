@@ -1,5 +1,7 @@
 from __future__ import annotations
 import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt
 import typing
 
 from src.dataset.indexers import TimeIndexer, LocIndexer
@@ -8,7 +10,7 @@ from src.dataset.indexers import TimeIndexer, LocIndexer
 class Dataset:
     def __init__(self, datafile: str, x_columns: typing.List[str], y_column: str):
         data = pd.read_csv(datafile, parse_dates=["timestamp"])
-        self.default_columns = ['timestamp', 'lat', 'lon']  # need to get data by time and location
+        self.default_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
         self.x_columns = x_columns
         self.y_column = y_column
         self.data = data[x_columns + [y_column] + self.default_columns]
@@ -46,9 +48,29 @@ class Dataset:
         """
         Select random sds_sensors id
         """
+        pass
+
+    def plot_series(self,  column: str):
+        series = [(i, x)
+                  for i, x in self.data[self.default_columns+[column]].groupby(self.data['sds_sensor'])]
+        _, ax = plt.subplots()
+        for i, x in series:
+            x.plot(x='timestamp', y=column, ax=ax, label=i)
+        ax.set_xlabel('timestamp')
+        ax.set_ylabel(column)
+        plt.show()
+
+    def plot_locations(self, ax=None):
+        data = self.data.groupby(self.data['sds_sensor']).last()
+        gdata = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.lon, data.lat))
+        gdata['geometry'] = gdata.geometry.set_crs(epsg=4326)
+        gdata.plot(ax=ax, color='black')
+        plt.show()
 
 
 if __name__ == '__main__':
     ds = Dataset('DATA/processed/dataset.csv', ['surface_alt'], 'P1')
-    # print(ds.tloc['2020-07-23':].x.head())
-    print(ds.sploc[55.6: 55.9, :].x.head())
+    ds = ds.tloc['2020-07-1':'2020-07-20']
+    ds = ds.sploc[55.6: 55.8, 37.2:37.4]
+    # ds.plot_series('P1')
+    ds.plot_locations()

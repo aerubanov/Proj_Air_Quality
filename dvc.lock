@@ -7,11 +7,13 @@ create_dataset:
     md5: edca8d765856a44350ecc4d71e3194d0.dir
   - path: DATA/raw/weather
     md5: 41e2af93cc0509005e2bf2cd99de4793.dir
+  - path: src/data/sensors_data.py
+    md5: d65242348bbd0aa2f2caf5b7345e90a8
   - path: src/data/utils.py
     md5: 54e3fe85eefa7a0380190774fbae7827
   outs:
   - path: DATA/processed/dataset.csv
-    md5: 81c359df87c10dcf7b362e7afd53d146
+    md5: e52e500e013dadb32cffe62a39f6193a
 train_clustering:
   cmd: python -m src.model.anom_clustering
   deps:
