@@ -84,11 +84,3 @@ class Dataset:
         gdata['geometry'] = gdata.geometry.set_crs(epsg=4326)
         gdata.plot(ax=ax, color='black')
         plt.show()
-
-
-if __name__ == '__main__':
-    ds = Dataset('DATA/processed/dataset.csv', ['surface_alt'], 'P1')
-    ds = ds.tloc['2020-07-1':'2020-07-20']
-    ds = ds.sploc[55.6: 55.8, 37.2:37.4]
-    # ds.plot_series('P1')
-    ds.plot_locations()
