@@ -1,6 +1,7 @@
 from __future__ import annotations
 import pandas as pd
 import typing
+import numpy as np
 
 from src.dataset.indexers import TimeIndexer, LocIndexer
 
@@ -8,7 +9,7 @@ from src.dataset.indexers import TimeIndexer, LocIndexer
 class Dataset:
     def __init__(self, datafile: str, x_columns: typing.List[str], y_column: str):
         data = pd.read_csv(datafile, parse_dates=["timestamp"])
-        self.default_columns = ['timestamp', 'lat', 'lon']  # need to get data by time and location
+        self.default_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
         self.x_columns = x_columns
         self.y_column = y_column
         self.data = data[x_columns + [y_column] + self.default_columns]
@@ -42,13 +43,20 @@ class Dataset:
         """
         return LocIndexer(self)
 
-    def random_sensors(self, n: int) -> Dataset:
+    def random_sensors(self, n: int, random_seed=42) -> Dataset:
         """
         Select random sds_sensors id
         """
+        np.random.seed(random_seed)
+        all_ids = self.data.sds_sensor.unique()
+        if len(all_ids) <= n:
+            return self
+        selected = np.random.choice(all_ids, n, replace=False)
+        self.data = self.data[self.data['sds_sensor'].isin(selected)]
+        return self
 
 
 if __name__ == '__main__':
     ds = Dataset('DATA/processed/dataset.csv', ['surface_alt'], 'P1')
     # print(ds.tloc['2020-07-23':].x.head())
-    print(ds.sploc[55.6: 55.9, :].x.head())
+    print(ds.random_sensors(10).x.head())
