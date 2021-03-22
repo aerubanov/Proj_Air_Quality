@@ -4,17 +4,22 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import typing
 import numpy as np
+import copy
 
 from src.dataset.indexers import TimeIndexer, LocIndexer
 
 
 class Dataset:
+    default_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
+
     def __init__(self, datafile: str, x_columns: typing.List[str], y_column: str):
         data = pd.read_csv(datafile, parse_dates=["timestamp"])
-        self.default_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
         self.x_columns = x_columns
         self.y_column = y_column
         self.data = data[x_columns + [y_column] + self.default_columns]
+
+    def __len__(self):
+        return len(self.data)
 
     @property
     def x(self) -> pd.DataFrame:
@@ -47,17 +52,22 @@ class Dataset:
 
     def random_sensors(self, n: int, random_seed=42) -> Dataset:
         """
-        Select random sds_sensors id
+        Select random sds_sensors id. If n >= len(dataset), return full dataset
         """
         np.random.seed(random_seed)
         all_ids = self.data.sds_sensor.unique()
         if len(all_ids) <= n:
             return self
         selected = np.random.choice(all_ids, n, replace=False)
-        self.data = self.data[self.data['sds_sensor'].isin(selected)]
-        return self
+        data = self.data[self.data['sds_sensor'].isin(selected)]
+        res = copy.deepcopy(self)
+        res.data = data
+        return res
 
     def plot_series(self,  column: str):
+        """
+        Plot column values changes in time after group by sensors
+        """
         series = [(i, x)
                   for i, x in self.data[self.default_columns+[column]].groupby(self.data['sds_sensor'])]
         _, ax = plt.subplots()
@@ -68,6 +78,7 @@ class Dataset:
         plt.show()
 
     def plot_locations(self, ax=None):
+        """Plot sensors spatial locations"""
         data = self.data.groupby(self.data['sds_sensor']).last()
         gdata = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.lon, data.lat))
         gdata['geometry'] = gdata.geometry.set_crs(epsg=4326)
