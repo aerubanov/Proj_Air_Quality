@@ -1,5 +1,7 @@
 from __future__ import annotations
 import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt
 import typing
 import numpy as np
 
@@ -55,8 +57,27 @@ class Dataset:
         self.data = self.data[self.data['sds_sensor'].isin(selected)]
         return self
 
+    def plot_series(self,  column: str):
+        series = [(i, x)
+                  for i, x in self.data[self.default_columns+[column]].groupby(self.data['sds_sensor'])]
+        _, ax = plt.subplots()
+        for i, x in series:
+            x.plot(x='timestamp', y=column, ax=ax, label=i)
+        ax.set_xlabel('timestamp')
+        ax.set_ylabel(column)
+        plt.show()
+
+    def plot_locations(self, ax=None):
+        data = self.data.groupby(self.data['sds_sensor']).last()
+        gdata = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.lon, data.lat))
+        gdata['geometry'] = gdata.geometry.set_crs(epsg=4326)
+        gdata.plot(ax=ax, color='black')
+        plt.show()
+
 
 if __name__ == '__main__':
     ds = Dataset('DATA/processed/dataset.csv', ['surface_alt'], 'P1')
-    # print(ds.tloc['2020-07-23':].x.head())
-    print(ds.random_sensors(10).x.head())
+    ds = ds.tloc['2020-07-1':'2020-07-20']
+    ds = ds.sploc[55.6: 55.8, 37.2:37.4]
+    # ds.plot_series('P1')
+    ds.plot_locations()
