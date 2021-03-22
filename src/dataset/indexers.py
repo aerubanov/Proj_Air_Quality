@@ -1,11 +1,12 @@
 import typing
+import copy
 if typing.TYPE_CHECKING:
     from src.dataset.dataset import Dataset
 
 
 class TimeIndexer:
     def __init__(self, dataset: 'Dataset'):
-        self._dataset = dataset
+        self._dataset = copy.deepcopy(dataset)
 
     def __getitem__(self, key) -> 'Dataset':
         if isinstance(key, slice):
@@ -20,7 +21,7 @@ class TimeIndexer:
 
 class LocIndexer:
     def __init__(self, dataset: 'Dataset'):
-        self._dataset = dataset
+        self._dataset = copy.deepcopy(dataset)
 
     def __getitem__(self, keys) -> 'Dataset':
         key1, key2 = keys
