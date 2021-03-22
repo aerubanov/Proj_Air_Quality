@@ -84,6 +84,7 @@ class Dataset:
         gdata['geometry'] = gdata.geometry.set_crs(epsg=4326)
         gdata.plot(ax=ax, color='black')
         plt.show()
+<<<<<<< HEAD
 
 
 if __name__ == '__main__':
@@ -93,3 +94,5 @@ if __name__ == '__main__':
     # ds.plot_series('P1')
     ds.plot_locations()
 
+=======
+>>>>>>> 65b0117 (add tests for indexers)
