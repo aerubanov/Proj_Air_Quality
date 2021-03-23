@@ -4,6 +4,7 @@ import datetime
 
 from src.dataset.dataset import Dataset
 
+
 @pytest.fixture
 def test_dataset(tmp_path):
     data = pd.DataFrame(data={
@@ -22,4 +23,3 @@ def test_dataset(tmp_path):
     ds = Dataset(test_file, ['x'], 'y')
     yield ds
     del ds
-

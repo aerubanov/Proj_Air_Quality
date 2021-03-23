@@ -27,4 +27,3 @@ def test_spatial_indexing(test_dataset):
 
     ds1 = ds.sploc[3:5, :]
     assert len(ds1) == 2
-
