@@ -27,7 +27,7 @@ def get_sensor_data(bme_sensor_id: int, sds_sensor_id: int, sensors: pd.DataFram
     bme_data = bme_data[["pressure", "temperature", "humidity"]]
     sds_data = sds_data[["P1", "P2"]]
     data = sds_data.join(bme_data)
-    for c in ['lat', 'lon', 'sealevel_alt',
+    for c in ['sds_sensor', 'lat', 'lon', 'sealevel_alt',
               'surface_alt', 'nearest_park', 'nearest_road', 'nearest_indust']:
         data[c] = sensors[sensors.sds_sensor == sds_sensor_id][c].values[0]
     return data
