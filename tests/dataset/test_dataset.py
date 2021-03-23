@@ -1,4 +1,4 @@
-from src.dataset.dataset import Dataset
+from src.dataset.datasets import Dataset
 
 
 def test_dataset_init(test_dataset):

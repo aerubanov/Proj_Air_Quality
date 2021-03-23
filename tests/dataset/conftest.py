@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 import datetime
 
-from src.dataset.dataset import Dataset
+from src.dataset.datasets import Dataset
 
 
 @pytest.fixture
