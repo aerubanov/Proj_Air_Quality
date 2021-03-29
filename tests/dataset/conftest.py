@@ -2,8 +2,6 @@ import pandas as pd
 import pytest
 import datetime
 
-from src.dataset.datasets import Dataset
-
 
 @pytest.fixture
 def test_dataset(tmp_path):
@@ -16,10 +14,9 @@ def test_dataset(tmp_path):
         'sds_sensor': [9, 10, 11],
         'x': [12, 13, 14],
         'y': [15, 16, 17],
+        'P1': [10, 15, 20],
         'other': [100, 101, 102]
     })
-    test_file = tmp_path / 'test'
-    data.to_csv(test_file)
-    ds = Dataset(test_file, ['x'], 'y')
+    ds = pd.DataFrame(data)
     yield ds
     del ds

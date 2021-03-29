@@ -9,25 +9,37 @@ import copy
 from src.dataset.indexers import TimeIndexer, LocIndexer
 
 
-class Dataset:
-    default_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
+@pd.api.extensions.register_dataframe_accessor("geo")
+class GeoAccessor:
+    necessary_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
 
-    def __init__(self, datafile: str, x_columns: typing.List[str], y_column: str):
-        data = pd.read_csv(datafile, parse_dates=["timestamp"])
-        self.x_columns = x_columns
-        self.y_column = y_column
-        self.data = data[x_columns + [y_column] + self.default_columns]
+    def __init__(self, pandas_obj: pd.DataFrame):
+        self._validate(pandas_obj)
+        self.data = pandas_obj
+        self.x_column = None
+        self.y_column = 'P1'
 
-    def __len__(self):
-        return len(self.data)
+    @staticmethod
+    def _validate(obj: pd.DataFrame):
+        for col in GeoAccessor.necessary_columns:
+            if col not in obj.columns:
+                raise AttributeError(f"Must have {col} column")
 
     @property
     def x(self) -> pd.DataFrame:
-        return self.data[self.x_columns + self.default_columns]
+        col = self.x_column + self.necessary_columns \
+            if self.x_column is not None else self.necessary_columns
+        return self.data[col]
 
     @property
     def y(self) -> pd.DataFrame:
         return self.data[[self.y_column]]
+
+    def set_x_col(self, columns: typing.List[str]):
+        self.x_column = columns
+
+    def set_y_col(self, y_column: str):
+        self.y_column = y_column
 
     @property
     def tloc(self) -> TimeIndexer:
@@ -38,7 +50,7 @@ class Dataset:
         dataset.tloc['2020-07-23':'2020-07-24'] # get dataset items from timestamp range
         dataset.tloc['2020-07-23':] # get all dataset items starting from specified timestamp
         """
-        return TimeIndexer(self)
+        return TimeIndexer(self.data)
 
     @property
     def sploc(self) -> LocIndexer:
@@ -48,21 +60,19 @@ class Dataset:
         dataset.sploc[55.850951, 37.348591] # get dataset item with specified location
         dataset.sploc[55.3:55.8, :] # get dataset items with locations in specified ranges
         """
-        return LocIndexer(self)
+        return LocIndexer(self.data)
 
-    def random_sensors(self, n: int, random_seed=42) -> Dataset:
+    def random_sensors(self, n: int, random_seed=42) -> pd.DataFrame:
         """
         Select random sds_sensors id. If n >= len(dataset), return full dataset
         """
         np.random.seed(random_seed)
         all_ids = self.data.sds_sensor.unique()
         if len(all_ids) <= n:
-            return self
+            return self.data
         selected = np.random.choice(all_ids, n, replace=False)
         data = self.data[self.data['sds_sensor'].isin(selected)]
-        res = copy.deepcopy(self)
-        res.data = data
-        return res
+        return data
 
     def plot_series(self,  column: str):
         """

@@ -1,36 +1,34 @@
-import typing
 import copy
-if typing.TYPE_CHECKING:
-    from src.dataset.dataset import Dataset
+import pandas as pd
 
 
 class TimeIndexer:
-    def __init__(self, dataset: 'Dataset'):
-        self._dataset = copy.deepcopy(dataset)
+    def __init__(self, data: pd.DataFrame):
+        self._dataset = copy.deepcopy(data)
 
-    def __getitem__(self, key) -> 'Dataset':
+    def __getitem__(self, key) -> pd.DataFrame:
         if isinstance(key, slice):
             if key.start is not None:
-                self._dataset.data = self._dataset.data[self._dataset.data['timestamp'] >= key.start]
+                self._dataset = self._dataset[self._dataset['timestamp'] >= key.start]
             if key.stop is not None:
-                self._dataset.data = self._dataset.data[self._dataset.data['timestamp'] < key.stop]
+                self._dataset = self._dataset[self._dataset['timestamp'] < key.stop]
         else:
-            self._dataset.data = self._dataset.data[self._dataset.data['timestamp'] == key]
+            self._dataset = self._dataset[self._dataset['timestamp'] == key]
         return self._dataset
 
 
 class LocIndexer:
-    def __init__(self, dataset: 'Dataset'):
-        self._dataset = copy.deepcopy(dataset)
+    def __init__(self, data: pd.DataFrame):
+        self._dataset = copy.deepcopy(data)
 
-    def __getitem__(self, keys) -> 'Dataset':
+    def __getitem__(self, keys) -> pd.DataFrame:
         key1, key2 = keys
         for key, col in zip((key1, key2), ('lat', 'lon')):
             if isinstance(key, slice):
                 if key.start is not None:
-                    self._dataset.data = self._dataset.data[self._dataset.data[col] >= key.start]
+                    self._dataset = self._dataset[self._dataset[col] >= key.start]
                 if key.stop is not None:
-                    self._dataset.data = self._dataset.data[self._dataset.data[col] < key.stop]
+                    self._dataset = self._dataset[self._dataset[col] < key.stop]
             else:
-                self._dataset.data = self._dataset.data[self._dataset.data[col] == key]
+                self._dataset = self._dataset[self._dataset[col] == key]
         return self._dataset
