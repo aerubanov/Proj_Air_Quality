@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-import src.dataset.accessor
+import src.dataset.accessor  # noqa: F401
 
 
 def test_dataset_init(test_dataset):

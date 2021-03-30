@@ -4,7 +4,6 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import typing
 import numpy as np
-import copy
 
 from src.dataset.indexers import TimeIndexer, LocIndexer
 

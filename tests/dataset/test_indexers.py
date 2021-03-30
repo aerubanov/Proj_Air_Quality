@@ -1,4 +1,4 @@
-import src.dataset.accessor
+import src.dataset.accessor  # noqa: F401
 
 
 def test_time_indexing(test_dataset):
