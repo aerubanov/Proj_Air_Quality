@@ -14,6 +14,7 @@ class TimeIndexer:
                 self._dataset = self._dataset[self._dataset['timestamp'] < key.stop]
         else:
             self._dataset = self._dataset[self._dataset['timestamp'] == key]
+
         return self._dataset
 
 
