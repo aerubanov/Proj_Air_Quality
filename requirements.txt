@@ -32,3 +32,4 @@ sqlalchemy-migrate==0.13.0
 geopandas == 0.8.2
 pyrosm==0.6.0
 shapely==1.7.1
+pymc3==3.11.2
