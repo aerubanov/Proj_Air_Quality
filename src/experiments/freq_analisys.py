@@ -1,10 +1,7 @@
 import pandas as pd
 import numpy as np
-import scipy
 import scipy.fftpack
 import matplotlib.pyplot as plt
-
-import src.dataset.accessor
 
 
 if __name__ == '__main__':
@@ -19,6 +16,8 @@ if __name__ == '__main__':
 
     plt.subplot(211)
     plt.plot(y.values)
-    plt.subplot(212)
+    ax = plt.subplot(212)
     plt.plot(1/freqs, 20*scipy.log10(fft), 'x')
+    ax.set_xlim(0, 30)
+    ax.set_xticks(np.arange(30))
     plt.show()

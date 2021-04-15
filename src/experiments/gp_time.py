@@ -2,35 +2,60 @@ import pandas as pd
 import pymc3 as pm
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import QuantileTransformer
+import arviz
 
-import src.dataset.accessor
+from  src.experiments.data_gen import genetate_data
+
+
+def get_data(file_path: str):
+    data = pd.read_csv(file_path)
+    data.spat.set_y_col('P1')
+    data = data[data.sds_sensor == 56073]
+    qt = QuantileTransformer(output_distribution='normal', random_state=42, n_quantiles=100)
+    # qt = PowerTransformer()
+    qt.fit(data.spat.y)
+
+    data = data.spat.tloc['2021-01-20':'2021-01-30']
+
+    x = np.arange(len(data))[:, None]
+    y = data.spat.y.values
+    y = qt.transform(y)
+    idx = round(len(data)*0.7)
+    x, y, x_star, y_star = x[:idx], y[:idx], x[idx:], y[idx:]
+    return x, y, x_star, y_star
 
 
 if __name__ == '__main__':
-    data = pd.read_csv('DATA/processed/dataset.csv')
-    data = data.spat.tloc['2021-01-01':'2021-01-31']
-    data = data[data.sds_sensor == 56073]
-    data.spat.set_y_col('P1')
-    x = np.arange(len(data))[:, None]
-    y = data.spat.y
+    data_file = 'DATA/processed/dataset.csv'
+    # x, y, x_star, _ = get_data(data_file)
+    x, y, x_star, _ = genetate_data(100)
 
-    with pm.Model():
-        mt = pm.gp.cov.Matern32(1, ls=5)
-        pr = pm.gp.cov.Periodic(1, period=24, ls=20)
-        pr2 = pm.gp.cov.Periodic(1, period=64, ls=70)
-        pr3 = pm.gp.cov.Periodic(1, period=100, ls=120)
-        cov = mt + mt * (pr + pr2 + pr3)
-        f = pm.gp.Latent(mean_func=pm.gp.mean.Constant(y.values.mean()), cov_func=cov)
-        pr = f.prior('pr', X=x)
-        check = pm.sample_prior_predictive(samples=1)
+    with pm.Model() as model:
+        # p = pm.Uniform('p', lower=5, upper=10)
+        # l = pm.Uniform('l', lower=2, upper=7)
+        p = pm.Normal('p', mu=5, sigma=1)
+        l = pm.Normal('l', mu=5, sigma=1)
+        lm = pm.Normal('lm', mu=15, sigma=1)
+        mt = pm.gp.cov.Matern32(1, ls=lm)
+        pk = pm.gp.cov.Periodic(1, period=p, ls=l)
+        cov = mt * pk
 
-    print(x.flatten(), y.values)
+        gp = pm.gp.Latent(mean_func=pm.gp.mean.Constant(y.mean()), cov_func=cov)
+        pr = gp.prior('pr', X=x)
 
-    plt.plot(x.flatten(), y.values, label="data")
-    plt.plot(x.flatten(), check['pr'][0], label="prior")
+    with model:
+        check = pm.sample_prior_predictive(samples=3)
+
+    plt.plot(x.flatten(), y, label="data", color='red')
+    for i in range(check['pr'].shape[0]):
+        plt.plot(x.flatten(), check['pr'][i], alpha=0.3)
     plt.legend()
     plt.show()
 
+    with model:
+        f_star = gp.conditional("f_star", x_star)
 
-
-
+    with model:
+        trace = pm.sample(1000, chains=2, cores=2, return_inferencedata=True)
+        arviz.to_netcdf(trace, 'src/experiments/results/gp_time_trace')
