@@ -28,5 +28,6 @@ def plot_trace(trace, X, X_star, y=None, y_star=None):
 
 
 if __name__ == '__main__':
-    X, y, x_star, y_star = genetate_data(100)
+    # X, y, x_star, y_star = genetate_data(100)
+    X, y, x_star, y_star = get_data(data_file)
     plot_trace(trace, X, x_star, y=y, y_star=y_star)

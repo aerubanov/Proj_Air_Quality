@@ -16,7 +16,7 @@ def get_data(file_path: str):
     # qt = PowerTransformer()
     qt.fit(data.spat.y)
 
-    data = data.spat.tloc['2021-01-20':'2021-01-30']
+    data = data.spat.tloc['2021-01-01':'2021-01-31']
 
     x = np.arange(len(data))[:, None]
     y = data.spat.y.values
@@ -28,22 +28,24 @@ def get_data(file_path: str):
 
 if __name__ == '__main__':
     data_file = 'DATA/processed/dataset.csv'
-    # x, y, x_star, _ = get_data(data_file)
-    x, y, x_star, _ = genetate_data(100)
+    x, y, x_star, _ = get_data(data_file)
+    # x, y, x_star, _ = genetate_data(100)
 
     with pm.Model() as model:
         # p = pm.Uniform('p', lower=5, upper=10)
         # l = pm.Uniform('l', lower=2, upper=7)
-        p = pm.Normal('p', mu=5, sigma=1)
-        l = pm.Normal('l', mu=5, sigma=1)
-        lm = pm.Normal('lm', mu=15, sigma=1)
-        mt = pm.gp.cov.Matern32(1, ls=lm)
-        pk = pm.gp.cov.Periodic(1, period=p, ls=l)
-        cov = mt * pk
+        # p = pm.Normal('p', mu=5, sigma=1)
+        # l = pm.Normal('l', mu=5, sigma=1)
+        # lm = pm.Normal('lm', mu=15, sigma=1)
+        periods = [2.2, 3, 6.6, 9.7, 14]
+        mt = pm.gp.cov.Matern32(1, ls=15)
+        pk = pm.gp.cov.Periodic(1, period=3, ls=5)
+        cov = mt + sum([pm.gp.cov.Matern32(1, ls=i * 2) * pm.gp.cov.Periodic(1, period=i, ls=1.5*i) for i in periods])
 
-        gp = pm.gp.Latent(mean_func=pm.gp.mean.Constant(y.mean()), cov_func=cov)
+        gp = pm.gp.Latent(cov_func=cov)
         pr = gp.prior('pr', X=x)
-
+        sigma = pm.HalfNormal('sigma', sigma=2)
+        f_star = gp.conditional("f_star", x_star)
     with model:
         check = pm.sample_prior_predictive(samples=3)
 
@@ -54,8 +56,11 @@ if __name__ == '__main__':
     plt.show()
 
     with model:
-        f_star = gp.conditional("f_star", x_star)
+        y_ = pm.Normal("y", mu=pr, sigma=sigma, observed=y)
 
     with model:
-        trace = pm.sample(1000, chains=2, cores=2, return_inferencedata=True)
+        trace = pm.sample(200, n_init=100, tune=100, chains=2, cores=2, return_inferencedata=True)
         arviz.to_netcdf(trace, 'src/experiments/results/gp_time_trace')
+
+    n_nonconverged = int(np.sum(arviz.rhat(trace)[["sigma", "pr_rotated_"]].to_array() > 1.03).values)
+    print("%i variables MCMC chains appear not to have converged." % n_nonconverged)
