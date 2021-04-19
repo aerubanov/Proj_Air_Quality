@@ -16,12 +16,12 @@ def get_data(file_path: str):
     # qt = PowerTransformer()
     qt.fit(data.spat.y)
 
-    data = data.spat.tloc['2021-01-01':'2021-01-31']
+    data = data.spat.tloc['2021-01-01':'2021-02-20']
 
     x = np.arange(len(data))[:, None]
     y = data.spat.y.values
     y = qt.transform(y).flatten()
-    idx = round(len(data)*0.7)
+    idx = round(len(data)*0.9)
     x, y, x_star, y_star = x[:idx], y[:idx], x[idx:], y[idx:]
     return x, y, x_star, y_star
 
@@ -32,11 +32,6 @@ if __name__ == '__main__':
     # x, y, x_star, _ = genetate_data(100)
 
     with pm.Model() as model:
-        # p = pm.Uniform('p', lower=5, upper=10)
-        # l = pm.Uniform('l', lower=2, upper=7)
-        # p = pm.Normal('p', mu=5, sigma=1)
-        # l = pm.Normal('l', mu=5, sigma=1)
-        # lm = pm.Normal('lm', mu=15, sigma=1)
         periods = [6.7, 8.4, 9.5, 14]
         mt = pm.gp.cov.Matern32(1, ls=24)
         pk = pm.gp.cov.Periodic(1, period=3, ls=5)
@@ -53,6 +48,7 @@ if __name__ == '__main__':
     for i in range(check['pr'].shape[0]):
         plt.plot(x.flatten(), check['pr'][i], alpha=0.3)
     plt.legend()
+    plt.savefig("src/experiments/plots/gp_time_prior.png", format='png')
     plt.show()
 
     with model:
