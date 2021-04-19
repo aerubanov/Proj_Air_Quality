@@ -2,30 +2,18 @@ create_dataset:
   cmd: python -m src.data.sensors_data
   deps:
   - path: DATA/processed/sensors.csv
-<<<<<<< HEAD
-    md5: 850dd99ae73b891cc6eb5cb99596a328
+    md5: 77e72c8b0a2f3cadd5fbc9d7e63f736f
   - path: DATA/raw/sensors
-    md5: edca8d765856a44350ecc4d71e3194d0.dir
+    md5: 39c1b875bcf41517185e9c1d7c191122.dir
   - path: DATA/raw/weather
-    md5: 41e2af93cc0509005e2bf2cd99de4793.dir
-=======
-    md5: ac252246d4ee8bd47d1c7cf2bde61a07
-  - path: DATA/raw/sensors
-    md5: c30e09a99afb4b71f275be2624249c1d.dir
-  - path: DATA/raw/weather
-    md5: 693f60a0c1c3eeaec23cb4d754ebf27c.dir
->>>>>>> a47fcdfd1829414e67b2d7bfec42041aaf41adcc
+    md5: f0bb1a9b02af3906aa0da8f34b6f2b50.dir
   - path: src/data/sensors_data.py
     md5: d65242348bbd0aa2f2caf5b7345e90a8
   - path: src/data/utils.py
     md5: 54e3fe85eefa7a0380190774fbae7827
   outs:
   - path: DATA/processed/dataset.csv
-<<<<<<< HEAD
-    md5: e52e500e013dadb32cffe62a39f6193a
-=======
-    md5: 012854571ac2a6e30059c760f41aba78
->>>>>>> a47fcdfd1829414e67b2d7bfec42041aaf41adcc
+    md5: 184d6e2bbbe856b874fd44cf70828722
 train_clustering:
   cmd: python -m src.model.anom_clustering
   deps:
@@ -72,17 +60,11 @@ extract_sensors:
   cmd: python -m src.data.spatial_data
   deps:
   - path: DATA/raw/sensors
-<<<<<<< HEAD
-    md5: edca8d765856a44350ecc4d71e3194d0.dir
+    md5: 39c1b875bcf41517185e9c1d7c191122.dir
   - path: DATA/raw/weather
-    md5: 41e2af93cc0509005e2bf2cd99de4793.dir
-=======
-    md5: c30e09a99afb4b71f275be2624249c1d.dir
-  - path: DATA/raw/weather
-    md5: 693f60a0c1c3eeaec23cb4d754ebf27c.dir
->>>>>>> a47fcdfd1829414e67b2d7bfec42041aaf41adcc
+    md5: f0bb1a9b02af3906aa0da8f34b6f2b50.dir
   - path: requirements.txt
-    md5: 8fe8e3231d51dda03ae4eae853d74c22
+    md5: 6d1e6455c896f895f9d8a9d9a75b1ef4
   - path: src/data/opentopodata.py
     md5: 9d824da3053f862ca361217e2bec164c
   - path: src/data/osmdata.py
@@ -91,8 +73,4 @@ extract_sensors:
     md5: 54e3fe85eefa7a0380190774fbae7827
   outs:
   - path: DATA/processed/sensors.csv
-<<<<<<< HEAD
-    md5: 850dd99ae73b891cc6eb5cb99596a328
-=======
-    md5: ac252246d4ee8bd47d1c7cf2bde61a07
->>>>>>> a47fcdfd1829414e67b2d7bfec42041aaf41adcc
+    md5: 77e72c8b0a2f3cadd5fbc9d7e63f736f
