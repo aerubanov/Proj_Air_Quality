@@ -20,7 +20,7 @@ def get_data(file_path: str):
 
     x = np.arange(len(data))[:, None]
     y = data.spat.y.values
-    y = qt.transform(y)
+    y = qt.transform(y).flatten()
     idx = round(len(data)*0.7)
     x, y, x_star, y_star = x[:idx], y[:idx], x[idx:], y[idx:]
     return x, y, x_star, y_star
@@ -37,10 +37,10 @@ if __name__ == '__main__':
         # p = pm.Normal('p', mu=5, sigma=1)
         # l = pm.Normal('l', mu=5, sigma=1)
         # lm = pm.Normal('lm', mu=15, sigma=1)
-        periods = [2.2, 3, 6.6, 9.7, 14]
-        mt = pm.gp.cov.Matern32(1, ls=15)
+        periods = [6.7, 8.4, 9.5, 14]
+        mt = pm.gp.cov.Matern32(1, ls=24)
         pk = pm.gp.cov.Periodic(1, period=3, ls=5)
-        cov = mt + sum([pm.gp.cov.Matern32(1, ls=i * 2) * pm.gp.cov.Periodic(1, period=i, ls=1.5*i) for i in periods])
+        cov = mt + sum([mt * pm.gp.cov.Periodic(1, period=i, ls=1.5*i) for i in periods])
 
         gp = pm.gp.Latent(cov_func=cov)
         pr = gp.prior('pr', X=x)
