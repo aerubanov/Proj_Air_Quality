@@ -2,6 +2,10 @@
 [![codecov](https://codecov.io/gh/aerubanov/Proj_Air_Quality/branch/master/graph/badge.svg)](https://codecov.io/gh/aerubanov/Proj_Air_Quality)
 # Proj_Air_Quality
 Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://air-quality-moscow.net/). Так же вы можете использовать [Telegram-бот](https://t.me/lskjhgoiuh9887_bot?start=666) для получения информации о концентрации частиц и уведомлений о её измениях.
+
+# Contribution guid
+[contributing.md](contribution.md)
+
 # Docs
 ### data
 [raw_data.rst](docs/data/raw_data.rst)
