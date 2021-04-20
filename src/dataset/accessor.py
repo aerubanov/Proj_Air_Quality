@@ -8,7 +8,7 @@ import numpy as np
 from src.dataset.indexers import TimeIndexer, LocIndexer
 
 
-@pd.api.extensions.register_dataframe_accessor("geo")
+@pd.api.extensions.register_dataframe_accessor("spat")
 class GeoAccessor:
     necessary_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
 
@@ -78,7 +78,7 @@ class GeoAccessor:
         Plot column values changes in time after group by sensors
         """
         series = [(i, x)
-                  for i, x in self.data[self.default_columns+[column]].groupby(self.data['sds_sensor'])]
+                  for i, x in self.data[self.necessary_columns+[column]].groupby(self.data['sds_sensor'])]
         _, ax = plt.subplots()
         for i, x in series:
             x.plot(x='timestamp', y=column, ax=ax, label=i)
