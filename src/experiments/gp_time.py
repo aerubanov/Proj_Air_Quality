@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import QuantileTransformer
 import arviz
 
-from  src.experiments.data_gen import genetate_data
+# from  src.experiments.data_gen import genetate_data
 
 
 def get_data(file_path: str):

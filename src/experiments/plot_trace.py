@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from pymc3.gp.util import plot_gp_dist
 
 from src.experiments.gp_time import get_data
-from src.experiments.data_gen import genetate_data
+# from src.experiments.data_gen import genetate_data
 
 trace = "src/experiments/results/gp_time_trace"
 data_file = 'DATA/processed/dataset.csv'
