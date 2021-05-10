@@ -43,7 +43,8 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         self.Y = Y
         likelihood = Gaussian()
         self.inducing_variable = gpflow.models.util.inducingpoint_wrapper(inducing_variable)
-        GPModel.__init__(self, kernel, likelihood, mean_function, self.inducing_variable.Z.shape[0])
+
+        GPModel.__init__(self, kernel, likelihood, mean_function, inducing_variable.size)
 
         self.num_data = X.shape[0]
         self.num_latent = Y.shape[1]

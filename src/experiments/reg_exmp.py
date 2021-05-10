@@ -73,21 +73,6 @@ def get_data(shuffle):
         y = y[idxs, :]
     return X, y
 
-def simple_training_loop(model: GPflow.models.GPModel,
-                         maxiter=1000,
-                         logging_epoch_freq: int = 10,
-                         learning_rate: float = 0.001,
-                         **kwargs):
-    # optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
-    optimizer = GPflow.optimizers.Scipy()
-    iteration = 0
-    while iteration < maxiter:
-        optimizer.minimize(model.training_loss, model.trainable_variables)
-        if iteration % logging_epoch_freq == 0:
-            tf.print(f"Epoch {iteration}: Loss (train) {model.training_loss()}")
-            # tf.print(f"Epoch {iteration}")
-        iteration += 1
-
 
 def plot_VFE_optimized(M, use_old_Z, shuffle):
     fig, axs = plt.subplots(4, 1, figsize=figsize(1, ratio=12.0/19.0), sharey=True, sharex=True)
@@ -109,18 +94,14 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     model1.likelihood.variance.assign(0.001)
     model1.kernel.variance.assign(1.0)
     model1.kernel.lengthscales.assign(0.8)
-    #GPflow.set_trainable(model1.likelihood.variance, True)
-    #GPflow.set_trainable(model1.kernel.variance, True)
-    #GPflow.set_trainable(model1.kernel.lengthscales, True)
-    #simple_training_loop(model1, learning_rate=0.05, maxiter=8, logging_epoch_freq=1)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model1.training_loss, model1.trainable_variables)
-    GPflow.utilities.print_summary(model1)
+    #GPflow.utilities.print_summary(model1)
 
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu1, Su1, Zopt = plot_model(model1, axs[0], X1, y1, xx, seen_x, seen_y)
-    print(mu1, Su1, Zopt)
+    # print(mu1, Su1, Zopt)
 
     # now call online method on the second portion of the data
     X2 = X[gap:2*gap, :]
@@ -141,12 +122,13 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     # print(f'Kaa1: {Kaa1}')
 
     Zinit = init_Z(Zopt.numpy(), X2, use_old_Z)
+    print(f'Z_init: {Zinit}')
     model2 = src.models.osgpr.OSGPR((X2, y2), GPflow.kernels.RBF(1), mu1, Su1, Kaa1,
         Zopt, Zinit)
     # print(model1.kernel.variance)
-    model2.likelihood.variance.assign(model1.likelihood.variance.numpy())
-    model2.kernel.variance.assign(model1.kernel.variance.numpy())
-    model2.kernel.lengthscales.assign(model1.kernel.lengthscales.numpy())
+    model2.likelihood.variance.assign(model1.likelihood.variance)
+    model2.kernel.variance.assign(model1.kernel.variance)
+    model2.kernel.lengthscales.assign(model1.kernel.lengthscales)
     # model2.optimize(disp=1)
     #simple_training_loop(model2, learning_rate=0.000005)
     optimizer = GPflow.optimizers.Scipy()
@@ -175,14 +157,14 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     Zinit = init_Z(Zopt.numpy(), X3, use_old_Z)
     model3 = src.models.osgpr.OSGPR((X3, y3), GPflow.kernels.RBF(1), mu2, Su2, Kaa2,
         Zopt, Zinit)
-    model3.likelihood.variance.assign(model2.likelihood.variance.numpy())
-    model3.kernel.variance.assign(model2.kernel.variance.numpy())
-    model3.kernel.lengthscales.assign(model2.kernel.lengthscales.numpy())
+    model3.likelihood.variance.assign(model2.likelihood.variance)
+    model3.kernel.variance.assign(model2.kernel.variance)
+    model3.kernel.lengthscales.assign(model2.kernel.lengthscales)
     # model3.optimize(disp=1)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model1.training_loss, model1.trainable_variables)
     mu3, Su3, Zopt = plot_model(model3, axs[2], X3, y3, xx, seen_x, seen_y)
-    print(mu3, Su3, Zopt)
+    # print(mu3, Su3, Zopt)
 
     Z4 = X[np.random.permutation(X.shape[0])[0:M], :]
     model4 = GPflow.models.SGPR((X, y), GPflow.kernels.RBF(1), Z4)
@@ -196,6 +178,7 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu4, Su4, Zopt4 = plot_model(model4, axs[3], X, y, xx, None, None)
+    # print(mu4, Su4, Zopt)
     axs[3].set_xlabel('x')
     fig.savefig('src/experiments/plots/online_exmpl.png', bbox_inches='tight')
 
@@ -207,5 +190,4 @@ if __name__ == '__main__':
     shuffle = False
 
     np.random.seed(seed)
-    np.random.seed(seed)
-    plot_VFE_optimized(10, use_old_Z, shuffle)
+    plot_VFE_optimized(15, use_old_Z, shuffle)
