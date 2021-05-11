@@ -12,7 +12,7 @@ import numpy as np
 
 
 float_type = gpflow.config.default_float()
-print(float_type)
+
 
 class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
     """
@@ -58,8 +58,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
     def _build_common_terms(self):
         Mb = tf.shape(self.inducing_variable.Z)[0]
         Ma = self.M_old
-        # jitter = settings.numerics.jitter_level
-        jitter = 1e-3
+        jitter = gpflow.config.default_jitter()
         sigma2 = self.likelihood.variance
         sigma = tf.sqrt(sigma2)
 
@@ -115,12 +114,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         likelihood.
         """
 
-        # Mb = tf.shape(self.inducing_variable)[0]
-        # Ma = self.M_old
-        # jitter = gpflow.config.default_jitter()
-        # jitter = 1e-4
         sigma2 = self.likelihood.variance
-        # sigma = tf.sqrt(sigma2)
         N = self.num_data
 
         Saa = self.Su_old
@@ -161,7 +155,6 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
 
         bound += -0.5 * tf.reduce_sum(
             tf.linalg.diag_part(Sainv_Kaadiff) - tf.linalg.diag_part(Kainv_Kaadiff))
-        print(bound)
 
         return bound
 
@@ -171,8 +164,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         Xnew.
         """
 
-        # jitter = settings.numerics.jitter_level
-        jitter = 1e-3
+        jitter = gpflow.config.default_jitter()
 
         # a is old inducing points, b is new
         # f is training points

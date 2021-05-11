@@ -87,9 +87,7 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     y1 = y[:gap, :]
     seen_x = None
     seen_y = None
-    # Z1 = np.random.rand(M, 1)*L
     Z1 = X1[np.random.permutation(X1.shape[0])[0:M], :]
-    #print(f'Z_init: {Z1}')
 
     model1 = GPflow.models.sgpr.SGPR((X1, y1), GPflow.kernels.RBF(1), Z1)
     model1.likelihood.variance.assign(0.001)
@@ -101,8 +99,6 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu1, Su1, Zopt = plot_model(model1, axs[0], X1, y1, xx, seen_x, seen_y)
-    print(mu1, Su1, Zopt)
-    #print(f'Z_opt: {Zopt}')
 
     # now call online method on the second portion of the data
     X2 = X[gap:2*gap, :]
@@ -110,17 +106,7 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     seen_x = X[:gap, :]
     seen_y = y[:gap, :]
 
-    # x_free = tf.placeholder('float64')
-    # model1.kern.make_tf_array(x_free)
-    # X_tf = tf.placeholder('float64')
-    # with model1.kern.tf_mode():
-    #    Kaa1 = tf.Session().run(
-    #        model1.kern.K(X_tf),
-    #        feed_dict={x_free: model1.kern.get_free_state(), X_tf: model1.Z.value})
-
-    # GPflow.set_trainable(model1.kernel, True)
     Kaa1 = model1.kernel.K(model1.inducing_variable.Z)
-    print(f'Kaa1: {Kaa1}')
 
     Zinit = init_Z(Zopt.numpy(), X2, use_old_Z)
     model2 = src.models.osgpr.OSGPR((X2, y2), GPflow.kernels.RBF(1), mu1, Su1, Kaa1,
@@ -128,20 +114,11 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     model2.likelihood.variance.assign(model1.likelihood.variance)
     model2.kernel.variance.assign(model1.kernel.variance)
     model2.kernel.lengthscales.assign(model1.kernel.lengthscales)
-    #GPflow.set_trainable(model2.mu_old, False)
-    #GPflow.set_trainable(model2.Su_old, False)
-    #GPflow.set_trainable(model2.Kaa_old, False)
-    #GPflow.set_trainable(model2.Z_old, False)
-    GPflow.utilities.print_summary(model2)
-    # model2.optimize(disp=1)
-    # simple_training_loop(model2, learning_rate=0.000005)
-    #GPflow.set_trainable(model2.inducing_variable, True)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model2.training_loss, model2.trainable_variables, compile=False)
 
     # plot prediction
     mu2, Su2, Zopt = plot_model(model2, axs[1], X2, y2, xx, seen_x, seen_y)
-    # print(mu2, Su2, Zopt)
 
     # now call online method on the third portion of the data
     X3 = X[2*gap:3*gap, :]
@@ -149,14 +126,6 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     seen_x = np.vstack((seen_x, X2))
     seen_y = np.vstack((seen_y, y2))
 
-    #x_free = tf.placeholder('float64')
-    #model2.kern.make_tf_array(x_free)
-    #X_tf = tf.placeholder('float64')
-    #with model2.kern.tf_mode():
-    #    Kaa2 = tf.Session().run(model2.kern.K(X_tf),
-    #        feed_dict={x_free: model2.kern.get_free_state(), X_tf: model2.Z.value})
-
-    # GPflow.set_trainable(model2.kernel, True)
     Kaa2 = model2.kernel.K(tf.constant(model2.inducing_variable.Z))
 
     Zinit = init_Z(Zopt.numpy(), X3, use_old_Z)
@@ -165,28 +134,21 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     model3.likelihood.variance.assign(model2.likelihood.variance)
     model3.kernel.variance.assign(model2.kernel.variance)
     model3.kernel.lengthscales.assign(model2.kernel.lengthscales)
-    # model3.optimize(disp=1)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model3.training_loss, model3.trainable_variables)
     mu3, Su3, Zopt = plot_model(model3, axs[2], X3, y3, xx, seen_x, seen_y)
-    # print(mu3, Su3, Zopt)
 
     Z4 = X[np.random.permutation(X.shape[0])[0:M], :]
-    print(f'Z_init: {Z4}')
     model4 = GPflow.models.sgpr.SGPR((X, y), GPflow.kernels.RBF(1), Z4)
     model4.likelihood.variance.assign(0.001)
     model4.kernel.variance.assign(1.0)
     model4.kernel.lengthscales.assign(0.8)
-    #GPflow.set_trainable(model4.inducing_variable.Z, True)
-    #GPflow.utilities.print_summary(model4)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model4.training_loss, model4.trainable_variables)
 
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu4, Su4, Zopt4 = plot_model(model4, axs[3], X, y, xx, None, None)
-    # print(mu4, Su4, Zopt)
-    print(f'Z_opt: {Zopt4}')
 
     axs[3].set_xlabel('x')
     fig.savefig('src/experiments/plots/online_exmpl.png', bbox_inches='tight')
