@@ -89,6 +89,7 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     seen_y = None
     # Z1 = np.random.rand(M, 1)*L
     Z1 = X1[np.random.permutation(X1.shape[0])[0:M], :]
+    #print(f'Z_init: {Z1}')
 
     model1 = GPflow.models.sgpr.SGPR((X1, y1), GPflow.kernels.RBF(1), Z1)
     model1.likelihood.variance.assign(0.001)
@@ -96,12 +97,12 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     model1.kernel.lengthscales.assign(0.8)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model1.training_loss, model1.trainable_variables)
-    #GPflow.utilities.print_summary(model1)
 
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu1, Su1, Zopt = plot_model(model1, axs[0], X1, y1, xx, seen_x, seen_y)
-    # print(mu1, Su1, Zopt)
+    print(mu1, Su1, Zopt)
+    #print(f'Z_opt: {Zopt}')
 
     # now call online method on the second portion of the data
     X2 = X[gap:2*gap, :]
@@ -119,24 +120,28 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
 
     # GPflow.set_trainable(model1.kernel, True)
     Kaa1 = model1.kernel.K(model1.inducing_variable.Z)
-    # print(f'Kaa1: {Kaa1}')
+    print(f'Kaa1: {Kaa1}')
 
     Zinit = init_Z(Zopt.numpy(), X2, use_old_Z)
-    print(f'Z_init: {Zinit}')
     model2 = src.models.osgpr.OSGPR((X2, y2), GPflow.kernels.RBF(1), mu1, Su1, Kaa1,
         Zopt, Zinit)
-    # print(model1.kernel.variance)
     model2.likelihood.variance.assign(model1.likelihood.variance)
     model2.kernel.variance.assign(model1.kernel.variance)
     model2.kernel.lengthscales.assign(model1.kernel.lengthscales)
+    #GPflow.set_trainable(model2.mu_old, False)
+    #GPflow.set_trainable(model2.Su_old, False)
+    #GPflow.set_trainable(model2.Kaa_old, False)
+    #GPflow.set_trainable(model2.Z_old, False)
+    GPflow.utilities.print_summary(model2)
     # model2.optimize(disp=1)
-    #simple_training_loop(model2, learning_rate=0.000005)
+    # simple_training_loop(model2, learning_rate=0.000005)
+    #GPflow.set_trainable(model2.inducing_variable, True)
     optimizer = GPflow.optimizers.Scipy()
-    optimizer.minimize(model1.training_loss, model1.trainable_variables)
+    optimizer.minimize(model2.training_loss, model2.trainable_variables, compile=False)
 
     # plot prediction
     mu2, Su2, Zopt = plot_model(model2, axs[1], X2, y2, xx, seen_x, seen_y)
-    print(mu2, Su2, Zopt)
+    # print(mu2, Su2, Zopt)
 
     # now call online method on the third portion of the data
     X3 = X[2*gap:3*gap, :]
@@ -162,23 +167,27 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     model3.kernel.lengthscales.assign(model2.kernel.lengthscales)
     # model3.optimize(disp=1)
     optimizer = GPflow.optimizers.Scipy()
-    optimizer.minimize(model1.training_loss, model1.trainable_variables)
+    optimizer.minimize(model3.training_loss, model3.trainable_variables)
     mu3, Su3, Zopt = plot_model(model3, axs[2], X3, y3, xx, seen_x, seen_y)
     # print(mu3, Su3, Zopt)
 
     Z4 = X[np.random.permutation(X.shape[0])[0:M], :]
-    model4 = GPflow.models.SGPR((X, y), GPflow.kernels.RBF(1), Z4)
+    print(f'Z_init: {Z4}')
+    model4 = GPflow.models.sgpr.SGPR((X, y), GPflow.kernels.RBF(1), Z4)
     model4.likelihood.variance.assign(0.001)
     model4.kernel.variance.assign(1.0)
     model4.kernel.lengthscales.assign(0.8)
-    # model4.optimize(disp=1)
+    #GPflow.set_trainable(model4.inducing_variable.Z, True)
+    #GPflow.utilities.print_summary(model4)
     optimizer = GPflow.optimizers.Scipy()
-    optimizer.minimize(model1.training_loss, model1.trainable_variables)
+    optimizer.minimize(model4.training_loss, model4.trainable_variables)
 
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu4, Su4, Zopt4 = plot_model(model4, axs[3], X, y, xx, None, None)
     # print(mu4, Su4, Zopt)
+    print(f'Z_opt: {Zopt4}')
+
     axs[3].set_xlabel('x')
     fig.savefig('src/experiments/plots/online_exmpl.png', bbox_inches='tight')
 
@@ -190,4 +199,4 @@ if __name__ == '__main__':
     shuffle = False
 
     np.random.seed(seed)
-    plot_VFE_optimized(15, use_old_Z, shuffle)
+    plot_VFE_optimized(10, use_old_Z, shuffle)

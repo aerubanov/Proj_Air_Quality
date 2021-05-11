@@ -12,7 +12,7 @@ import numpy as np
 
 
 float_type = gpflow.config.default_float()
-
+print(float_type)
 
 class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
     """
@@ -49,17 +49,17 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         self.num_data = X.shape[0]
         self.num_latent = Y.shape[1]
 
-        self.mu_old = gpflow.Parameter(mu_old)
+        self.mu_old = gpflow.Parameter(mu_old, trainable=False)
         self.M_old = Z_old.shape[0]
-        self.Su_old = gpflow.Parameter(Su_old)
-        self.Kaa_old = gpflow.Parameter(Kaa_old)
-        self.Z_old = gpflow.Parameter(Z_old)
+        self.Su_old = gpflow.Parameter(Su_old, trainable=False)
+        self.Kaa_old = gpflow.Parameter(Kaa_old, trainable=False)
+        self.Z_old = gpflow.Parameter(Z_old,  trainable=False)
 
     def _build_common_terms(self):
         Mb = tf.shape(self.inducing_variable.Z)[0]
         Ma = self.M_old
         # jitter = settings.numerics.jitter_level
-        jitter = 1e-4
+        jitter = 1e-3
         sigma2 = self.likelihood.variance
         sigma = tf.sqrt(sigma2)
 
@@ -88,9 +88,8 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         Lbinv_Kba = tf.linalg.triangular_solve(Lb, Kba, lower=True)
         Lbinv_Kbf = tf.linalg.triangular_solve(Lb, Kbf, lower=True) / sigma
         d1 = tf.matmul(Lbinv_Kbf, tf.transpose(Lbinv_Kbf))
-        # print(f'Saa: {Saa}')
 
-        LSa = tf.linalg.cholesky(Saa.numpy())
+        LSa = tf.linalg.cholesky(Saa)
         Kab_Lbinv = tf.transpose(Lbinv_Kba)
         LSainv_Kab_Lbinv = tf.linalg.triangular_solve(
             LSa, Kab_Lbinv, lower=True)
@@ -112,9 +111,9 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
 
     def maximum_log_likelihood_objective(self) -> tf.Tensor:
         """
-                Construct a tensorflow function to compute the bound on the marginal
-                likelihood.
-                """
+        Construct a tensorflow function to compute the bound on the marginal
+        likelihood.
+        """
 
         # Mb = tf.shape(self.inducing_variable)[0]
         # Ma = self.M_old
@@ -131,7 +130,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         # f is training points
         Kfdiag = self.kernel(self.X, full_cov=False)
         (Kbf, Kba, Kaa, Kaa_cur, La, Kbb, Lb, D, LD,
-         Lbinv_Kba, LDinv_Lbinv_c, err, Qff) = self._build_common_terms()
+        Lbinv_Kba, LDinv_Lbinv_c, err, Qff) = self._build_common_terms()
 
         LSa = tf.linalg.cholesky(Saa)
         Lainv_ma = tf.linalg.triangular_solve(LSa, ma, lower=True)
@@ -162,6 +161,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
 
         bound += -0.5 * tf.reduce_sum(
             tf.linalg.diag_part(Sainv_Kaadiff) - tf.linalg.diag_part(Kainv_Kaadiff))
+        print(bound)
 
         return bound
 
@@ -172,7 +172,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         """
 
         # jitter = settings.numerics.jitter_level
-        jitter = 1e-4
+        jitter = 1e-3
 
         # a is old inducing points, b is new
         # f is training points
