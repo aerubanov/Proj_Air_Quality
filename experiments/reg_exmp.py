@@ -120,7 +120,10 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
 
     Kaa1 = model1.kernel.K(model1.inducing_variable.Z)
 
-    Zinit = init_Z(Zopt.numpy(), X2, use_old_Z)
+    # Zinit = init_Z(Zopt.numpy(), X2, use_old_Z)
+    Zinit = X2[np.random.permutation(X1.shape[0])[0:M], :]
+    Zinit = np.vstack((Zopt.numpy(), Zinit))
+    print(Su1.shape)
     model2 = src.models.osgpr.OSGPR((X2, y2), GPflow.kernels.RBF(1), mu1, Su1, Kaa1,
         Zopt, Zinit)
     model2.likelihood.variance.assign(model1.likelihood.variance)
@@ -140,15 +143,19 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
 
     Kaa2 = model2.kernel.K(tf.constant(model2.inducing_variable.Z))
 
-    Zinit = init_Z(Zopt.numpy(), X3, use_old_Z)
-    model3 = src.models.osgpr.OSGPR((X3, y3), GPflow.kernels.RBF(1), mu2, Su2, Kaa2,
-        Zopt, Zinit)
+    #Zinit = init_Z(Zopt.numpy(), X3, use_old_Z)
+    Zinit = X2[np.random.permutation(X1.shape[0])[0:M], :]
+    Zinit = np.vstack((Zopt.numpy(), Zinit))
+    print(Su2.shape)
+    model3 = src.models.osgpr.OSGPR((X3, y3), GPflow.kernels.RBF(1), mu2[10:, :], Su2[10:, 10:], Kaa2[10:, 10:],
+        Zopt[10:, :], Zinit)
     model3.likelihood.variance.assign(model2.likelihood.variance)
     model3.kernel.variance.assign(model2.kernel.variance)
     model3.kernel.lengthscales.assign(model2.kernel.lengthscales)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model3.training_loss, model3.trainable_variables)
     mu3, Su3, Zopt = plot_model(model3, axs[2], X3, y3, xx, seen_x, seen_y)
+
 
     Z4 = X[np.random.permutation(X.shape[0])[0:M], :]
     model4 = GPflow.models.sgpr.SGPR((X, y), GPflow.kernels.RBF(1), Z4)
@@ -161,12 +168,6 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     # plot prediction
     xx = np.linspace(-2, 12, 100)[:, None]
     mu4, Su4, Zopt4 = plot_model(model4, axs[3], X, y, xx, None, None)
-
-    # GPflow.utilities.print_summary(model3)
-    # GPflow.utilities.print_summary(model4)
-    # print(model4.compute_qu())
-    print(sorted(Zopt4.numpy()))
-    print(sorted(Zopt.numpy()))
 
     axs[3].set_xlabel('x')
     fig.savefig('experiments/plots/online_exmpl.png', bbox_inches='tight')
