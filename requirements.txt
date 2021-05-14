@@ -33,3 +33,4 @@ geopandas == 0.8.2
 pyrosm==0.6.0
 shapely==1.7.1
 pymc3==3.11.2
+gpflow==2.2.1
