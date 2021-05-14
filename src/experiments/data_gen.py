@@ -11,7 +11,7 @@ def genetate_data(size, train_part=0.7):
         cov = mt * pk
 
         gp = pm.gp.Latent(cov_func=cov)
-        pr = gp.prior('pr', X=x)
+        pr = gp.prior('pr', X=x)  # noqa: F841
 
         check = pm.sample_prior_predictive(1, random_seed=42)
 

@@ -2,7 +2,6 @@ import arviz as az
 import matplotlib.pyplot as plt
 import numpy as np
 import pymc3 as pm
-import theano.tensor as tt
 
 
 RANDOM_SEED = 8927
@@ -33,7 +32,7 @@ if __name__ == '__main__':
     ν_true = 3.0
     y = f_true + σ_true * np.random.standard_t(ν_true, size=n)
 
-    ## Plot the data and the unobserved latent function
+    # Plot the data and the unobserved latent function
     fig = plt.figure(figsize=(12, 5))
     ax = fig.gca()
     ax.plot(X, f_true, "dodgerblue", lw=3, label="True generating function 'f'")
@@ -44,10 +43,10 @@ if __name__ == '__main__':
     plt.show()
 
     with pm.Model() as model:
-        l = pm.Gamma("l", alpha=2, beta=1)
+        l_ = pm.Gamma("l", alpha=2, beta=1)
         eta = pm.HalfCauchy("eta", beta=1)
 
-        cov = eta ** 2 * pm.gp.cov.Matern52(1, l)
+        cov = eta ** 2 * pm.gp.cov.Matern52(1, l_)
         gp = pm.gp.Latent(cov_func=cov)
 
         f = gp.prior("f", X=X)
@@ -82,5 +81,3 @@ if __name__ == '__main__':
     plt.title("Posterior distribution over $f(x)$ at the observed values")
     plt.legend()
     plt.show()
-
-
