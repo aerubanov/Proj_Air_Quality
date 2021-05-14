@@ -1,44 +1,23 @@
 stages:
-  create_dataset:
-    cmd: python -m src.data.create_dataset
+  extract_sensors:
+    cmd: python -m src.data.spatial_data
     deps:
       - DATA/raw/weather
       - DATA/raw/sensors
-      - src/data/create_dataset.py
+      - src/data/utils.py
+      - src/data/opentopodata.py
+      - src/data/osmdata.py
       - requirements.txt
     outs:
-      - DATA/processed/dataset.csv
       - DATA/processed/sensors.csv
-  train_clustering:
-    cmd: python -m src.model.anom_clustering
+  create_dataset:
+    cmd: python -m src.data.sensors_data
     deps:
-      - DATA/processed/dataset.csv
-      - src/features/preproc_anom.py
-      - src/model/anom_clustering.py
+      - DATA/raw/weather
+      - DATA/raw/sensors
+      - src/data/utils.py
+      - src/data/sensors_data.py
+      - DATA/processed/sensors.csv
     outs:
-      - models/anomalies:
-          cache: false
-    metrics:
-      - DATA/metrics/clustering_metric.json:
-          cache: false
-  extract_anomalies:
-    cmd: python -m src.model.extract_anomalies
-    deps:
       - DATA/processed/dataset.csv
-      - src/features/preproc_anom.py
-      - src/model/anom_clustering.py
-      - models/anomalies
-    outs:
-      - DATA/processed/anomalies.csv
-  train_forecast:
-    cmd: python -m src.model.forecast
-    deps:
-      - src/model/forecast.py
-      - src/features/preproc_forecast.py
-      - DATA/processed/dataset.csv
-    outs:
-      - models/forecast:
-          cache: false
-    metrics:
-      - DATA/metrics/forecast_metrics.json:
-          cache: false
+

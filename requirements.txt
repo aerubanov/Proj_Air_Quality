@@ -2,12 +2,13 @@ numpy== 1.19.4
 requests==2.24.0
 dvc==1.9.1
 beautifulsoup4==4.9.3
-lxml==4.6.1
+lxml==4.6.3
 pytest==6.1.2
 pandas==1.0.5
 requests-mock==1.8.0
 pytest-flake8==1.0.6
 pytest-cov==2.10.1
+pytest_mock==3.5.1
 boto3==1.16.10
 scikit-learn==0.23.2
 statsmodels==0.12.1
@@ -28,3 +29,7 @@ python-telegram-bot==13.0
 python-dotenv==0.15.0
 environ-config==20.1.0
 sqlalchemy-migrate==0.13.0
+geopandas == 0.8.2
+pyrosm==0.6.0
+shapely==1.7.1
+pymc3==3.11.2

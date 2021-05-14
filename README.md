@@ -1,15 +1,16 @@
 [![Build Status](https://travis-ci.org/aerubanov/Proj_Air_Quality.svg?branch=master)](https://travis-ci.org/aerubanov/Proj_Air_Quality)
 [![codecov](https://codecov.io/gh/aerubanov/Proj_Air_Quality/branch/master/graph/badge.svg)](https://codecov.io/gh/aerubanov/Proj_Air_Quality)
 # Proj_Air_Quality
-Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://air-quality-moscow.net/). Так же вы можете использовать [Telegram-бот](https://t.me/lskjhgoiuh9887_bot?start=666) для получения информации о концентрации частиц и уведомлений о её измениях.
+Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://air-quality-moscow.net/).
+# Contribution guid
+[contributing.md](contribution.md)
+
 # Docs
 ### data
 [raw_data.rst](docs/data/raw_data.rst)
 
 [dataset.rst](docs/data/dataset.rst)
 
-### api
-[api.rst](docs/api/api.rst)
 # ML
 ## Источники данных
 В проекте используются проекта данные общественного мониторнга воздуха проекта
@@ -21,15 +22,6 @@
 
 Для версионирования данных и построения pipline в проекте используется [Data Version Control (DVC)](https://dvc.org/ "Open-source Version Control System for Machine Learning Projects").  
 
-
-## Notebooks
-Эксперименты с данными
- 
- [Anomaly detection.ipynb](notebooks/Anomaly%20detection.ipynb)
- 
- [Forecasting](notebooks/forecast_ansamble.ipynb)
-
-[EDA](notebooks/EDA.ipynb)
 
 ## Загрузка новых данных
 - получение списка новых сенсоров
@@ -46,43 +38,26 @@ python -m src.data.update_weather
 ```
 ## DVC-pipline
 <!-- language: lang-none -->
-          | DATA/raw/weather |      | DATA/raw/sensors | 
-                      *****                   *****                                                
-                           ***             ***                           
-                              ***       ***                              
-                    +-------------------------------+                    
-                    | dvc_stages/create_dataset.dvc |                    
-                    +-------------------------------+                                                      
-                              ***       ***                                                                  
-                            ***             *** 
-                        *****                   *****                                                                                             
-    +-------------------------------+      +---------------------------------+          
-    | dvc_stages/train_forecast.dvc |      | dvc_stages/train_clustering.dvc |          
-    +-------------------------------+      +---------------------------------+  
-                    *                          *                   *
-                    *                          *                   * 
-                    *                          *                   *
-          |models/p1_forecast.obj|     |models/pca.obj|     +----------------------------------+ 
-          |models/p2_forecast.obj|     |models/kmean.obj|   | dvc_stages/extract_anomalies.dvc | 
-                                                            +----------------------------------+
-                                                                            *
-                                                                            *
-                                                                            *
-                                                                |DATA/processed/anomalies.csv| 
+            +----------------------+                  +----------------------+         
+            | DATA/raw/sensors.dvc |                  | DATA/raw/weather.dvc |         
+            +----------------------+                  +----------------------+         
+             ***                 ***                  ***                  ***         
+         ****                       ****          ****                        ***      
+      ***                               **      **                               ****  
+    ****                           +-----------------+                             ****
+         *******                    | extract_sensors |                      *******    
+               *******             +-----------------+                ******           
+                      ******                 *                 *******                 
+                            *******          *          *******                        
+                                   ****      *      ****                               
+                                    +----------------+                                 
+                                    | create_dataset |                                 
+                                    +----------------+  
+
 <!-- language: lang-none -->
 Для запуска стадий pipline используйте dvc repro <stage.dvc> ([подробнее](https://dvc.org/doc/tutorials/pipelines))
 
-# Web
-Веб часть проекта состоит из нескольких сервисов, запускаемых docker-compose
- ([docker-compouse.yml](src/web/docker-compose.yml))  
-- bot - telegram-бот для отслеживания измения концентрации частиц.
-- client - web-клиент для отображения информации в виде графиков
-- server - код сервера проекта. Загрузка данных, запуск моделей, база данных (PostgresSQL)
-    - api - сервис реализующий API для доступа к данным БД ([дока](docs/api/api.rst))
-    - common - модуль с общим кодом для разных компонентов сервера (модель БД и т.д.)
-    - loader - загрузка новых данных в БД
-    - ml - запуск моделей на данных из БД
-- utils - модуль со вспомогательными функциями
+
 
 # Tests
 * Запуск всех тестов (перед отправкой на PR): `python -m pytest --flake8 -v --cov-report term --cov=./src`
