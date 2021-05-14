@@ -10,7 +10,6 @@ import tensorflow as tf
 from typing import Optional, Union
 import numpy as np
 
-
 float_type = gpflow.config.default_float()
 
 
@@ -22,6 +21,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
     Thang D. Bui, Cuong V. Nguyen, Richard E. Turner
     NIPS 2017
     """
+
     def __init__(self,
                  data: RegressionData,
                  kernel: Kernel,
@@ -53,7 +53,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         self.M_old = Z_old.shape[0]
         self.Su_old = gpflow.Parameter(Su_old, trainable=False)
         self.Kaa_old = gpflow.Parameter(Kaa_old, trainable=False)
-        self.Z_old = gpflow.Parameter(Z_old,  trainable=False)
+        self.Z_old = gpflow.Parameter(Z_old, trainable=False)
 
     def _build_common_terms(self):
         Mb = tf.shape(self.inducing_variable.Z)[0]
@@ -124,7 +124,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         # f is training points
         Kfdiag = self.kernel(self.X, full_cov=False)
         (Kbf, Kba, Kaa, Kaa_cur, La, Kbb, Lb, D, LD,
-        Lbinv_Kba, LDinv_Lbinv_c, err, Qff) = self._build_common_terms()
+         Lbinv_Kba, LDinv_Lbinv_c, err, Qff) = self._build_common_terms()
 
         LSa = tf.linalg.cholesky(Saa)
         Lainv_ma = tf.linalg.triangular_solve(LSa, ma, lower=True)
@@ -171,7 +171,7 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
         # s is test points
         Kbs = self.kernel.K(self.inducing_variable.Z, Xnew)
         (Kbf, Kba, Kaa, Kaa_cur, La, Kbb, Lb, D, LD,
-            Lbinv_Kba, LDinv_Lbinv_c, err, Qff) = self._build_common_terms()
+         Lbinv_Kba, LDinv_Lbinv_c, err, Qff) = self._build_common_terms()
 
         Lbinv_Kbs = tf.linalg.triangular_solve(Lb, Kbs, lower=True)
         LDinv_Lbinv_Kbs = tf.linalg.triangular_solve(LD, Lbinv_Kbs, lower=True)

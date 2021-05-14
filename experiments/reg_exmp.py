@@ -3,18 +3,17 @@ import gpflow as GPflow
 import src.models.osgpr
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import tensorflow_probability as tfp
 import matplotlib.ticker as ticker
 
 
 def figsize(scale, ratio=None):
-    fig_width_pt = 397.4849                         # Get this from LaTeX using \the\textwidth
-    inches_per_pt = 1.0/72.27                       # Convert pt to inch
-    golden_mean = (np.sqrt(5.0)-1.0)/4           # Aesthetic ratio (you could change this)
+    fig_width_pt = 397.4849  # Get this from LaTeX using \the\textwidth
+    inches_per_pt = 1.0 / 72.27  # Convert pt to inch
+    golden_mean = (np.sqrt(5.0) - 1.0) / 4  # Aesthetic ratio (you could change this)
     if ratio is not None:
         golden_mean = ratio
-    fig_width = fig_width_pt*inches_per_pt*scale    # width in inches
-    fig_height = fig_width*golden_mean              # height in inches
+    fig_width = fig_width_pt * inches_per_pt * scale  # width in inches
+    fig_height = fig_width * golden_mean  # height in inches
     fig_size = [fig_width, fig_height]
     return fig_size
 
@@ -44,13 +43,14 @@ def plot_model(model, ax, cur_x, cur_y, pred_x, seen_x=None, seen_y=None):
         ax.plot(seen_x, seen_y, 'kx', mew=1, alpha=0.2)
     ax.plot(pred_x, mx, 'b', lw=2)
     ax.fill_between(
-        pred_x[:, 0], mx[:, 0] - 2*np.sqrt(vx),
-        mx[:, 0] + 2*np.sqrt(vx),
+        pred_x[:, 0],
+        mx[:, 0] - 2 * np.sqrt(vx),
+        mx[:, 0] + 2 * np.sqrt(vx),
         color='b', alpha=0.3)
     ax.plot(Zopt.numpy(), mu.numpy(), 'ro', mew=1)
     ax.set_ylim([-2.4, 2])
     ax.set_xlim([np.min(pred_x), np.max(pred_x)])
-    plt.subplots_adjust(hspace = .08)
+    plt.subplots_adjust(hspace=.08)
     ax.set_ylabel('y')
     ax.yaxis.set_ticks(np.arange(-2, 3, 1))
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
@@ -64,9 +64,9 @@ def get_data(shuffle):
     X = X.reshape(X.shape[0], 1)
     y = y.reshape((y.shape[0], 1))
     N = y.shape[0]
-    gap = round(N/3)
+    gap = round(N / 3)
     X[:gap, :] = X[:gap, :] - 1
-    X[2*gap:3*gap, :] = X[2*gap:3*gap, :] + 1
+    X[2 * gap:3 * gap, :] = X[2 * gap:3 * gap, :] + 1
     if shuffle:
         idxs = np.random.permutation(N)
         X = X[idxs, :]
@@ -86,13 +86,13 @@ def test_data(n=100):
 
 
 def plot_VFE_optimized(M, use_old_Z, shuffle):
-    fig, axs = plt.subplots(4, 1, figsize=figsize(1, ratio=12.0/19.0), sharey=True, sharex=True)
+    fig, axs = plt.subplots(4, 1, figsize=figsize(1, ratio=12.0 / 19.0), sharey=True, sharex=True)
 
     X, y = get_data(shuffle)
     # X, y = test_data(100)
 
     N = X.shape[0]
-    gap = round(N/3)
+    gap = round(N / 3)
 
     # get the first portion and call sparse GP regression
     X1 = X[:gap, :]
@@ -113,8 +113,8 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     mu1, Su1, Zopt = plot_model(model1, axs[0], X1, y1, xx, seen_x, seen_y)
 
     # now call online method on the second portion of the data
-    X2 = X[gap:2*gap, :]
-    y2 = y[gap:2*gap, :]
+    X2 = X[gap:2 * gap, :]
+    y2 = y[gap:2 * gap, :]
     seen_x = X[:gap, :]
     seen_y = y[:gap, :]
 
@@ -125,7 +125,7 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     Zinit = np.vstack((Zopt.numpy(), Zinit))
     print(Su1.shape)
     model2 = src.models.osgpr.OSGPR((X2, y2), GPflow.kernels.RBF(1), mu1, Su1, Kaa1,
-        Zopt, Zinit)
+                                    Zopt, Zinit)
     model2.likelihood.variance.assign(model1.likelihood.variance)
     model2.kernel.variance.assign(model1.kernel.variance)
     model2.kernel.lengthscales.assign(model1.kernel.lengthscales)
@@ -136,26 +136,25 @@ def plot_VFE_optimized(M, use_old_Z, shuffle):
     mu2, Su2, Zopt = plot_model(model2, axs[1], X2, y2, xx, seen_x, seen_y)
 
     # now call online method on the third portion of the data
-    X3 = X[2*gap:3*gap, :]
-    y3 = y[2*gap:3*gap, :]
+    X3 = X[2 * gap:3 * gap, :]
+    y3 = y[2 * gap:3 * gap, :]
     seen_x = np.vstack((seen_x, X2))
     seen_y = np.vstack((seen_y, y2))
 
     Kaa2 = model2.kernel.K(tf.constant(model2.inducing_variable.Z))
 
-    #Zinit = init_Z(Zopt.numpy(), X3, use_old_Z)
+    # Zinit = init_Z(Zopt.numpy(), X3, use_old_Z)
     Zinit = X2[np.random.permutation(X1.shape[0])[0:M], :]
     Zinit = np.vstack((Zopt.numpy(), Zinit))
     print(Su2.shape)
     model3 = src.models.osgpr.OSGPR((X3, y3), GPflow.kernels.RBF(1), mu2[10:, :], Su2[10:, 10:], Kaa2[10:, 10:],
-        Zopt[10:, :], Zinit)
+                                    Zopt[10:, :], Zinit)
     model3.likelihood.variance.assign(model2.likelihood.variance)
     model3.kernel.variance.assign(model2.kernel.variance)
     model3.kernel.lengthscales.assign(model2.kernel.lengthscales)
     optimizer = GPflow.optimizers.Scipy()
     optimizer.minimize(model3.training_loss, model3.trainable_variables)
     mu3, Su3, Zopt = plot_model(model3, axs[2], X3, y3, xx, seen_x, seen_y)
-
 
     Z4 = X[np.random.permutation(X.shape[0])[0:M], :]
     model4 = GPflow.models.sgpr.SGPR((X, y), GPflow.kernels.RBF(1), Z4)
