@@ -2,10 +2,10 @@ import arviz
 import matplotlib.pyplot as plt
 from pymc3.gp.util import plot_gp_dist
 
-from experiments.gp_time import get_data
+from experiments.pymc_gp_time import get_data
 
 
-trace = "src/experiments/results/gp_time_trace"
+trace = "experiments/results/gp_time_trace"
 data_file = 'DATA/processed/dataset.csv'
 
 
@@ -24,7 +24,7 @@ def plot_trace(trace, X, X_star, y=None, y_star=None):
     plt.xlabel("X")
     plt.ylabel("Y (normalized)")
     plt.legend()
-    plt.savefig("src/experiments/plots/" + trace.split('/')[-1] + '.png')
+    plt.savefig("experiments/plots/" + trace.split('/')[-1] + '.png')
     plt.show()
 
 
