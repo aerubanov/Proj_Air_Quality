@@ -1,4 +1,4 @@
-import gpflow
+Import gpflow
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -30,9 +30,6 @@ def main(M=100):
 
     z = x[np.random.permutation(x.shape[0])[0:M], :]
 
-    print(x.shape, y.shape, z.shape)
-    print(x)
-    print(y)
     model = gpflow.models.sgpr.SGPR((x, y), gpflow.kernels.Matern32(variance=1, lengthscales=0.1), z)
     gpflow.set_trainable(model.kernel, False)
     gpflow.utilities.print_summary(model)

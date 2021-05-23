@@ -1,7 +1,6 @@
 import gpflow
 import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow_probability as tfp
 
 from experiments.pymc_gp_time import get_data
 
@@ -10,23 +9,24 @@ data_file = 'DATA/processed/dataset.csv'
 
 
 def plot_result(model, ax, cur_x, cur_y,  x_star, y_star, xx):
-    mx, vx = model.predict_f(xx)
-    samples = model.predict_f_samples(xx, 10)
+    samples = model.predict_f_samples(xx, 50)
+    var = samples[:, :, 0].numpy().T.var(axis=1)
+    mn = samples[:, :, 0].numpy().T.mean(axis=1)
     Zopt = model.inducing_variable.Z
     mu, Su = model.predict_f(Zopt, full_cov=True)
     if len(Su.shape) == 3:
         Su = Su[0, :, :]
-        vx = vx[:, 0]
     ax.plot(cur_x, cur_y, 'kx', mew=1, alpha=0.8)
     ax.plot(x_star, y_star, 'rx', mew=1, alpha=0.8)
-    ax.plot(xx, mx, 'b', lw=2)
+    ax.plot(xx, mn, 'b', lw=2)
     ax.fill_between(
         xx[:, 0],
-        mx[:, 0] - 2 * np.sqrt(vx),
-        mx[:, 0] + 2 * np.sqrt(vx),
+        mn - 2 * np.sqrt(var),
+        mn + 2 * np.sqrt(var),
         color='b', alpha=0.3)
     ax.plot(Zopt.numpy(), mu.numpy(), 'ro', mew=1)
-    plt.plot(xx, samples[:, :, 0].numpy().T, "C0", linewidth=0.5)
+    #plt.plot(xx, samples[:, :, 0].numpy().T, "C0", linewidth=0.5)
+    return mu, Su, Zopt
 
 
 def main(M=30):
@@ -45,11 +45,11 @@ def main(M=30):
     mt = gpflow.kernels.Matern32(variance=1, lengthscales=24)
     # cov = mt + sum([mt * gpflow.kernels.Periodic(gpflow.kernels.SquaredExponential(lengthscales=i*1.5), period=i)
     #                 for i in periods])
-    pk = gpflow.kernels.Periodic(gpflow.kernels.SquaredExponential(lengthscales=24*1.5), period=12)
+    pk = gpflow.kernels.Periodic(gpflow.kernels.SquaredExponential(lengthscales=24*1.5), period=24)
     cov = mt * pk
     model = gpflow.models.sgpr.SGPR((X, y), cov, Z)
     # model.kernel.kernels[1].period.prior = tfp.distributions.Normal(24., 1.)
-    # gpflow.set_trainable(model.kernel, False)
+    gpflow.set_trainable(model.kernel, False)
     gpflow.utilities.print_summary(model)
     # print(model.kernel.kernels[1].trainable_variables)
     optimizer = gpflow.optimizers.Scipy()
