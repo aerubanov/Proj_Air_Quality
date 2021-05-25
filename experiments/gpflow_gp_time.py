@@ -1,14 +1,18 @@
 import gpflow
 import numpy as np
+import tensorflow as tf
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from sklearn.metrics import mean_squared_error
 
 from experiments.pymc_gp_time import get_data
-
 
 data_file = 'DATA/processed/dataset.csv'
 
 
-def plot_result(model, ax, cur_x, cur_y,  x_star, y_star, xx):
+def plot_result(model, cur_x, cur_y,  x_star, y_star):
+    _, ax = plt.subplots(figsize=(15, 5))
+    xx = np.linspace(cur_x.min(), x_star.max(), 200)[:, None]
     samples = model.predict_f_samples(xx, 50)
     var = samples[:, :, 0].numpy().T.var(axis=1)
     mn = samples[:, :, 0].numpy().T.mean(axis=1)
@@ -17,7 +21,7 @@ def plot_result(model, ax, cur_x, cur_y,  x_star, y_star, xx):
     if len(Su.shape) == 3:
         Su = Su[0, :, :]
     ax.plot(cur_x, cur_y, 'kx', mew=1, alpha=0.8)
-    ax.plot(x_star, y_star, 'rx', mew=1, alpha=0.8)
+    ax.plot(x_star, y_star, 'kx', mew=1, alpha=0.8)
     ax.plot(xx, mn, 'b', lw=2)
     ax.fill_between(
         xx[:, 0],
@@ -25,45 +29,58 @@ def plot_result(model, ax, cur_x, cur_y,  x_star, y_star, xx):
         mn + 2 * np.sqrt(var),
         color='b', alpha=0.3)
     ax.plot(Zopt.numpy(), mu.numpy(), 'ro', mew=1)
-    #plt.plot(xx, samples[:, :, 0].numpy().T, "C0", linewidth=0.5)
-    return mu, Su, Zopt
+    y_pr = model.predict_f_samples(x_star, 100)[:, :, 0].numpy().T.mean(axis=1)
+    rmse = mean_squared_error(y_star, y_pr)
+    print(rmse)
+    extra = Rectangle((0, 0), 1, 1, fc="w", fill=False,
+                      edgecolor='none', linewidth=0)
+    ax.legend([extra], (f"RMSE: {rmse}",))
+    plt.savefig("experiments/plots/SGPR_time.png")
+    plt.show()
+    return mu, Su, Zopt, rmse
 
 
-def main(M=30):
+def train_model(M=30):
     X, y, x_star, y_star = get_data(data_file)
+    print(len(X))
     y = y[:, None]
     X = X.astype(np.float64)
     x_star = x_star.astype(np.float64)
     y_star = y_star[:, None]
     print(X.shape, y.shape)
     print(X.dtype, y.dtype)
+    print(np.isnan(X).any())
+    print(np.isnan(y).any())
+
 
     Z = X[np.random.permutation(X.shape[0])[0:M], :]
-    # Z = np.vstack((Z, x_star[np.random.permutation(x_star.shape[0])[0:round(0.25 * M)], :]))
 
-    periods = [6.7, 8.4, 9.5, 14]
     mt = gpflow.kernels.Matern32(variance=1, lengthscales=24)
-    # cov = mt + sum([mt * gpflow.kernels.Periodic(gpflow.kernels.SquaredExponential(lengthscales=i*1.5), period=i)
-    #                 for i in periods])
-    pk = gpflow.kernels.Periodic(gpflow.kernels.SquaredExponential(lengthscales=24*1.5), period=24)
+    pk = gpflow.kernels.Periodic(
+            gpflow.kernels.SquaredExponential(lengthscales=24*1.5),
+            period=24,
+            )
     cov = mt * pk
     model = gpflow.models.sgpr.SGPR((X, y), cov, Z)
-    # model.kernel.kernels[1].period.prior = tfp.distributions.Normal(24., 1.)
-    gpflow.set_trainable(model.kernel, False)
-    gpflow.utilities.print_summary(model)
-    # print(model.kernel.kernels[1].trainable_variables)
-    optimizer = gpflow.optimizers.Scipy()
+    
+    # gpflow.utilities.print_summary(model)
 
+    optimizer = gpflow.optimizers.Scipy()
     optimizer.minimize(model.training_loss, model.trainable_variables)
 
-    gpflow.utilities.print_summary(model)
+    # gpflow.utilities.print_summary(model)
 
-    _, axs = plt.subplots(figsize=(12, 5))
-    xx = np.linspace(X.min(), x_star.max(), 200)[:, None]
-    plot_result(model, axs, X, y, x_star, y_star, xx)
-    plt.savefig("experiments/plots/SGPR_time.png")
-    plt.show()
+    _, _, _, rmse = plot_result(model, X, y, x_star, y_star)
+    return rmse
 
 
 if __name__ == '__main__':
-    main(100)
+    np.random.seed(0)
+    tf.random.set_seed(0)
+    num_ind = [10, 30, 100, 200, 300, 400, 600]
+    errors = [train_model(i) for i in num_ind]
+    plt.plot(num_ind, errors)
+    plt.xlabel('Num. inducing pounts')
+    plt.ylabel('RMSE')
+    plt.savefig("experiments/plots/SGPR_num_ind.png")
+    plt.show()
