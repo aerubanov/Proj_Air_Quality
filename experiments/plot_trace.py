@@ -38,7 +38,8 @@ def plot_trace(trace, X, X_star, y=None, y_star=None):
     plt.savefig("experiments/plots/" + trace.split('/')[-1] + '.png')
     plt.show()
     if y is not None:
-        qqplot_2samples(y, ad.posterior['pr'][0, :, 0], ylabel='Posterior quantiles',
+        qqplot_2samples(y, ad.posterior['pr'][0, :, 0],
+                        ylabel='Posterior quantiles',
                         xlabel='Data quantiles', line='r')
         plt.show()
 
