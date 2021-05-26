@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from pymc3.gp.util import plot_gp_dist
 from sklearn.metrics import mean_squared_error
+from statsmodels.graphics.gofplots import qqplot_2samples
 
 from experiments.pymc_gp_time import get_data
 
@@ -36,6 +37,11 @@ def plot_trace(trace, X, X_star, y=None, y_star=None):
     ax.legend([extra], (f"RMSE: {rmse}",))
     plt.savefig("experiments/plots/" + trace.split('/')[-1] + '.png')
     plt.show()
+    if y is not None:
+        qqplot_2samples(y, ad.posterior['pr'][0, :, 0],
+                        ylabel='Posterior quantiles',
+                        xlabel='Data quantiles', line='r')
+        plt.show()
 
 
 if __name__ == '__main__':

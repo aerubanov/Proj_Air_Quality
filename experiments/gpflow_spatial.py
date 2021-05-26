@@ -1,4 +1,4 @@
-Import gpflow
+import gpflow
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -13,7 +13,8 @@ def plot_result(model, cur_x, cur_y, xx):
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
     ax1.hexbin(xx[:, 0], xx[:, 1], mx,
                gridsize=30, cmap='rainbow', alpha=0.7)
-    plot = ax1.scatter(cur_x[:, 0], cur_x[:, 1], c=cur_y[:, 0], s=300, cmap='rainbow')
+    plot = ax1.scatter(cur_x[:, 0], cur_x[:, 1],
+                       c=cur_y[:, 0], s=300, cmap='rainbow')
     ax2.scatter(cur_x[:, 0], cur_x[:, 1], c=cur_y[:, 0], s=300, cmap='rainbow')
     ax1.set_title("Data + Posterior")
     ax2.set_title("Data")
@@ -26,11 +27,13 @@ def main(M=100):
     x, y, x_new = get_data(data_file)
     y = y[:, None]
 
-
-
     z = x[np.random.permutation(x.shape[0])[0:M], :]
 
-    model = gpflow.models.sgpr.SGPR((x, y), gpflow.kernels.Matern32(variance=1, lengthscales=0.1), z)
+    model = gpflow.models.sgpr.SGPR(
+            (x, y),
+            gpflow.kernels.Matern32(variance=1, lengthscales=0.1),
+            z,
+            )
     gpflow.set_trainable(model.kernel, False)
     gpflow.utilities.print_summary(model)
 
