@@ -4,6 +4,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from sklearn.metrics import mean_squared_error
+from statsmodels.graphics.gofplots import qqplot_2samples
 
 from experiments.pymc_gp_time import get_data
 
@@ -40,18 +41,22 @@ def plot_result(model, cur_x, cur_y,  x_star, y_star):
     return mu, Su, Zopt, rmse
 
 
+def qqplot(model, X, y, ax=None):
+    sample = model.predict_f_samples(X, 1)[0, :, 0]
+    y = y[:, 0]
+    qqplot_2samples(y, sample, ylabel='Posterior quantiles',
+                    xlabel='Data quantiles', line='45', ax=ax)
+    plt.show()
+
+
 def train_model(M=30):
+    np.random.seed(0)
+    tf.random.set_seed(0)
     X, y, x_star, y_star = get_data(data_file)
-    print(len(X))
     y = y[:, None]
     X = X.astype(np.float64)
     x_star = x_star.astype(np.float64)
     y_star = y_star[:, None]
-    print(X.shape, y.shape)
-    print(X.dtype, y.dtype)
-    print(np.isnan(X).any())
-    print(np.isnan(y).any())
-
 
     Z = X[np.random.permutation(X.shape[0])[0:M], :]
 
@@ -62,7 +67,7 @@ def train_model(M=30):
             )
     cov = mt * pk
     model = gpflow.models.sgpr.SGPR((X, y), cov, Z)
-    
+
     # gpflow.utilities.print_summary(model)
 
     optimizer = gpflow.optimizers.Scipy()
@@ -71,10 +76,11 @@ def train_model(M=30):
     # gpflow.utilities.print_summary(model)
 
     _, _, _, rmse = plot_result(model, X, y, x_star, y_star)
+    qqplot(model, X, y)
     return rmse
 
 
-if __name__ == '__main__':
+def rmse_from_num_ind():
     np.random.seed(0)
     tf.random.set_seed(0)
     num_ind = [10, 30, 100, 200, 300, 400, 600]
@@ -84,3 +90,7 @@ if __name__ == '__main__':
     plt.ylabel('RMSE')
     plt.savefig("experiments/plots/SGPR_num_ind.png")
     plt.show()
+
+
+if __name__ == "__main__":
+    train_model(200)
