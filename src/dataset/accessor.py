@@ -10,7 +10,12 @@ from src.dataset.indexers import TimeIndexer, LocIndexer
 
 @pd.api.extensions.register_dataframe_accessor("spat")
 class GeoAccessor:
-    necessary_columns = ['timestamp', 'lat', 'lon', 'sds_sensor']  # need to get data by time and location
+    necessary_columns = [  # need to get data by time and location
+            'timestamp',
+            'lat',
+            'lon',
+            'sds_sensor',
+            ]
 
     def __init__(self, pandas_obj: pd.DataFrame):
         self._validate(pandas_obj)
@@ -30,9 +35,20 @@ class GeoAccessor:
             if self.x_column is not None else self.necessary_columns
         return self.data[col]
 
+    @x.setter
+    def x(self, value: pd.DataFrame):
+        col = self.x_column + self.necessary_columns \
+            if self.x_column is not None else self.necessary_columns
+        for c in col:
+            self.data[c] = value[c].values
+
     @property
     def y(self) -> pd.DataFrame:
         return self.data[[self.y_column]]
+
+    @y.setter
+    def y(self, value: np.array):
+        self.data[self.y_column] = value
 
     def set_x_col(self, columns: typing.List[str]):
         self.x_column = columns
