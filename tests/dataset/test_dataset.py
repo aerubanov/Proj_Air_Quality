@@ -19,11 +19,27 @@ def test_dataset_x(test_dataset):
     assert {'timestamp', 'lat', 'lon', 'sds_sensor', 'x'} == set(x.columns)
 
 
+def test_dataset_x_set(test_dataset):
+    ds = test_dataset
+    x = ds.spat.x
+    x.loc[:, 'lon'] = 1
+    ds.spat.x = x
+    assert ds['lon'].values[0] == 1
+
+
 def test_dataset_y(test_dataset):
     ds = test_dataset
     ds.spat.set_y_col('y')
     y = ds.spat.y
     assert {'y'} == set(y.columns)
+
+
+def test_dataset_y_set(test_dataset):
+    ds = test_dataset
+    ds.spat.set_y_col('y')
+    val = [0, 0, 0]
+    ds.spat.y = val
+    assert ds['y'].values[0] == 0
 
 
 def test_dataset_loc(test_dataset):
