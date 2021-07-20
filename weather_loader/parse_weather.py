@@ -5,7 +5,7 @@ import time
 import typing
 import pytz
 import pandas as pd
-#import numpy as np
+import numpy as np
 import schedule
 #! pip install schedule
 #from src.web.server.loader import config
@@ -14,7 +14,6 @@ import configparser
 def parse_page(url: str) -> typing.List['BeautifulSoup.Tag']:
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
-
     table = soup.find("table", {"id": "forecastTable_1_3"})
     #table = soup.find("table", {"id": "forecastTable"})
     #print(table)
@@ -42,7 +41,6 @@ def get_prec(row: 'BeautifulSoup.Tag') -> typing.List[str]:
         result.append(i['onmouseover'].split(',')[1])
     result = result[::2]  # list consist results for both metric and imperial unit systems. Skip imperial.
     return result
-
 
 def get_row_val(row: 'BeautifulSoup.Tag') -> typing.List[float]:
     cells = row.find_all('td')
@@ -98,25 +96,26 @@ def parse_weather(url):
 
 def start_parsing(url):
     print('start ', datetime.datetime.now())
+    res = parse_weather(url)
+    ind = np.arange(len(res['date']))
     frame = pd.DataFrame(columns=['Num','Now','Date-Time','Weather','Temp','Presure','Wind_speed','Wind_dir','Humidity'])
-    if __name__ == '__main__':
-        res = parse_weather(url)
-        for i in range(len(res['date'])):
-            #print(i)
-            #print(f"{i} {datetime.datetime.utcnow()} {res['date'][i]} {res['prec'][i]} {res['temp'][i]} {res['pressure'][i]} {res['wind_speed'][i]} "
-            #      f"{res['wind_dir'][i]} {res['humidity'][i]}")
-            new_line = {'Num':i, 'Now':datetime.datetime.utcnow(), 'Date-Time':res['date'][i], 'Weather':res['prec'][i], 'Temp':res['temp'][i],'Presure':res['pressure'][i],'Wind_speed':res['wind_speed'][i], 'Wind_dir':res['wind_dir'][i], 'Humidity':res['humidity'][i]}
-            frame = frame.append(new_line, ignore_index=True)
-            #print('frame:', frame)
-    frame.to_csv('parsed_weather.csv', sep=',', header=True, index=False) #запись DataFrame в файл
+    new_parse = {'Num':ind, 'Parsing date':datetime.datetime.utcnow(), 'Date-Time':np.array(res['date'])[ind],
+                 'Weather':np.array(res['prec'])[ind], 'Temp':np.array(res['temp'])[ind],
+                 'Presure':np.array(res['pressure'])[ind],'Wind_speed':np.array(res['wind_speed'])[ind],
+                 'Wind_dir':np.array(res['wind_dir'])[ind], 'Humidity':np.array(res['humidity'])[ind]}
+    frame = frame.from_dict(new_parse)
+    frame.to_csv('parsed_weather.csv', sep=',', header=False, index=False, mode='a') #запись DataFrame в файл
     print('done')
-    #frame2 = pd.read_csv('parsed_weather.csv', header=0, sep=',')
 
-#Schedule
-max_col = 24 #max_col = configparser.weathermaxcol
+# Первое создание DataFrame
+frame = pd.DataFrame(columns=['Num','Parsing date','Date-Time','Weather','Temp','Presure','Wind_speed','Wind_dir','Humidity'])
+frame.to_csv('parsed_weather.csv', sep=',', header=True, index=False, mode='a') 
+max_col = 24
 url = 'https://rp5.ru/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5_(%D1%86%D0%B5%D0%BD%D1%82%D1%80,_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3)'
-#schedule.every().hour.at(":00").do(start_parsing,url=url)
-schedule.every().minute.at(':00').do(start_parsing,url=url)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+#Schedule
+if __name__ == '__main__':
+    schedule.every().hour.at(":00").do(start_parsing,url=url)
+    #schedule.every().minute.at(':00').do(start_parsing,url=url)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
