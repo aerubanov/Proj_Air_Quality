@@ -15,7 +15,7 @@ y_col = 'P1'
 
 spat_cov = gpflow.kernels.Matern32(
         variance=1,
-        lengthscales=0.1,
+        lengthscales=0.05,
         active_dims=[1, 2],
         )
 
