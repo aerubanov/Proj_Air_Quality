@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 import gpflow
 import tensorflow as tf
 
-from src.models.osgpr import OSGPR
+from src.gp.models.osgpr import OSGPR
+from src.gp.trainer.osgpr_trainer import OSGPRTrainer
+from src.gp.transform.basic import GPTransform
+
 
 
 data_file = 'DATA/processed/dataset.csv'
@@ -196,30 +199,43 @@ def plot_spatial(model: gpflow.models.GPModel, data, timestamp=None):
 if __name__ == '__main__':
     np.random.seed(0)
     tf.random.set_seed(0)
-    data = get_data(data_file)
+
+    data = pd.read_csv(data_file)
+    transf = GPTransform()
+    data = transf.fit_transform(data)
+
+    results = []
+
     train_t = 13*24
     test_t = 13*24 + 24
-    results = []
+
     train_data = data[data['timestamp'] < train_t]
     test_data = data[
             (data['timestamp'] >= train_t) & (data['timestamp'] < test_t)
             ]
-    model = train_model(train_data, max_iter=100)
-    mse = eval_model(model, test_data)
+    
+    trainer = OSGPRTrainer(kernel=kernel)
+    trainer.build_model(
+            train_data[x_col].values,
+            train_data[y_col].values,
+            max_iter=100,
+            )
+    mu, var = trainer.model.predict_f(test_data[x_col].values)
     print(f'init MSE: {mse}')
-    results.append(mse)
+    
+    # results.append(mse)
 
-    for i, item in enumerate(time_cv(data[data['timestamp'] >= test_t])):
-        train_data = test_data
-        test_data = item
-        model = update_model(model, train_data, max_iter=100, iprint=0)
-        mse = eval_model(model, test_data)
-        print(f'step {i} MSE: {mse}')
-        results.append(mse)
-    print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
-    _, ax = plt.subplots(figsize=(15, 5))
-    ax.plot([i for i in range(len(results))], np.sqrt(results))
-    ax.set_xlabel('iteration')
-    ax.set_ylabel('RMSE')
-    plt.show()
+    # for i, item in enumerate(time_cv(data[data['timestamp'] >= test_t])):
+    #    train_data = test_data
+    #    test_data = item
+    #    model = update_model(model, train_data, max_iter=100, iprint=0)
+    #    mse = eval_model(model, test_data)
+    #    print(f'step {i} MSE: {mse}')
+    #    results.append(mse)
+    # print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
+    # _, ax = plt.subplots(figsize=(15, 5))
+    # ax.plot([i for i in range(len(results))], np.sqrt(results))
+    # ax.set_xlabel('iteration')
+    # ax.set_ylabel('RMSE')
+    # plt.show()
     plot_spatial(model, train_data)
