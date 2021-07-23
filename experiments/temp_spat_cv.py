@@ -11,6 +11,7 @@ from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
 
 
+pd.options.mode.chained_assignment = None  # default='warn'
 
 data_file = 'DATA/processed/dataset.csv'
 x_col = ['timestamp', 'lon', 'lat']
@@ -34,17 +35,9 @@ time_cov = mt * pk
 kernel = spat_cov * time_cov
 
 
-def convert_time(data) -> pd.DataFrame:
-    data['timestamp'] = pd.to_datetime(data['timestamp'])
-    data['timestamp'] = (
-            data['timestamp'] - pd.to_datetime('2021-01-01', utc=True)
-            )/pd.Timedelta(hours=1)
-    return data
-
-
 def time_cv(data: pd.DataFrame, step=24):
     curr_t = data['timestamp'].min()
-    next_t = curr_t + step
+    next_t = curr_t + pd.Timedelta(step, unit='hours')
     while curr_t < data['timestamp'].max():
         item = data[
                 (data['timestamp'] >= curr_t) & (data['timestamp'] < next_t)
@@ -52,98 +45,7 @@ def time_cv(data: pd.DataFrame, step=24):
         if len(item) > 0:
             yield item
         curr_t = next_t
-        next_t += step
-
-
-def get_data(file_path: str) -> pd.DataFrame:
-    data = pd.read_csv(file_path)
-    data.spat.set_y_col(y_col)
-    qt = QuantileTransformer(
-            output_distribution='normal',
-            random_state=42,
-            n_quantiles=100,
-            )
-    qt.fit(data.spat.y)
-
-    data = data.spat.tloc['2021-01-01':'2021-02-01']
-    data = data.dropna(subset=['P1'])
-    data = data[['timestamp', 'lat', 'lon', 'P1', 'sds_sensor']]
-
-    data.spat.y = qt.transform(data.spat.y.values).flatten()
-    data.spat.x = convert_time(data)
-
-    return data
-
-
-def train_model(
-        data: pd.DataFrame,
-        M=200,
-        max_iter=100
-        ) -> gpflow.models.sgpr.SGPR:
-    x = data[x_col].values
-    y = data[y_col].values[:, None]
-
-    Z = x[np.random.permutation(x.shape[0])[0:M], :]
-    model = gpflow.models.sgpr.SGPR((x, y), kernel, Z)
-    gpflow.set_trainable(model.kernel, False)
-
-    optimizer = gpflow.optimizers.Scipy()
-    optimizer.minimize(
-            model.training_loss,
-            model.trainable_variables,
-            options={'iprint': 50, 'maxiter': max_iter},
-            )
-    return model
-
-
-def update_model(
-        model: gpflow.models.GPModel,
-        data: pd.DataFrame,
-        new_m: int = 20,
-        max_iter: int = 1000,
-        iprint: int = 50,
-        ) -> gpflow.models.GPModel:
-    x = data[x_col].values
-    y = data[y_col].values[:, None]
-
-    Z_opt = model.inducing_variable.Z
-    mu, Su = model.predict_f(Z_opt, full_cov=True)
-    if len(Su.shape) == 3:
-        Su = Su[0, :, :]
-    Kaa1 = model.kernel.K(model.inducing_variable.Z)
-
-    Zinit = x[np.random.permutation(x.shape[0])[0:new_m], :]
-    Zinit = np.vstack((Z_opt.numpy(), Zinit))
-
-    new_model = OSGPR(
-            (x, y),
-            kernel,
-            mu[new_m:, :],
-            Su[new_m:, new_m:],
-            Kaa1[new_m:, new_m:],
-            Z_opt[new_m:, :],
-            Zinit,
-            )
-    new_model.likelihood.variance.assign(model.likelihood.variance)
-    for i, item in enumerate(model.kernel.trainable_variables):
-        new_model.kernel.trainable_variables[i].assign(item)
-    gpflow.set_trainable(model.kernel, False)
-    optimizer = gpflow.optimizers.Scipy()
-    optimizer.minimize(
-            new_model.training_loss,
-            new_model.trainable_variables,
-            options={'iprint': iprint, 'maxiter': max_iter},
-            )
-    return new_model
-
-
-def eval_model(model: gpflow.models.GPModel, test_data):
-    x_test = test_data[x_col].values
-    y_test = test_data[y_col].values[:, None]
-
-    mu, var = model.predict_f(x_test)
-    mse = mean_squared_error(y_test, mu[:, 0])
-    return mse
+        next_t += pd.Timedelta(step, unit='hours')
 
 
 def plot_time(model: gpflow.models.GPModel, train_data, test_data):
@@ -200,42 +102,51 @@ if __name__ == '__main__':
     np.random.seed(0)
     tf.random.set_seed(0)
 
-    data = pd.read_csv(data_file)
+    data = pd.read_csv(data_file, parse_dates=['timestamp'])
+    data = data[
+            (data['timestamp'] >= '2021-01-01')
+            & (data['timestamp'] < '2021-04-01')]
+    data = data.dropna(subset=['P1'])
+
+    init_data = data[data['timestamp'] < '2021-01-15']
+
     transf = GPTransform()
-    data = transf.fit_transform(data)
+    transf.fit(data)
 
-    results = []
+    init_data = transf.transform(init_data)
 
-    train_t = 13*24
-    test_t = 13*24 + 24
-
-    train_data = data[data['timestamp'] < train_t]
-    test_data = data[
-            (data['timestamp'] >= train_t) & (data['timestamp'] < test_t)
-            ]
-    
     trainer = OSGPRTrainer(kernel=kernel)
     trainer.build_model(
-            train_data[x_col].values,
-            train_data[y_col].values,
+            init_data[x_col].values,
+            init_data[y_col].values[:, None],
             max_iter=100,
             )
-    mu, var = trainer.model.predict_f(test_data[x_col].values)
-    print(f'init MSE: {mse}')
-    
-    # results.append(mse)
 
-    # for i, item in enumerate(time_cv(data[data['timestamp'] >= test_t])):
-    #    train_data = test_data
-    #    test_data = item
-    #    model = update_model(model, train_data, max_iter=100, iprint=0)
-    #    mse = eval_model(model, test_data)
-    #    print(f'step {i} MSE: {mse}')
-    #    results.append(mse)
-    # print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
+    results = []
+    cv = time_cv(data[data['timestamp'] >= '2021-01-16'])
+    test_data = next(cv)
+    test_data = transf.transform(test_data)
+    for i, item in enumerate(cv):
+        train_data = test_data
+        test_data = item
+        y_test = test_data[y_col].values
+        test_data = transf.transform(test_data)
+        trainer.update_model(
+                train_data[x_col].values,
+                train_data[y_col].values[:, None],
+                max_iter=100,
+                iprint=0,
+                )
+        mu, var = trainer.model.predict_f(test_data[x_col].values)
+        pred = np.hstack((mu, mu + 2*np.sqrt(var), mu - 2 * np.sqrt(var)))
+        pred = transf.inverse_transform(pred)
+        mse = mean_squared_error(y_test, pred[:, 0])
+        print(f'step {i} RMSE: {np.sqrt(mse)}')
+        results.append(mse)
+    print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
     # _, ax = plt.subplots(figsize=(15, 5))
     # ax.plot([i for i in range(len(results))], np.sqrt(results))
     # ax.set_xlabel('iteration')
     # ax.set_ylabel('RMSE')
     # plt.show()
-    plot_spatial(model, train_data)
+    # plot_spatial(model, train_data)

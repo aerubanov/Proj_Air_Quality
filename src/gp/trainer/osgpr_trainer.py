@@ -1,7 +1,7 @@
 import gpflow
 from gpflow.kernels.base import Kernel
 import numpy as np
-from src.models import OSGPR
+from src.gp.models.osgpr import OSGPR
 
 
 class OSGPRTrainer:
@@ -14,7 +14,7 @@ class OSGPRTrainer:
             self,
             X: np.ndarray,
             y: np.ndarray,
-            M: int,
+            M: int = 200,
             max_iter: int = 1000,
             iprint: int = 50,
             ):

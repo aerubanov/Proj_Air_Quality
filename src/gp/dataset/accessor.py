@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import typing
 import numpy as np
 
-from src.dataset.indexers import TimeIndexer, LocIndexer
+from .indexers import TimeIndexer, LocIndexer
 
 
 @pd.api.extensions.register_dataframe_accessor("spat")
