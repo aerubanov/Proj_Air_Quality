@@ -30,7 +30,7 @@ def time_cv(data: pd.DataFrame, step=24):
         next_t += pd.Timedelta(step, unit='hours')
 
 
-def main(init_data: pd.dataframe, val_data: pd.dataframe):
+def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
     transf = GPTransform()
     transf.fit(data)
 
@@ -75,8 +75,8 @@ if __name__ == '__main__':
     tf.random.set_seed(0)
 
     start_date = '2021-01-01'
-    end_date = '2021-02-01'
-    val_split = '2021-01-23'
+    end_date = '2021-03-01'
+    val_split = '2021-02-01'
 
     data = pd.read_csv(data_file, parse_dates=['timestamp'])
     data = data[

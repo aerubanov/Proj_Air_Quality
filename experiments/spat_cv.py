@@ -4,7 +4,7 @@ import tensorflow as tf
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
-from experiments.temp_spat_cv import data_file, x_col, y_col, kernel, time_cv
+from experiments.temp_cv import data_file, x_col, y_col, kernel, time_cv
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
 
@@ -56,9 +56,9 @@ if __name__ == '__main__':
     np.random.seed(0)
     tf.random.set_seed(0)
 
-    start_date = '2021-01-01'
-    end_date = '2021-02-01'
-    val_split = '2021-01-23'
+    start_date = '2021-05-01'
+    end_date = '2021-07-01'
+    val_split = '2021-06-10'
 
     data = pd.read_csv(data_file, parse_dates=['timestamp'])
     data = data[
