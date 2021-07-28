@@ -6,7 +6,7 @@
   ```
   pip install -r requirements.txt
   ```
-- запустити тесты и проверте, что все работает:
+- запустите тесты и проверте, что все работает:
   ```
   python -m pytest --flake8 -v --cov-report term --cov=./src
   ```
