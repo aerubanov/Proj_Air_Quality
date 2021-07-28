@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/aerubanov/Proj_Air_Quality.svg?branch=master)](https://travis-ci.org/aerubanov/Proj_Air_Quality)
 [![codecov](https://codecov.io/gh/aerubanov/Proj_Air_Quality/branch/master/graph/badge.svg)](https://codecov.io/gh/aerubanov/Proj_Air_Quality)
 # Proj_Air_Quality
-Проект анализу качества воздуха в Москве - детекции аномалий, их кластеризации и предсказания измения концентрации частиц пыли. Данные и результаты анализа отображаются на [web-сайте](http://air-quality-moscow.net/).
+Проект анализу качества воздуха в Москве - детекции аномалий и предсказания измения концентрации частиц пыли c помощью вероятностной модели на основе Гауссовского процесса.
 # Contribution guid
 [contributing.md](contribution.md)
 
