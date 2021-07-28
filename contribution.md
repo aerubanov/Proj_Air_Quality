@@ -1,7 +1,7 @@
 # Contributing
 ## Прежде чем начать писать код
-- Зарегистрируйтесь в https://ods.ai/, если ещё не зарегистрированы.
-- Зарегистрируйтесь в форме проекта #proj_air_quality https://docs.google.com/forms/d/1tLVQF0VJq7nmOG0k8uGlHYjI6J7baUdcPHsNTaf_TXQ/viewform?edit_requested=true, чтобы Вас добавили в чат проекта в слэке и на доску в трелло.
+- Зарегистрируйтесь в https://ods.ai/, если ещё не зарегистрированы. Страница проекта https://ods.ai/projects/air_quality
+- Свяжитесь в slack-е ODS с @Anatolijrubanov
 - установите зависимости (лучше использовать среду ```conda``` или ```venv```):
   ```
   pip install -r requirements.txt
