@@ -8,6 +8,9 @@ import pandas as pd
 
 
 class OSGPRTrainer:
+    """
+    Build, update and evaluate OSGPR model
+    """
 
     def __init__(
             self,

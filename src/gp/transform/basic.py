@@ -7,6 +7,10 @@ import src.gp.dataset.accessor  # noqa: F401
 
 
 class GPTransform(TransformerMixin):
+    """
+    Data transformation for gaussian process
+    """
+
     def __init__(
             self,
             random_state: int = 42,
