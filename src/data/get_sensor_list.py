@@ -2,11 +2,26 @@ import requests
 import datetime
 from bs4 import BeautifulSoup
 import csv
+import yaml
 
-from src.data.config import MAX_LAT, MIN_LAT, MAX_LON, MIN_LON, CHECKED_LINKS_FILE, SENSOR_ID_FILE, SERVER_URL
 
-# This script update list of available sensors. Script get all csv files links and check sensor lat and lon
-# in range [MIN_LAT, MAX_LAT], [MIN_LON, MAX_LON] respectively. See config.py for that values.
+with open("params.yaml", 'r') as f:
+    params = yaml.safe_load(f)
+
+MAX_LAT, MIN_LAT, MAX_LON, MIN_LON = (
+        params['data']['coords']['max_lat'],
+        params['data']['coords']['min_lat'],
+        params['data']['coords']['max_lon'],
+        params['data']['coords']['min_lon'],
+        )
+
+CHECKED_LINKS_FILE = params['data']['paths']['checked_links']
+SENSOR_ID_FILE = params['data']['paths']['sensor_id']
+SERVER_URL = params['data']['urls']['server']
+# This script update list of available sensors. Script get
+# all csv files links and check sensor lat and lon
+# in range [MIN_LAT, MAX_LAT], [MIN_LON, MAX_LON]
+# respectively. See config.py for that values.
 
 
 def get_links(for_date, links_file):

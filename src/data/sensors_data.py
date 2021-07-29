@@ -2,14 +2,27 @@ import pandas as pd
 import os
 import multiprocessing
 from functools import partial
+import yaml
 
-from src.data.config import SENSOR_DATA_FOLDER, WEATHER_DATA_FOLDER, WEATHER_FILE
 from src.data.utils import get_weather_data
+
+with open("params.yaml", 'r') as fd:
+    params = yaml.safe_load(fd)
+
+SENSOR_DATA_FOLDER = params['data']['paths']['sensor_data']
+WEATHER_DATA_FOLDER = params['data']['paths']['weather_data']
+WEATHER_FILE = params['data']['paths']['weather_filename']
+SENSORS_FILE = params['data']['paths']['sensors_file']
+DATASET_FILE = params['data']['paths']['dataset_file']
 
 
 def load_data(filename: str) -> pd.DataFrame:
     """load sensor data from file into pandas dataframe"""
-    data = pd.read_csv(os.path.join(SENSOR_DATA_FOLDER, filename), sep=';', parse_dates=['timestamp'])
+    data = pd.read_csv(
+            os.path.join(SENSOR_DATA_FOLDER, filename),
+            sep=';',
+            parse_dates=['timestamp'],
+            )
     data['timestamp'] = pd.to_datetime(data.timestamp, errors='coerce')
     data = data.set_index("timestamp")
     for col in data.columns:
@@ -18,8 +31,14 @@ def load_data(filename: str) -> pd.DataFrame:
     return data
 
 
-def get_sensor_data(bme_sensor_id: int, sds_sensor_id: int, sensors: pd.DataFrame) -> pd.DataFrame:
-    """Get combined data from bme280 and sds011. Add spatial features for sensor location"""
+def get_sensor_data(
+        bme_sensor_id: int,
+        sds_sensor_id: int,
+        sensors: pd.DataFrame,
+        ) -> pd.DataFrame:
+    """Get combined data from bme280 and sds011.
+    Add spatial features for sensor location
+    """
     file_name = f'{bme_sensor_id}_bme280_sensor_.csv'
     bme_data = load_data(file_name)
     file_name = f'{sds_sensor_id}_sds011_sensor_.csv'
@@ -33,13 +52,21 @@ def get_sensor_data(bme_sensor_id: int, sds_sensor_id: int, sensors: pd.DataFram
     return data
 
 
-def add_weather_data(sensor_data: pd.DataFrame, weather_data: pd.DataFrame) -> pd.DataFrame:
+def add_weather_data(
+        sensor_data: pd.DataFrame,
+        weather_data: pd.DataFrame,
+        ) -> pd.DataFrame:
     """add weather data from meteo station"""
     sensor_data.index = sensor_data.index.tz_localize(tz="UTC")
     return sensor_data.join(weather_data)
 
 
-def worker(bme_id: int, sds_id: int, weather_data: pd.DataFrame, sensors: pd.DataFrame) -> pd.DataFrame:
+def worker(
+        bme_id: int,
+        sds_id: int,
+        weather_data: pd.DataFrame,
+        sensors: pd.DataFrame,
+        ) -> pd.DataFrame:
     """Using to run data collection im multiple processes"""
     sensor_data = get_sensor_data(bme_id, sds_id, sensors)
     sensor_data = add_weather_data(sensor_data, weather_data)
@@ -47,12 +74,15 @@ def worker(bme_id: int, sds_id: int, weather_data: pd.DataFrame, sensors: pd.Dat
 
 
 if __name__ == '__main__':
-    sens = pd.read_csv("DATA/processed/sensors.csv")
+    sens = pd.read_csv(SENSORS_FILE)
     bme_sensor = sens.bme_sensor.values
     sds_sensor = sens.sds_sensor.values
     weather = get_weather_data(os.path.join(WEATHER_DATA_FOLDER, WEATHER_FILE))
     with multiprocessing.Pool(processes=4) as pool:
-        results = pool.starmap(partial(worker, weather_data=weather, sensors=sens), zip(bme_sensor, sds_sensor))
+        results = pool.starmap(
+                partial(worker, weather_data=weather, sensors=sens),
+                zip(bme_sensor, sds_sensor),
+                )
     dataset = pd.concat(results)
-    dataset.to_csv('DATA/processed/dataset.csv')
+    dataset.to_csv(DATASET_FILE)
     print(dataset.head())
