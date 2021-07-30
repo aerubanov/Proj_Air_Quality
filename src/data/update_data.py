@@ -2,17 +2,21 @@ import datetime
 import requests
 import os
 import csv
+import yaml
 
-from src.data.config import SENSOR_ID_FILE, SERVER_URL, SENSOR_DATA_FOLDER
+# This script update data for all sensors in sensor list.
+# If data file for some sensor exist, new data will be  added
+# to the file. Else, new file will be created. Default start
+# date for checking for updates is yesterday - 30 days
+# For exist file dates checked from last date with data if
+# it later then yesterday - 30 days.
 
-# This script update data for all sensors in sensor list. If data file for some sensor exist, new data will be  added
-# to the file. Else, new file will be created. Default start date for checking for updates is yesterday - 30 days
-# For exist file dates checked from last date with data if it later then yesterday - 30 days.
+with open("params.yaml", 'r') as fd:
+    params = yaml.safe_load(fd)
 
-
-# This script update data for all sensors in sensor list. If data file for some sensor exist, new data will be  added
-# to the file. Else, new file will be created. Default start date for checking for updates is yesterday - 30 days
-# For exist file dates checked from last date with data if it later then yesterday - 30 days.
+SENSOR_DATA_FOLDER = params['data']['paths']['sensor_data']
+SENSOR_ID_FILE = params['data']['paths']['sensor_id']
+SERVER_URL = params['data']['urls']['server']
 
 
 DEFAULT_DATE = datetime.date.today() - datetime.timedelta(days=30)
@@ -23,8 +27,8 @@ def check_file(fname, data_folder=SENSOR_DATA_FOLDER):
     check data file
     :param fname: file name
     :param data_folder: folders with data
-    :return: (True, <last timestamp value in file>) if file exist and consist data
-             (False, None) otherwise
+    :return: (True, <last timestamp value in file>) if file
+              exist and consist data (False, None) otherwise
     """
     try:
         f = open(os.path.join(data_folder, fname), 'r')
@@ -42,11 +46,20 @@ def check_file(fname, data_folder=SENSOR_DATA_FOLDER):
 
 def construct_url(sensor_id, date, sensor_type):
     """generate url for download csv file with data by date"""
-    url = SERVER_URL + str(date) + '/' + '_'.join([str(date), sensor_type, 'sensor', str(sensor_id)]) + '.csv'
+    url = SERVER_URL + str(date) + '/' + '_'.join(
+            [str(date), sensor_type, 'sensor', str(sensor_id)]
+            ) + '.csv'
     return url
 
 
-def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor_type, data_folder=SENSOR_DATA_FOLDER):
+def download_data_for_interval(
+        start_date,
+        end_date,
+        filename,
+        sensor_id,
+        sensor_type,
+        data_folder=SENSOR_DATA_FOLDER,
+        ):
     """
     Download all data for time interval and save in one file
     :param end_date:  end point of time interval
@@ -59,7 +72,10 @@ def download_data_for_interval(start_date, end_date, filename, sensor_id, sensor
     """
     delta = end_date - start_date
     num_days = delta.days + 1
-    dates = [start_date + datetime.timedelta(days=1) * i for i in range(num_days)]
+    dates = [
+            start_date + datetime.timedelta(days=1) * i
+            for i in range(num_days)
+            ]
     header_writen = False
     try:
         fh = open(os.path.join(data_folder, filename), "r")
@@ -101,7 +117,10 @@ def main(sensor_file):
                 date = DEFAULT_DATE
             yesterday = datetime.date.today() - datetime.timedelta(days=1)
             date = max(DEFAULT_DATE, date)
-            download_data_for_interval(date, yesterday, fname, sensor_id, sensor_type)
+            download_data_for_interval(
+                    date, yesterday, fname,
+                    sensor_id, sensor_type,
+                    )
             print(sensor)
 
 

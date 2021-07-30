@@ -3,17 +3,26 @@ import datetime
 import gzip
 import os
 import re
-
+import yaml
 import requests
 from bs4 import BeautifulSoup
 
-from src.data.config import WEATHER_DATA_FOLDER, WEATHER_FILE
-from src.data.config import WEATHER_URL1, WEATHER_URL2
+with open("params.yaml", 'r') as fd:
+    params = yaml.safe_load(fd)
 
-DEFAULT_DATE = datetime.date(2019, 4, 1)  # the start point of data loading interval
+WEATHER_DATA_FOLDER = params['data']['paths']['weather_data']
+WEATHER_FILE = params['data']['paths']['weather_filename']
+WEATHER_URL1 = params['data']['urls']['weather1']
+WEATHER_URL2 = params['data']['urls']['weather2']
+
+# the start point of data loading interval
+DEFAULT_DATE = datetime.date(2019, 4, 1)
 
 
-def check_file(fname: str, data_folder: str = WEATHER_DATA_FOLDER) -> [bool, datetime.date]:
+def check_file(
+        fname: str,
+        data_folder: str = WEATHER_DATA_FOLDER,
+        ) -> [bool, datetime.date]:
     """
     checking existing weather data
     :param fname: file name for checking
@@ -21,7 +30,10 @@ def check_file(fname: str, data_folder: str = WEATHER_DATA_FOLDER) -> [bool, dat
     :return: (True, last_date) if file with data exist, (False, None) otherwise
     """
     try:
-        with open(os.path.join(data_folder, fname), 'r', encoding="utf-8") as f:
+        with open(
+                os.path.join(data_folder, fname),
+                'r', encoding="utf-8",
+                ) as f:
             reader = csv.DictReader(f, delimiter=";")
             try:
                 row = next(reversed(list(reader)))
@@ -36,27 +48,41 @@ def check_file(fname: str, data_folder: str = WEATHER_DATA_FOLDER) -> [bool, dat
         return False, None
 
 
-def get_link_to_data_download(start_date: datetime.date, end_date: datetime.date) -> str:
+def get_link_to_data_download(
+        start_date: datetime.date,
+        end_date: datetime.date,
+        ) -> str:
     date1 = f'{start_date.day}.{start_date.month}.{start_date.year}'
     date2 = f'{end_date.day}.{end_date.month}.{end_date.year}'
     resp = requests.get(WEATHER_URL1)
     php_id = resp.cookies.get_dict()["PHPSESSID"]
     my_url = WEATHER_URL2
     my_header = {
-        "Accept": "text/html, */*; q=0.01", "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "en-US,en;q=0.5", "Connection": "keep-alive", "Content-Length": "98",
-        "Content-Type": "application/x-www-form-urlencoded", "Host": "rp5.ru", "Origin": "https://rp5.ru",
+        "Accept": "text/html, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Connection": "keep-alive",
+        "Content-Length": "98",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Host": "rp5.ru", "Origin": "https://rp5.ru",
         "Referer": "https://rp5.ru/",
-        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0",
+        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0)"
+        " Gecko/20100101 Firefox/71.0",
         "X-Requested-With": "XMLHttpRequest",
-        "Cookie": f"extreme_open=false; ftab=2; tab_synop=2; PHPSESSID={php_id}; i=152492; iru=152492;"
-                  " ru=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0+%28%D1%86%D0%B5%D0%BD%D1%82%D1%80%2C+%D0%91%"
-                  "D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; last_visited_page=http%3A%2F%2Frp5.ru%2F%D0%9F%D0%BE%D"
-                  "0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5_%28%D1%86%D0%B5%D0%"
-                  "BD%D1%82%D1%80%2C_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; format=csv; f_enc=utf; lang=ru"
+        "Cookie": "extreme_open=false; ftab=2; tab_synop=2;"
+        f"PHPSESSID={php_id}; i=152492; iru=152492;"
+        " ru=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0+%28%D1"
+        "%86%D0%B5%D0%BD%D1%82%D1%80%2C+%D0%91%"
+        "D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; "
+        "last_visited_page=http%3A%2F%2Frp5.ru%2F%D0%9F%D0%BE%D"
+        "0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA"
+        "%D0%B2%D0%B5_%28%D1%86%D0%B5%D0%"
+        "BD%D1%82%D1%80%2C_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3%29; "
+        "format=csv; f_enc=utf; lang=ru"
     }
 
-    my_data = {'wmo_id': '27605', 'a_date1': date1, 'a_date2': date2, 'f_ed3': '9', 'f_ed4': '9',
+    my_data = {'wmo_id': '27605', 'a_date1': date1,
+               'a_date2': date2, 'f_ed3': '9', 'f_ed4': '9',
                'f_ed5': '8', 'f_pe': '1', 'f_pe1': '2', 'lng_id': '2'}
 
     print('my_data', my_data)
@@ -71,7 +97,8 @@ def parse_response_link(response: str) -> str:
     soup = BeautifulSoup(response, 'lxml')
     script = soup.find('script')
     link = re.findall(
-        """http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+""",
+        """http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|"""
+        """[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+""",
         script.string)[0][:-1]
     link = '/'.join([i for i in link.split('/') if i != '..'])  # remove '/../'
     return link
@@ -79,8 +106,10 @@ def parse_response_link(response: str) -> str:
 
 def download_data(link: str) -> str:
     header = {
-        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) '
+        'Gecko/20100101 Firefox/71.0',
+        'Accept': 'text/html,application/xhtml+xml,application'
+        '/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
         'Accept-Encoding': 'gzip, deflate',
         'DNT': '1',
@@ -119,7 +148,10 @@ def main(datafile: str):
         with open(os.path.join(WEATHER_DATA_FOLDER, datafile), "w") as f:
             f.write(data[0])
 
-    with open(os.path.join(WEATHER_DATA_FOLDER, datafile), 'a', encoding='utf-8') as f:
+    with open(
+            os.path.join(WEATHER_DATA_FOLDER, datafile),
+            'a', encoding='utf-8'
+            ) as f:
         for i in reversed(data[1:]):
             f.write(i + '\n')
 

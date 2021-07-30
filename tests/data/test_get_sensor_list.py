@@ -1,7 +1,17 @@
 import datetime
+import yaml
 
 from src.data.get_sensor_list import get_links, check_sensor_pos, check_coordinate
-from src.data.config import MIN_LON, MAX_LON, MIN_LAT, MAX_LAT
+
+with open("params.yaml", 'r') as f:
+    params = yaml.safe_load(f)
+
+MAX_LAT, MIN_LAT, MAX_LON, MIN_LON = (
+        params['data']['coords']['max_lat'],
+        params['data']['coords']['min_lat'],
+        params['data']['coords']['max_lon'],
+        params['data']['coords']['min_lon'],
+        )
 
 test_html = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
                 <html>

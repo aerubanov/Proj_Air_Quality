@@ -43,7 +43,8 @@ def get_links(for_date, links_file):
         resp = requests.get(url)
         soup = BeautifulSoup(resp.text, 'lxml')
         links = [link.get('href') for link in soup.find_all('a')]
-        links = [i for i in links if str(for_date) in i and i[10:] not in checked_links]
+        links = [i for i in links
+                 if str(for_date) in i and i[10:] not in checked_links]
         links = [url+i for i in links]
         links = [i for i in links if 'indoor' not in i]
         links = links[1:]  # first links is reference on parrent folder
@@ -76,7 +77,9 @@ def check_sensor_pos(links, links_file, sensor_id_file):
             try:
                 download = s.get(url)
                 decoded_content = download.content.decode('utf-8')
-                cr = csv.DictReader(decoded_content.splitlines(), delimiter=';')
+                cr = csv.DictReader(
+                        decoded_content.splitlines(), delimiter=';'
+                        )
                 row = next(cr)
                 print(row)
                 try:

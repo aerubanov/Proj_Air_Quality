@@ -2,8 +2,12 @@ import typing
 import pandas as pd
 from datetime import timezone
 import os
+import yaml
 
-from src.data.config import SENSOR_DATA_FOLDER
+with open("params.yaml", 'r') as fd:
+    params = yaml.safe_load(fd)
+
+SENSOR_DATA_FOLDER = params['data']['paths']['sensor_data']
 
 
 def get_sensors_loc(sensors_list: typing.List[str]) -> pd.DataFrame:
@@ -24,7 +28,10 @@ def get_sensors_loc(sensors_list: typing.List[str]) -> pd.DataFrame:
         except (pd.errors.ParserError, pd.errors.EmptyDataError,
                 pd.core.groupby.groupby.DataError, KeyError):
             pass
-    sens_loc = pd.DataFrame(sensors_data, columns=['sensor_id', 'sensor_type', 'lat', 'lon'])
+    sens_loc = pd.DataFrame(
+            sensors_data,
+            columns=['sensor_id', 'sensor_type', 'lat', 'lon'],
+            )
     return sens_loc
 
 
@@ -35,7 +42,8 @@ def combine_sensors(sensors: pd.DataFrame) -> pd.DataFrame:
     sensors = (sds_sensors.assign(dummy=1)
                .merge(bme_sensors.assign(dummy=1), on='dummy')
                .query('lat_x==lat_y and lon_x==lon_y')
-               .drop('dummy', axis=1))[['sensor_id_x', 'sensor_id_y', 'lat_x', 'lon_x']]
+               .drop('dummy', axis=1)
+               )[['sensor_id_x', 'sensor_id_y', 'lat_x', 'lon_x']]
     sensors = sensors.rename(columns={'sensor_id_x': 'sds_sensor',
                                       'sensor_id_y': 'bme_sensor',
                                       'lat_x': 'lat',
@@ -48,11 +56,16 @@ def get_sealevel_alt(bme_id: int, press_meteo: pd.Series) -> float:
     Calculate sensor altitude based on ddifference in pressure.
     See details https://ru.wikipedia.org/wiki/Барометрическая_ступень"""
     file_name = f'{bme_id}_bme280_sensor_.csv'
-    bme_data = pd.read_csv(os.path.join(SENSOR_DATA_FOLDER, file_name), sep=';', parse_dates=['timestamp'])
+    bme_data = pd.read_csv(
+            os.path.join(SENSOR_DATA_FOLDER, file_name),
+            sep=';',
+            parse_dates=['timestamp'],
+            )
     bme_data = bme_data.set_index('timestamp').resample('1H').mean()
     bme_data = bme_data.tz_localize(timezone.utc)
     bme_data['press_diff'] = (bme_data['pressure'] - press_meteo) / 1000
-    bme_data['Q'] = 8000/(bme_data.pressure/1000) * (1 + 0.00366*bme_data.temperature)
+    bme_data['Q'] = 8000/(bme_data.pressure/1000) * (
+            1 + 0.00366*bme_data.temperature)
     bme_data['delta_h'] = - bme_data.Q * bme_data.press_diff
     delta_h = bme_data.delta_h.median()
     h = delta_h + 125  # высота метеостанции над уровнем моря
@@ -66,10 +79,16 @@ def get_weather_data(weather_file: str) -> pd.DataFrame:
     :return: processed data
     """
     def parser(date): return pd.to_datetime(date, format='%d.%m.%Y %H:%M')
-    data = pd.read_csv(weather_file, delimiter=';', parse_dates=['Местное время в Москве (центр, Балчуг)'],
-                       date_parser=parser,
-                       index_col=False)
-    data = data.rename(columns={'Местное время в Москве (центр, Балчуг)': 'date'})
+    data = pd.read_csv(
+            weather_file,
+            delimiter=';',
+            parse_dates=['Местное время в Москве (центр, Балчуг)'],
+            date_parser=parser,
+            index_col=False,
+            )
+    data = data.rename(
+            columns={'Местное время в Москве (центр, Балчуг)': 'date'}
+            )
     data = data.set_index('date')
     data.index = data.index.tz_localize(tz="Europe/Moscow").tz_convert('UTC')
     sel_data = pd.DataFrame(index=data.index)
