@@ -1,7 +1,12 @@
 import datetime
+import yaml
 
-from src.data.config import SERVER_URL
 from src.data.update_data import construct_url, check_file, download_data_for_interval
+
+with open("params.yaml", 'r') as fd:
+    params = yaml.safe_load(fd)
+
+SERVER_URL = params['data']['urls']['server']
 
 
 def test_construct_url():

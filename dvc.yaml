@@ -2,22 +2,20 @@ stages:
   extract_sensors:
     cmd: python -m src.data.spatial_data
     deps:
-      - DATA/raw/weather
-      - DATA/raw/sensors
+      - ${data.paths.weather_data}
+      - ${data.paths.sensor_data}
       - src/data/utils.py
       - src/data/opentopodata.py
       - src/data/osmdata.py
       - requirements.txt
     outs:
-      - DATA/processed/sensors.csv
+      - ${data.paths.sensors_file}
   create_dataset:
     cmd: python -m src.data.sensors_data
     deps:
-      - DATA/raw/weather
-      - DATA/raw/sensors
+      - ${data.paths.sensors_file}
       - src/data/utils.py
       - src/data/sensors_data.py
-      - DATA/processed/sensors.csv
     outs:
-      - DATA/processed/dataset.csv
+      - ${data.paths.dataset_file}
 

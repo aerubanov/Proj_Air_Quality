@@ -1,0 +1,19 @@
+data:
+  coords:
+    min_lat: 55.26
+    max_lat: 56.47
+    min_lon: 36.82
+    max_lon: 38.40
+  paths:
+    checked_links: processing_lists/links_list.txt
+    sensor_id: processing_lists/sensorID_list.txt
+    sensor_data: DATA/raw/sensors/
+    weather_data: DATA/raw/weather/
+    weather_filename: weather_centr.csv
+    sensors_file: DATA/processed/sensors.csv
+    dataset_file: DATA/processed/dataset.csv
+    osm_dump: DATA/raw/planet_37.15_55.486_4cd95583.osm.pbf
+  urls:
+    server: https://archive.sensor.community/
+    weather1: https://rp5.ru/%D0%90%D1%80%D1%85%D0%B8%D0%B2_%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D1%8B_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5_(%D1%86%D0%B5%D0%BD%D1%82%D1%80,_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3)
+    weather2: https://rp5.ru/responses/reFileSynop.php

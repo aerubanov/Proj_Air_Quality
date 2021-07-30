@@ -6,20 +6,12 @@ stages:
     - path: DATA/processed/sensors.csv
       md5: 3c6565fded257414abe9c4bdcd417f4e
       size: 28242
-    - path: DATA/raw/sensors
-      md5: 54b00448252d43abe607bd2c8495439e.dir
-      size: 7196200520
-      nfiles: 639
-    - path: DATA/raw/weather
-      md5: 56cdfd6fa93b42a56c2441d6d27c0805.dir
-      size: 3679018
-      nfiles: 1
     - path: src/data/sensors_data.py
-      md5: d65242348bbd0aa2f2caf5b7345e90a8
-      size: 2507
+      md5: 5dc35172562453d51352c8b04cb426dc
+      size: 2983
     - path: src/data/utils.py
-      md5: 54e3fe85eefa7a0380190774fbae7827
-      size: 3828
+      md5: 6354c16229ce22a3711241bff2336b93
+      size: 4097
     outs:
     - path: DATA/processed/dataset.csv
       md5: 1f7e45ff4852fd7befbbf3cd22968627
@@ -69,26 +61,26 @@ stages:
   extract_sensors:
     cmd: python -m src.data.spatial_data
     deps:
-    - path: DATA/raw/sensors
+    - path: DATA/raw/sensors/
       md5: 54b00448252d43abe607bd2c8495439e.dir
       size: 7196200520
       nfiles: 639
-    - path: DATA/raw/weather
+    - path: DATA/raw/weather/
       md5: 56cdfd6fa93b42a56c2441d6d27c0805.dir
       size: 3679018
       nfiles: 1
     - path: requirements.txt
-      md5: 253de2a9c348dba4879df975f7ca4f75
+      md5: 216f2018de6bfb8e8ced25bf8386b5d7
       size: 353
     - path: src/data/opentopodata.py
-      md5: 9d824da3053f862ca361217e2bec164c
-      size: 1396
+      md5: 09038e1d814fff6bcb998429c2ca5d00
+      size: 1497
     - path: src/data/osmdata.py
-      md5: c776baf8998a8b2bfe7ae7c224b5fbcc
-      size: 2047
+      md5: 1483ea3c9809b6e05ce66dd18cf60e25
+      size: 2117
     - path: src/data/utils.py
-      md5: 54e3fe85eefa7a0380190774fbae7827
-      size: 3828
+      md5: 6354c16229ce22a3711241bff2336b93
+      size: 4097
     outs:
     - path: DATA/processed/sensors.csv
       md5: 3c6565fded257414abe9c4bdcd417f4e

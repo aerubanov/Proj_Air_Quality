@@ -3,9 +3,13 @@ import geopandas as gpd
 from pyrosm import OSM
 import typing
 from shapely.ops import nearest_points
+import yaml
+
+with open("params.yaml", 'r') as fd:
+    params = yaml.safe_load(fd)
 
 CRS = "EPSG:3395"
-fp = 'DATA/raw/planet_37.15_55.486_4cd95583.osm.pbf'
+fp = params['data']['paths']['osm_dump']
 
 
 def get_osm_gata(protobuf: str) -> typing.Tuple:

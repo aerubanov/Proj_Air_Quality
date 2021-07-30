@@ -73,9 +73,9 @@ if __name__ == '__main__':
     np.random.seed(0)
     tf.random.set_seed(0)
 
-    start_date = '2021-01-01'
-    end_date = '2021-03-01'
-    val_split = '2021-02-01'
+    start_date = '2021-05-01'
+    end_date = '2021-07-01'
+    val_split = '2021-06-10'
 
     data = pd.read_csv(data_file, parse_dates=['timestamp'])
     data = data[
