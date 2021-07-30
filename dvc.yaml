@@ -3,7 +3,7 @@ stages:
     cmd: python -m src.data.spatial_data
     deps:
       - ${data.paths.weather_data}
-      - ${data.paths.sensor_data
+      - ${data.paths.sensor_data}
       - src/data/utils.py
       - src/data/opentopodata.py
       - src/data/osmdata.py
@@ -13,11 +13,9 @@ stages:
   create_dataset:
     cmd: python -m src.data.sensors_data
     deps:
-      - ${data.paths.weather_data}
-      - ${data.paths.sensor_data
+      - ${data.paths.sensors_file}
       - src/data/utils.py
       - src/data/sensors_data.py
-      - ${data.paths.dataset_file}
     outs:
-      - ${data.paths.sensors_file}
+      - ${data.paths.dataset_file}
 

@@ -11,7 +11,7 @@ data:
     weather_data: DATA/raw/weather/
     weather_filename: weather_centr.csv
     sensors_file: DATA/processed/sensors.csv
-    dataset_file: DATA/processed/sensors.csv
+    dataset_file: DATA/processed/dataset.csv
     osm_dump: DATA/raw/planet_37.15_55.486_4cd95583.osm.pbf
   urls:
     server: https://archive.sensor.community/
