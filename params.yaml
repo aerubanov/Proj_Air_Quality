@@ -17,3 +17,10 @@ data:
     server: https://archive.sensor.community/
     weather1: https://rp5.ru/%D0%90%D1%80%D1%85%D0%B8%D0%B2_%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D1%8B_%D0%B2_%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B5_(%D1%86%D0%B5%D0%BD%D1%82%D1%80,_%D0%91%D0%B0%D0%BB%D1%87%D1%83%D0%B3)
     weather2: https://rp5.ru/responses/reFileSynop.php
+model:
+  start_date: 2021-05-01
+  end_date: 2021-07-01
+  val_split: 2021-06-10
+  max_iter: 100
+  num_induc: 200
+  num_induc_upd: 20

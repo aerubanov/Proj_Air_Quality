@@ -3,15 +3,19 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import yaml
 
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
 from src.gp.models.kernel import basic_kernel as kernel
 
 
+with open('params.yaml', 'r') as fd:
+    params = yaml.safe_load(fd)
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
-data_file = 'DATA/processed/dataset.csv'
+data_file = params['data']['paths']['dataset_file']
 x_col = ['timestamp', 'lon', 'lat']
 y_col = 'P1'
 
@@ -41,7 +45,8 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
             )
     trainer.build_model(
             init_data,
-            max_iter=100,
+            max_iter=params['model']['max_iter'],
+            M=params['model']['num_induc'],
             )
 
     results = []
@@ -53,7 +58,8 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         y_test = test_data[y_col].values
         trainer.update_model(
                 train_data,
-                max_iter=100,
+                max_iter=params['model']['max_iter'],
+                new_m=params['model']['num_induc_upd'],
                 iprint=0,
                 )
         pred = trainer.predict(test_data)
@@ -73,9 +79,9 @@ if __name__ == '__main__':
     np.random.seed(0)
     tf.random.set_seed(0)
 
-    start_date = '2021-05-01'
-    end_date = '2021-07-01'
-    val_split = '2021-06-10'
+    start_date = params['model']['start_date']
+    end_date = params['model']['end_date']
+    val_split = params['model']['val_split']
 
     data = pd.read_csv(data_file, parse_dates=['timestamp'])
     data = data[
