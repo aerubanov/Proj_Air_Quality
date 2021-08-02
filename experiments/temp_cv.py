@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import yaml
+import json
 
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
@@ -67,12 +67,18 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
     print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
-    _, ax = plt.subplots(figsize=(15, 5))
-    ax.plot([i for i in range(len(results))], np.sqrt(results))
-    ax.set_xlabel('iteration')
-    ax.set_ylabel('RMSE')
-    plt.show()
-    # plot_spatial(model, train_data)
+
+    with open(params['model']['temp_cv']['result_file'], 'w') as fd:
+        json.dump({
+            'mean RMSE': np.mean(np.sqrt(results)),
+            'RMSE std': np.std(np.sqrt(results)),
+            }, fd)
+
+    plot_data = np.sqrt(results)
+    plot_data = [{'step': i, 'RMSE': plot_data[i]}
+                 for i in range(len(plot_data))]
+    with open(params['model']['temp_cv']['plot_file'], 'w') as fd:
+        json.dump({'temp_cv': plot_data}, fd)
 
 
 if __name__ == '__main__':
