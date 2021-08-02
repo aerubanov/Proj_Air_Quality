@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DVC Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.10.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.8.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.5.1"></script>
+</head>
+<body>
+    <div id = "plot0"></div>
+<script type = "text/javascript">
+    var spec = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "data": {
+        "values": [
+    {
+        "RMSE": 6.161762311048357,
+        "rev": "workspace",
+        "step": 0
+    },
+    {
+        "RMSE": 16.889404206195522,
+        "rev": "workspace",
+        "step": 1
+    },
+    {
+        "RMSE": 20.586046160781418,
+        "rev": "workspace",
+        "step": 2
+    },
+    {
+        "RMSE": 10.727298452995054,
+        "rev": "workspace",
+        "step": 3
+    },
+    {
+        "RMSE": 9.126697138484712,
+        "rev": "workspace",
+        "step": 4
+    }
+]
+    },
+    "title": "",
+    "width": 300,
+    "height": 300,
+    "mark": {
+        "type": "line"
+    },
+    "encoding": {
+        "x": {
+            "field": "step",
+            "type": "quantitative",
+            "title": "step"
+        },
+        "y": {
+            "field": "RMSE",
+            "type": "quantitative",
+            "title": "RMSE",
+            "scale": {
+                "zero": false
+            }
+        },
+        "color": {
+            "field": "rev",
+            "type": "nominal"
+        }
+    }
+}
+;
+    vegaEmbed('#plot0', spec);
+</script>
+<div id = "plot1"></div>
+<script type = "text/javascript">
+    var spec = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "data": {
+        "values": [
+    {
+        "RMSE": 19.66441528096093,
+        "rev": "workspace",
+        "step": 0
+    },
+    {
+        "RMSE": 23.520300762295737,
+        "rev": "workspace",
+        "step": 1
+    },
+    {
+        "RMSE": 14.823496244757118,
+        "rev": "workspace",
+        "step": 2
+    },
+    {
+        "RMSE": 9.21789719345523,
+        "rev": "workspace",
+        "step": 3
+    }
+]
+    },
+    "title": "",
+    "width": 300,
+    "height": 300,
+    "mark": {
+        "type": "line"
+    },
+    "encoding": {
+        "x": {
+            "field": "step",
+            "type": "quantitative",
+            "title": "step"
+        },
+        "y": {
+            "field": "RMSE",
+            "type": "quantitative",
+            "title": "RMSE",
+            "scale": {
+                "zero": false
+            }
+        },
+        "color": {
+            "field": "rev",
+            "type": "nominal"
+        }
+    }
+}
+;
+    vegaEmbed('#plot1', spec);
+</script>
+</body>
+</html>

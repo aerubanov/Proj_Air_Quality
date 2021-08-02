@@ -18,4 +18,27 @@ stages:
       - src/data/sensors_data.py
     outs:
       - ${data.paths.dataset_file}
-
+  spat_cv:
+    cmd: python -m experiments.spat_cv
+    deps: 
+      - src/gp/
+      - experiments/spat_cv.py
+      - ${data.paths.dataset_file}
+    metrics:
+      - ${model.spat_cv.result_file}:
+          cache: false
+    plots:
+      - ${model.spat_cv.plot_file}:
+          cache: false
+  temp_cv:
+    cmd: python -m experiments.temp_cv
+    deps: 
+      - src/gp/
+      - experiments/temp_cv.py
+      - ${data.paths.dataset_file}
+    metrics:
+      - ${model.temp_cv.result_file}:
+          cache: false
+    plots:
+      - ${model.temp_cv.plot_file}:
+          cache: false
