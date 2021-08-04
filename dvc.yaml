@@ -8,6 +8,8 @@ stages:
       - src/data/opentopodata.py
       - src/data/osmdata.py
       - requirements.txt
+    params:
+      - data
     outs:
       - ${data.paths.sensors_file}
   create_dataset:
@@ -16,6 +18,8 @@ stages:
       - ${data.paths.sensors_file}
       - src/data/utils.py
       - src/data/sensors_data.py
+    params:
+      - data
     outs:
       - ${data.paths.dataset_file}
   spat_cv:
@@ -24,6 +28,9 @@ stages:
       - src/gp/
       - experiments/spat_cv.py
       - ${data.paths.dataset_file}
+    params:
+      - data
+      - model
     metrics:
       - ${model.spat_cv.result_file}:
           cache: false
@@ -36,6 +43,9 @@ stages:
       - src/gp/
       - experiments/temp_cv.py
       - ${data.paths.dataset_file}
+    params:
+      - data
+      - model
     metrics:
       - ${model.temp_cv.result_file}:
           cache: false
