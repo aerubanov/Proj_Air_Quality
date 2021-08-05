@@ -1,0 +1,12 @@
+version: "2"
+services:
+  weather_loader:
+    restart: always
+    build:
+      context: weather_loader/
+      dockerfile: Dockerfile
+    image: aerubanov/weather_loader
+    container_name: weather_loader
+    command: python -m app.parse_weather -u
+    volumes:
+      - "./DATA:/code/DATA"
