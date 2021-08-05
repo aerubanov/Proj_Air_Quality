@@ -105,7 +105,7 @@ def start_parsing(url):
     print('start ', datetime.datetime.now())
     try:
         res = parse_weather(url)
-    except (AttributeError, IndexError, ValueError, SSLError) as er:
+    except (AttributeError, IndexError, ValueError) as er:
         print('Except')
         print(str(er))
     else:
