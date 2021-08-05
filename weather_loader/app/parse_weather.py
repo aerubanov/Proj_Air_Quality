@@ -103,13 +103,18 @@ def parse_weather(url):
 
 def start_parsing(url):
     print('start ', datetime.datetime.now())
-    res = parse_weather(url)
-    frame = pd.DataFrame.from_dict(res)
-    header = False
-    if not os.path.exists(filename):
-        header = True
-    frame.to_csv(filename, sep=',', header=header, index=False, mode='a')
-    print('done')
+    try:
+        res = parse_weather(url)
+    except (AttributeError, IndexError, ValueError, SSLError) as er:
+        print('Except')
+        print(str(er))
+    else:
+        frame = pd.DataFrame.from_dict(res)
+        header = False
+        if not os.path.exists(filename):
+            header = True
+        frame.to_csv(filename, sep=',', header=header, index=False, mode='a')
+        print('done')
 
 
 max_col = 24
