@@ -43,7 +43,7 @@ class OSGPRTrainer:
         y = data[self.y_col].values[:, None]
         Z = X[np.random.permutation(X.shape[0])[0:M], :]
         model = gpflow.models.sgpr.SGPR((X, y), self.kernel, Z)
-        gpflow.set_trainable(model.kernel, False)
+        # gpflow.set_trainable(model.kernel, False)
 
         optimizer = gpflow.optimizers.Scipy()
         optimizer.minimize(
@@ -91,7 +91,7 @@ class OSGPRTrainer:
         new_model.likelihood.variance.assign(self.model.likelihood.variance)
         for i, item in enumerate(self.model.kernel.trainable_variables):
             new_model.kernel.trainable_variables[i].assign(item)
-        gpflow.set_trainable(new_model.kernel, False)
+        # gpflow.set_trainable(new_model.kernel, False)
         optimizer = gpflow.optimizers.Scipy()
         optimizer.minimize(
                 new_model.training_loss,

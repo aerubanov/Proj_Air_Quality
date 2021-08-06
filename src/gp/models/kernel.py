@@ -9,10 +9,10 @@ spat_cov = gpflow.kernels.Matern32(
 mt = gpflow.kernels.Matern32(variance=1, lengthscales=24, active_dims=[0])
 pk = gpflow.kernels.Periodic(
         gpflow.kernels.SquaredExponential(
-            lengthscales=24*1.5,
+            lengthscales=24*2,
             active_dims=[0],
             ),
         period=24,
         )
 time_cov = mt * pk
-basic_kernel = spat_cov * time_cov
+basic_kernel = time_cov

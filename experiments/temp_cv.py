@@ -4,6 +4,7 @@ from sklearn.metrics import mean_squared_error
 import tensorflow as tf
 import yaml
 import json
+import matplotlib.pyplot as plt
 
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
@@ -51,11 +52,11 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
 
     results = []
     cv = time_cv(val_data)
-    test_data = next(cv)
+    train_data = next(cv)
     predictions = []
     for i, item in enumerate(cv):
-        train_data = test_data
         test_data = item
+        print(test_data)
         y_test = test_data[y_col].values
         trainer.update_model(
                 train_data,
@@ -63,10 +64,14 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                 new_m=params['model']['num_induc_upd'],
                 iprint=0,
                 )
+        train_data = test_data
         pred = trainer.predict(test_data)
         test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
                 pred[:, 0], pred[:, 1], pred[:, 2]
         predictions.append(test_data)
+        test_data = test_data.reset_index()
+        test_data[['P1', 'pred']].plot()
+        plt.show()
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
@@ -101,6 +106,9 @@ if __name__ == '__main__':
             (data['timestamp'] >= start_date)
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
+    data = data[data['sds_sensor'] == 24323].reset_index()
+    data['P1'].plot()
+    plt.show()
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]
