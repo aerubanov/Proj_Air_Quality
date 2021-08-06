@@ -52,6 +52,7 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
     results = []
     cv = time_cv(val_data)
     test_data = next(cv)
+    predictions = []
     for i, item in enumerate(cv):
         train_data = test_data
         test_data = item
@@ -63,6 +64,9 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                 iprint=0,
                 )
         pred = trainer.predict(test_data)
+        test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
+                pred[:, 0], pred[:, 1], pred[:, 2]
+        predictions.append(test_data)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
@@ -79,6 +83,9 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                  for i in range(len(plot_data))]
     with open(params['model']['temp_cv']['plot_file'], 'w') as fd:
         json.dump({'temp_cv': plot_data}, fd)
+
+    predictions = pd.concat(predictions, ignore_index=True)
+    predictions.to_csv(params['model']['temp_cv']['prediction'])
 
 
 if __name__ == '__main__':

@@ -12,8 +12,8 @@ stages:
       size: 3679018
       nfiles: 1
     - path: requirements.txt
-      md5: 216f2018de6bfb8e8ced25bf8386b5d7
-      size: 353
+      md5: aa81df9430a7c47b9691bbebe5bdc453
+      size: 339
     - path: src/data/opentopodata.py
       md5: 09038e1d814fff6bcb998429c2ca5d00
       size: 1497
@@ -92,10 +92,10 @@ stages:
       md5: 1f7e45ff4852fd7befbbf3cd22968627
       size: 556467545
     - path: experiments/spat_cv.py
-      md5: 73adea9a989d85a455d535fd8fee9043
-      size: 2682
+      md5: e432820a8ba71e4826d1cd1aed121fa6
+      size: 2995
     - path: src/gp/
-      md5: 33d2165986ef99fadafcc61071280ffe.dir
+      md5: e062fd4c0c038dc50be8240ad6e0ae10.dir
       size: 44769
       nfiles: 25
     params:
@@ -121,7 +121,7 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
         model:
           start_date: '2021-05-01'
-          end_date: '2021-07-01'
+          end_date: '2021-06-15'
           val_split: '2021-06-10'
           max_iter: 100
           num_induc: 200
@@ -129,15 +129,17 @@ stages:
           temp_cv:
             result_file: experiments/results/temp_cv.json
             plot_file: experiments/plots/temp_cv.json
+            prediction: experiments/results/temp_cv.csv
           spat_cv:
             result_file: experiments/results/spat_cv.json
             plot_file: experiments/plots/spat_cv.json
+            prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/spat_cv.json
-      md5: ac049f646996a93c7bf7fc2bb7184d8b
-      size: 869
+      md5: 777babf44131fe20e76a3eecedbc2f05
+      size: 215
     - path: experiments/results/spat_cv.json
-      md5: 2b6fd877e660c86fac29d2604ccc886f
+      md5: 8904310c843c032d7a77ede4639390c1
       size: 64
   temp_cv:
     cmd: python -m experiments.temp_cv
@@ -146,10 +148,10 @@ stages:
       md5: 1f7e45ff4852fd7befbbf3cd22968627
       size: 556467545
     - path: experiments/temp_cv.py
-      md5: 46e8b244635775f81843385d70073909
-      size: 3024
+      md5: 41baac80518a2ec55c14687c0dc4d481
+      size: 3337
     - path: src/gp/
-      md5: 33d2165986ef99fadafcc61071280ffe.dir
+      md5: e062fd4c0c038dc50be8240ad6e0ae10.dir
       size: 44769
       nfiles: 25
     params:
@@ -175,7 +177,7 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
         model:
           start_date: '2021-05-01'
-          end_date: '2021-07-01'
+          end_date: '2021-06-15'
           val_split: '2021-06-10'
           max_iter: 100
           num_induc: 200
@@ -183,13 +185,15 @@ stages:
           temp_cv:
             result_file: experiments/results/temp_cv.json
             plot_file: experiments/plots/temp_cv.json
+            prediction: experiments/results/temp_cv.csv
           spat_cv:
             result_file: experiments/results/spat_cv.json
             plot_file: experiments/plots/spat_cv.json
+            prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/temp_cv.json
-      md5: a448364b26c54a86771407f90b077273
-      size: 831
+      md5: b687190b88364643103b5b99aa74cf75
+      size: 173
     - path: experiments/results/temp_cv.json
-      md5: 49fa4b6e2f5071709ff5023f762bd86d
-      size: 65
+      md5: a3fa5a1577471abbb49f60d688cf3a56
+      size: 64
