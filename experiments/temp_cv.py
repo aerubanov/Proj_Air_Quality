@@ -72,6 +72,7 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
+    gpflow.utilities.print_summary(trainer.model)
     print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
 
     with open(params['model']['temp_cv']['result_file'], 'w') as fd:
@@ -88,10 +89,15 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
 
     predictions = pd.concat(predictions, ignore_index=True)
     predictions.to_csv(params['model']['temp_cv']['prediction'])
+    return predictions
+
+
+def plot_pred(predictions: pd.DataFrame):
     predictions = predictions.reset_index()
+    predictions = predictions.groupby(['timestamp'], as_index=False).mean()
+    predictions['sds_sensor'] = 1
     predictions[['P1', 'pred', 'up_bound', 'low_bound']].plot()
     plt.show()
-    gpflow.utilities.print_summary(trainer.model)
 
 
 if __name__ == '__main__':
@@ -107,11 +113,13 @@ if __name__ == '__main__':
             (data['timestamp'] >= start_date)
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
-    data = data[['timestamp', 'lon', 'lat', 'P1']].groupby(
-            ['timestamp'], as_index=False).mean()
-    data['sds_sensor'] = 1
+    data = data[['timestamp', 'lon', 'lat', 'P1', 'sds_sensor']]
+    #data = data[['timestamp', 'lon', 'lat', 'P1']].groupby(
+    #        ['timestamp'], as_index=False).mean()
+    # data['sds_sensor'] = 1
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]
 
-    main(init_data, val_data)
+    pred = main(init_data, val_data)
+    plot_pred(pred)
