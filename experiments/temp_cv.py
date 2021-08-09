@@ -1,3 +1,4 @@
+import gpflow
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error
@@ -8,15 +9,15 @@ import matplotlib.pyplot as plt
 
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
-from src.gp.models.kernel import basic_kernel as kernel
+from src.gp.models.kernel import get_kernel
 
 
 with open('params.yaml', 'r') as fd:
     params = yaml.safe_load(fd)
 
 pd.options.mode.chained_assignment = None  # default='warn'
-
 data_file = params['data']['paths']['dataset_file']
+kernel = get_kernel(params['model']['kernel'])
 x_col = ['timestamp', 'lon', 'lat']
 y_col = 'P1'
 
@@ -56,7 +57,6 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
     predictions = []
     for i, item in enumerate(cv):
         test_data = item
-        print(test_data)
         y_test = test_data[y_col].values
         trainer.update_model(
                 train_data,
@@ -69,9 +69,6 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
                 pred[:, 0], pred[:, 1], pred[:, 2]
         predictions.append(test_data)
-        test_data = test_data.reset_index()
-        test_data[['P1', 'pred']].plot()
-        plt.show()
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
@@ -91,6 +88,10 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
 
     predictions = pd.concat(predictions, ignore_index=True)
     predictions.to_csv(params['model']['temp_cv']['prediction'])
+    predictions = predictions.reset_index()
+    predictions[['P1', 'pred', 'up_bound', 'low_bound']].plot()
+    plt.show()
+    gpflow.utilities.print_summary(trainer.model)
 
 
 if __name__ == '__main__':
@@ -106,9 +107,9 @@ if __name__ == '__main__':
             (data['timestamp'] >= start_date)
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
-    data = data[data['sds_sensor'] == 24323].reset_index()
-    data['P1'].plot()
-    plt.show()
+    data = data[['timestamp', 'lon', 'lat', 'P1']].groupby(
+            ['timestamp'], as_index=False).mean()
+    data['sds_sensor'] = 1
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]

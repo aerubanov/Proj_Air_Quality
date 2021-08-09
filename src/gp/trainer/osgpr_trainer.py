@@ -108,6 +108,7 @@ class OSGPRTrainer:
         data = self.transform.transform(data)
         X = data[self.x_col].values
         mu, var = self.model.predict_f(X)
+        var = var[:, None]
         pred = np.hstack((mu, mu + 2*np.sqrt(var), mu - 2 * np.sqrt(var)))
         pred = self.transform.inverse_transform(pred)
         return pred
