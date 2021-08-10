@@ -67,7 +67,7 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         train_data = test_data
         pred = trainer.predict(test_data)
         test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
-                pred[:, 0], pred[:, 1], pred[:, 2]
+            pred[:, 0], pred[:, 1], pred[:, 2]
         predictions.append(test_data)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
@@ -114,9 +114,6 @@ if __name__ == '__main__':
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
     data = data[['timestamp', 'lon', 'lat', 'P1', 'sds_sensor']]
-    #data = data[['timestamp', 'lon', 'lat', 'P1']].groupby(
-    #        ['timestamp'], as_index=False).mean()
-    # data['sds_sensor'] = 1
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]

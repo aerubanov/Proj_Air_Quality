@@ -1,5 +1,5 @@
 from sklearn.base import TransformerMixin
-from sklearn.preprocessing import QuantileTransformer, StandardScaler
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
 

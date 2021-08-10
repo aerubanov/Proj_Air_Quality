@@ -52,7 +52,7 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                 )
         pred = trainer.predict(test_data)
         test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
-                pred[:, 0], pred[:, 1], pred[:, 2]
+            pred[:, 0], pred[:, 1], pred[:, 2]
         predictions.append(test_data)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
