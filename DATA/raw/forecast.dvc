@@ -1,0 +1,5 @@
+outs:
+- md5: e8fdc8242451b5556a4d3d198c5398c1.dir
+  size: 390769
+  nfiles: 1
+  path: forecast
