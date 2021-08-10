@@ -5,9 +5,10 @@ import tensorflow as tf
 from sklearn.metrics import mean_squared_error
 import yaml
 
-from experiments.temp_cv import x_col, y_col, kernel, time_cv
+from experiments.temp_cv import x_col, y_col, time_cv
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
 from src.gp.transform.basic import GPTransform
+from src.gp.models.kernel import get_kernel
 
 with open('params.yaml', 'r') as fd:
     params = yaml.safe_load(fd)
@@ -15,6 +16,7 @@ with open('params.yaml', 'r') as fd:
 pd.options.mode.chained_assignment = None  # default='warn'
 
 data_file = params['data']['paths']['dataset_file']
+kernel = get_kernel(params['model']['kernel'])
 
 
 def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
@@ -34,6 +36,7 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
             )
 
     results = []
+    predictions = []
     n_sensors = round(len(val_data['sds_sensor'].unique()) * 0.25)
     for i, item in enumerate(time_cv(val_data)):
         test_data = item.spat.random_sensors(n_sensors)
@@ -48,6 +51,9 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                 iprint=0,
                 )
         pred = trainer.predict(test_data)
+        test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
+            pred[:, 0], pred[:, 1], pred[:, 2]
+        predictions.append(test_data)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
@@ -65,6 +71,9 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
     with open(params['model']['spat_cv']['plot_file'], 'w') as fd:
         json.dump({'spat_cv': plot_data}, fd)
 
+    predictions = pd.concat(predictions, ignore_index=True)
+    predictions.to_csv(params['model']['spat_cv']['prediction'])
+
 
 if __name__ == '__main__':
 
@@ -80,6 +89,7 @@ if __name__ == '__main__':
             (data['timestamp'] >= start_date)
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
+    data = data[['timestamp', 'lon', 'lat', 'P1', 'sds_sensor']]
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]

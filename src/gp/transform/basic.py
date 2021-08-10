@@ -1,5 +1,5 @@
 from sklearn.base import TransformerMixin
-from sklearn.preprocessing import QuantileTransformer
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
 
@@ -16,11 +16,12 @@ class GPTransform(TransformerMixin):
             random_state: int = 42,
             n_quantiles: int = 100,
     ):
-        self.target_transform = QuantileTransformer(
-                output_distribution='normal',
-                random_state=random_state,
-                n_quantiles=n_quantiles,
-            )
+        # self.target_transform = QuantileTransformer(
+        #         output_distribution='normal',
+        #         random_state=random_state,
+        #         n_quantiles=n_quantiles,
+        #     )
+        self.target_transform = StandardScaler()
         self.start_date = None
         super().__init__()
 
