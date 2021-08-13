@@ -42,9 +42,9 @@ class OSGPRTrainer:
         X = data[self.x_col].values
         y = data[self.y_col].values[:, None]
         Z = X[np.random.permutation(X.shape[0])[0:M], :]
+
         model = gpflow.models.sgpr.SGPR((X, y), self.kernel, Z)
         # gpflow.set_trainable(model.kernel, False)
-
         optimizer = gpflow.optimizers.Scipy()
         optimizer.minimize(
                 model.training_loss,
@@ -108,7 +108,6 @@ class OSGPRTrainer:
         data = self.transform.transform(data)
         X = data[self.x_col].values
         mu, var = self.model.predict_f(X)
-        var = var[:, None]
         pred = np.hstack((mu, mu + 2*np.sqrt(var), mu - 2 * np.sqrt(var)))
         pred = self.transform.inverse_transform(pred)
         return pred

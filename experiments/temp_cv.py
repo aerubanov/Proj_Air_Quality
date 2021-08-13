@@ -53,18 +53,11 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
 
     results = []
     cv = time_cv(val_data)
-    train_data = next(cv)
     predictions = []
     for i, item in enumerate(cv):
         test_data = item
+        train_data = test_data.copy()
         y_test = test_data[y_col].values
-        trainer.update_model(
-                train_data,
-                max_iter=params['model']['max_iter'],
-                new_m=params['model']['num_induc_upd'],
-                iprint=0,
-                )
-        train_data = test_data
         pred = trainer.predict(test_data)
         test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
             pred[:, 0], pred[:, 1], pred[:, 2]
@@ -72,6 +65,12 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
+        trainer.update_model(
+                train_data,
+                max_iter=params['model']['max_iter'],
+                new_m=params['model']['num_induc_upd'],
+                iprint=0,
+                )
     gpflow.utilities.print_summary(trainer.model)
     print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
 
@@ -113,8 +112,11 @@ if __name__ == '__main__':
             (data['timestamp'] >= start_date)
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
-    data = data[['timestamp', 'lon', 'lat', 'P1', 'sds_sensor']]
+    data = data[x_col + [y_col, 'sds_sensor']]
 
+    data.loc[data.P1 <= 1, 'P1'] = 1
+    print(data['P1'].min(), data['P1'].max())
+    
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]
 
