@@ -183,10 +183,12 @@ class OSGPR(GPModel, gpflow.models.InternalDataTrainingLossMixin):
             var2 = - tf.matmul(tf.transpose(Lbinv_Kbs), Lbinv_Kbs)
             var3 = tf.matmul(tf.transpose(LDinv_Lbinv_Kbs), LDinv_Lbinv_Kbs)
             var = var1 + var2 + var3
+            var = tf.tile(var[None, ...], [self.num_latent, 1, 1])  # [P, N, N]
         else:
             var1 = self.kernel(Xnew, full_cov=False)
             var2 = -tf.reduce_sum(tf.square(Lbinv_Kbs), 0)
             var3 = tf.reduce_sum(tf.square(LDinv_Lbinv_Kbs), 0)
             var = var1 + var2 + var3
+            var = tf.tile(var[:, None], [1, self.num_latent])
 
         return mean + self.mean_function(Xnew), var

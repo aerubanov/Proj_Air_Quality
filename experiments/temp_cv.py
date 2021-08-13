@@ -55,13 +55,12 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
     cv = time_cv(val_data)
     predictions = []
     for i, item in enumerate(cv):
-        test_data = item
-        train_data = test_data.copy()
-        y_test = test_data[y_col].values
-        pred = trainer.predict(test_data)
-        test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
+        y_test = item[y_col].to_numpy(copy=True)
+        train_data = item.copy()
+        pred = trainer.predict(item.copy())
+        item['pred'], item['low_bound'], item['up_bound'] = \
             pred[:, 0], pred[:, 1], pred[:, 2]
-        predictions.append(test_data)
+        predictions.append(item)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
@@ -95,7 +94,7 @@ def plot_pred(predictions: pd.DataFrame):
     predictions = predictions.reset_index()
     predictions = predictions.groupby(['timestamp'], as_index=False).mean()
     predictions['sds_sensor'] = 1
-    predictions[['P1', 'pred', 'up_bound', 'low_bound']].plot()
+    predictions[['P1', 'pred']].plot()
     plt.show()
 
 

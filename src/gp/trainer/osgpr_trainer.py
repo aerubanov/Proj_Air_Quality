@@ -53,6 +53,15 @@ class OSGPRTrainer:
                 )
         self.model = model
 
+    def _init_Z(self, cur_Z, new_X):
+        M = cur_Z.shape[0]
+        M_old = int(0.7 * M)
+        M_new = M - M_old
+        old_Z = cur_Z[np.random.permutation(M)[0:M_old], :]
+        new_Z = new_X[np.random.permutation(new_X.shape[0])[0:M_new], :]
+        Z = np.vstack((old_Z, new_Z))
+        return Z
+
     def update_model(
             self,
             data: pd.DataFrame,
@@ -76,18 +85,30 @@ class OSGPRTrainer:
             Su = Su[0, :, :]
         Kaa1 = self.model.kernel.K(self.model.inducing_variable.Z)
 
-        Zinit = X[np.random.permutation(X.shape[0])[0:new_m], :]
-        Zinit = np.vstack((Z_opt.numpy(), Zinit))
+        #Zinit = X[np.random.permutation(X.shape[0])[0:new_m], :]
+        #Zinit = np.vstack((Z_opt.numpy(), Zinit))
+        Zinit = self._init_Z(Z_opt.numpy(), X)
 
+        print(mu.shape, Su.shape, Kaa1.shape, Z_opt.shape)
+        #print(mu[new_m:, :].shape, Su[new_m:, new_m:].shape, Kaa1[new_m:, new_m:].shape, Z_opt[new_m:, :].shape)
         new_model = OSGPR(
                 (X, y),
                 self.kernel,
-                mu[new_m:, :],
-                Su[new_m:, new_m:],
-                Kaa1[new_m:, new_m:],
-                Z_opt[new_m:, :],
+                mu,
+                Su,
+                Kaa1,
+                Z_opt,
                 Zinit,
                 )
+        #new_model = OSGPR(
+        #        (X, y),
+        #        self.kernel,
+        #        mu[new_m:, :],
+        #        Su[new_m:, new_m:],
+        #        Kaa1[new_m:, new_m:],
+        #        Z_opt[new_m:, :],
+        #        Zinit,
+        #        )
         new_model.likelihood.variance.assign(self.model.likelihood.variance)
         for i, item in enumerate(self.model.kernel.trainable_variables):
             new_model.kernel.trainable_variables[i].assign(item)
@@ -108,6 +129,7 @@ class OSGPRTrainer:
         data = self.transform.transform(data)
         X = data[self.x_col].values
         mu, var = self.model.predict_f(X)
+        print(mu, var)
         pred = np.hstack((mu, mu + 2*np.sqrt(var), mu - 2 * np.sqrt(var)))
         pred = self.transform.inverse_transform(pred)
         return pred
