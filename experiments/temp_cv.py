@@ -58,8 +58,8 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         y_test = item[y_col].to_numpy(copy=True)
         train_data = item.copy()
         pred = trainer.predict(item.copy())
-        item['pred'], item['low_bound'], item['up_bound'] = \
-            pred[:, 0], pred[:, 1], pred[:, 2]
+        item['pred'], item['var'] = \
+            pred[:, 0], pred[:, 1]
         predictions.append(item)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
@@ -91,10 +91,12 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
 
 
 def plot_pred(predictions: pd.DataFrame):
+    fig, axs = plt.subplots(2, 1, sharex=True, figsize=(15, 5))
     predictions = predictions.reset_index()
     predictions = predictions.groupby(['timestamp'], as_index=False).mean()
     predictions['sds_sensor'] = 1
-    predictions[['P1', 'pred']].plot()
+    predictions[['P1', 'pred']].plot(ax=axs[0])
+    predictions[['var']].plot(ax=axs[1])
     plt.show()
 
 

@@ -19,11 +19,11 @@ data:
     weather2: https://rp5.ru/responses/reFileSynop.php
 model:
   start_date: '2021-06-01'
-  end_date: '2021-06-12'
-  val_split: '2021-06-08'
-  max_iter: 100
-  num_induc: 100
-  num_induc_upd: 10
+  end_date: '2021-06-16'
+  val_split: '2021-06-10'
+  max_iter: 150
+  num_induc: 200
+  num_induc_upd: 20
   kernel: basic
   temp_cv:
     result_file: experiments/results/temp_cv.json

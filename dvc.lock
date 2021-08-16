@@ -92,12 +92,12 @@ stages:
       md5: 34faf888160635dc1b4dfc2a798c4095
       size: 581221045
     - path: experiments/spat_cv.py
-      md5: 675be3325d55b34e30b59b5fa867c1be
-      size: 3139
+      md5: e33f0a0ccfd666d1bde0271d2b25f6e4
+      size: 3118
     - path: src/gp/
-      md5: abe56c5c5ab75c6b4f146da541b1f5e6.dir
-      size: 45847
-      nfiles: 25
+      md5: a42b199f6d3eb31882954ad2cee5d32e.dir
+      size: 46769
+      nfiles: 26
     params:
       params.yaml:
         data:
@@ -121,9 +121,9 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
         model:
           start_date: '2021-06-01'
-          end_date: '2021-07-01'
+          end_date: '2021-06-16'
           val_split: '2021-06-10'
-          max_iter: 100
+          max_iter: 150
           num_induc: 200
           num_induc_upd: 20
           kernel: basic
@@ -137,10 +137,10 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/spat_cv.json
-      md5: e60237b94e1647277fc31738310c0962
-      size: 867
+      md5: dd4ca5b61f6c0bb54bad00663eceffe8
+      size: 255
     - path: experiments/results/spat_cv.json
-      md5: dc4454e4fa72e13bddb0e6e20f80b198
+      md5: db27424e932645b84f91c1325d12e81b
       size: 64
   temp_cv:
     cmd: python -m experiments.temp_cv
@@ -149,12 +149,12 @@ stages:
       md5: 34faf888160635dc1b4dfc2a798c4095
       size: 581221045
     - path: experiments/temp_cv.py
-      md5: 3243629c37064835827a7c3f5d30ee65
-      size: 3842
+      md5: 1479316488c682a5a76d49a5b2d87e3e
+      size: 3976
     - path: src/gp/
-      md5: 267e3fb680296aa664e130c2ae535664.dir
-      size: 38940
-      nfiles: 23
+      md5: a42b199f6d3eb31882954ad2cee5d32e.dir
+      size: 46769
+      nfiles: 26
     params:
       params.yaml:
         data:
@@ -178,11 +178,11 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
         model:
           start_date: '2021-06-01'
-          end_date: '2021-06-12'
-          val_split: '2021-06-08'
-          max_iter: 100
-          num_induc: 100
-          num_induc_upd: 10
+          end_date: '2021-06-16'
+          val_split: '2021-06-10'
+          max_iter: 150
+          num_induc: 200
+          num_induc_upd: 20
           kernel: basic
           temp_cv:
             result_file: experiments/results/temp_cv.json
@@ -194,8 +194,8 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/temp_cv.json
-      md5: 6c1d388abf89a9352df78b8a1fa75d09
-      size: 175
+      md5: 0e6a25040069f06c51e5fa2c194298a5
+      size: 256
     - path: experiments/results/temp_cv.json
-      md5: a1d9d7ef36117908f272860862914a16
+      md5: 9cbb15bfc36746e6c163ecf5c50c755b
       size: 64
