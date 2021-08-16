@@ -85,12 +85,9 @@ class OSGPRTrainer:
             Su = Su[0, :, :]
         Kaa1 = self.model.kernel.K(self.model.inducing_variable.Z)
 
-        #Zinit = X[np.random.permutation(X.shape[0])[0:new_m], :]
-        #Zinit = np.vstack((Z_opt.numpy(), Zinit))
         Zinit = self._init_Z(Z_opt.numpy(), X)
 
         print(mu.shape, Su.shape, Kaa1.shape, Z_opt.shape)
-        #print(mu[new_m:, :].shape, Su[new_m:, new_m:].shape, Kaa1[new_m:, new_m:].shape, Z_opt[new_m:, :].shape)
         new_model = OSGPR(
                 (X, y),
                 self.kernel,
@@ -100,15 +97,6 @@ class OSGPRTrainer:
                 Z_opt,
                 Zinit,
                 )
-        #new_model = OSGPR(
-        #        (X, y),
-        #        self.kernel,
-        #        mu[new_m:, :],
-        #        Su[new_m:, new_m:],
-        #        Kaa1[new_m:, new_m:],
-        #        Z_opt[new_m:, :],
-        #        Zinit,
-        #        )
         new_model.likelihood.variance.assign(self.model.likelihood.variance)
         for i, item in enumerate(self.model.kernel.trainable_variables):
             new_model.kernel.trainable_variables[i].assign(item)

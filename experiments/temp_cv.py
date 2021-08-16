@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
     data.loc[data.P1 <= 1, 'P1'] = 1
     print(data['P1'].min(), data['P1'].max())
-    
+
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]
 
