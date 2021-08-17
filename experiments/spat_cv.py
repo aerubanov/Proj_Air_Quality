@@ -5,6 +5,7 @@ import tensorflow as tf
 from sklearn.metrics import mean_squared_error
 import yaml
 import matplotlib.pyplot as plt
+import gpflow
 
 from experiments.temp_cv import x_col, y_col, time_cv
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
@@ -49,19 +50,18 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                 train_data.copy(),
                 max_iter=params['model']['max_iter'],
                 new_m=params['model']['num_induc_upd'],
-                iprint=0,
+                iprint=-1,
                 )
         pred = trainer.predict(test_data.copy())
-        print(pred)
         test_data['pred'], test_data['var'] = \
             pred[:, 0], pred[:, 1]
         predictions.append(test_data)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
-        print(test_data.info(), test_data)
-        plot_spatial(trainer, train_data)
     print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
+    gpflow.utilities.print_summary(trainer.model)
+    plot_spatial(trainer, train_data)
 
     with open(params['model']['spat_cv']['result_file'], 'w') as fd:
         json.dump({
@@ -102,7 +102,6 @@ def plot_spatial(trainer, data: pd.DataFrame):
     )
     xx['sds_sensor'] = 1
     xx['P1'] = 1
-    print(xx, xx.info())
     pred = trainer.predict(xx)
     mx, var = pred[:, 0], pred[:, 1]
     f, (ax3, ax4) = plt.subplots(1, 2, figsize=(16, 8))
@@ -135,7 +134,6 @@ if __name__ == '__main__':
     data = data[x_col + [y_col, 'sds_sensor']]
 
     data.loc[data.P1 <= 1, 'P1'] = 1
-    print(data['P1'].min(), data['P1'].max())
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]

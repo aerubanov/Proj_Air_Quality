@@ -68,7 +68,7 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
                 train_data,
                 max_iter=params['model']['max_iter'],
                 new_m=params['model']['num_induc_upd'],
-                iprint=0,
+                iprint=-1,
                 )
     gpflow.utilities.print_summary(trainer.model)
     print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
@@ -116,7 +116,6 @@ if __name__ == '__main__':
     data = data[x_col + [y_col, 'sds_sensor']]
 
     data.loc[data.P1 <= 1, 'P1'] = 1
-    print(data['P1'].min(), data['P1'].max())
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]
