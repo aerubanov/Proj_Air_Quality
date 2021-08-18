@@ -22,8 +22,6 @@ class GPTransform(TransformerMixin):
         #         n_quantiles=n_quantiles,
         #     )
         self.target_transform = StandardScaler()
-        # self.lat_transform = StandardScaler()
-        # self.lon_transform = StandardScaler()
         self.start_date = None
         super().__init__()
 
@@ -35,7 +33,6 @@ class GPTransform(TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        # X = X[['timestamp', 'lat', 'lon', 'P1', 'sds_sensor']]
         X.spat.y = self.target_transform.transform(np.log(X.spat.y.values)).flatten()
         X.spat.x = self._convert_time(X)
         return X

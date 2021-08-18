@@ -18,7 +18,7 @@ with open('params.yaml', 'r') as fd:
 pd.options.mode.chained_assignment = None  # default='warn'
 data_file = params['data']['paths']['dataset_file']
 kernel = get_kernel(params['model']['kernel'])
-x_col = ['timestamp', 'lon', 'lat']
+x_col = ['timestamp', 'lon', 'lat', 'wind_speed', 'hum_meteo']
 y_col = 'P1'
 
 
@@ -114,6 +114,9 @@ if __name__ == '__main__':
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
     data = data[x_col + [y_col, 'sds_sensor']]
+    data['hum_meteo'] = data['hum_meteo'].fillna(method='bfill')
+    data['hum_meteo'] = (data['hum_meteo'] - data['hum_meteo'].mean()) / data['hum_meteo'].std()
+    data['wind_speed'] = (data['wind_speed'] - data['wind_speed'].mean()) / data['wind_speed'].std()
 
     data.loc[data.P1 <= 1, 'P1'] = 1
 

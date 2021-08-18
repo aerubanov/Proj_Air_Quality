@@ -24,7 +24,7 @@ model:
   max_iter: 150
   num_induc: 200
   num_induc_upd: 20
-  kernel: basic
+  kernel: meteo
   temp_cv:
     result_file: experiments/results/temp_cv.json
     plot_file: experiments/plots/temp_cv.json
