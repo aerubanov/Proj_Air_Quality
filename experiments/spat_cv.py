@@ -4,6 +4,8 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import mean_squared_error
 import yaml
+import matplotlib.pyplot as plt
+import gpflow
 
 from experiments.temp_cv import x_col, y_col, time_cv
 from src.gp.trainer.osgpr_trainer import OSGPRTrainer
@@ -45,19 +47,21 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
         y_test = test_data.spat.y.values
 
         trainer.update_model(
-                train_data,
+                train_data.copy(),
                 max_iter=params['model']['max_iter'],
                 new_m=params['model']['num_induc_upd'],
-                iprint=0,
+                iprint=-1,
                 )
-        pred = trainer.predict(test_data)
-        test_data['pred'], test_data['low_bound'], test_data['up_bound'] = \
-            pred[:, 0], pred[:, 1], pred[:, 2]
+        pred = trainer.predict(test_data.copy())
+        test_data['pred'], test_data['var'] = \
+            pred[:, 0], pred[:, 1]
         predictions.append(test_data)
         mse = mean_squared_error(y_test, pred[:, 0])
         print(f'step {i} RMSE: {np.sqrt(mse)}')
         results.append(mse)
     print(np.mean(np.sqrt(results)), np.std(np.sqrt(results)))
+    gpflow.utilities.print_summary(trainer.model)
+    plot_spatial(trainer, train_data)
 
     with open(params['model']['spat_cv']['result_file'], 'w') as fd:
         json.dump({
@@ -75,6 +79,44 @@ def main(init_data: pd.DataFrame, val_data: pd.DataFrame):
     predictions.to_csv(params['model']['spat_cv']['prediction'])
 
 
+def plot_spatial(trainer, data: pd.DataFrame):
+    timestamp = data['timestamp'].max()
+    df = data[data['timestamp'] == timestamp]
+    x = df[x_col].values
+    y = df[y_col].values
+
+    lon_min, lon_max = x[:, 1].min(), x[:, 1].max()
+    lat_min, lat_max = x[:, 2].min(), x[:, 2].max()
+
+    new_lon, new_lat = np.mgrid[
+            lon_min:lon_max:0.025,
+            lat_min:lat_max:0.0125,
+            ]
+    xx = pd.DataFrame(
+            data={
+                'timestamp': [timestamp for i in range(
+                    new_lon.flatten().shape[0])],
+                'lon': new_lon.flatten(),
+                'lat': new_lat.flatten(),
+            }
+    )
+    xx['sds_sensor'] = 1
+    xx['P1'] = 1
+    pred = trainer.predict(xx)
+    mx, var = pred[:, 0], pred[:, 1]
+    f, (ax3, ax4) = plt.subplots(1, 2, figsize=(16, 8))
+    plot1 = ax3.hexbin(xx.lon, xx.lat, mx,
+                       gridsize=30, cmap='rainbow', alpha=0.7)
+    ax3.scatter(x[:, 1], x[:, 2],
+                c=y,
+                s=300, cmap='rainbow')
+    plot2 = ax4.hexbin(xx.lon, xx.lat, var,
+                       gridsize=30, cmap='rainbow', alpha=0.7)
+    plt.colorbar(plot1, ax=ax3)
+    plt.colorbar(plot2, ax=ax4)
+    plt.show()
+
+
 if __name__ == '__main__':
 
     np.random.seed(0)
@@ -89,7 +131,9 @@ if __name__ == '__main__':
             (data['timestamp'] >= start_date)
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
-    data = data[['timestamp', 'lon', 'lat', 'P1', 'sds_sensor']]
+    data = data[x_col + [y_col, 'sds_sensor']]
+
+    data.loc[data.P1 <= 1, 'P1'] = 1
 
     init_data = data[data['timestamp'] < val_split]
     val_data = data[data['timestamp'] >= val_split]

@@ -87,7 +87,6 @@ class OSGPRTrainer:
 
         Zinit = self._init_Z(Z_opt.numpy(), X)
 
-        print(mu.shape, Su.shape, Kaa1.shape, Z_opt.shape)
         new_model = OSGPR(
                 (X, y),
                 self.kernel,
@@ -117,7 +116,6 @@ class OSGPRTrainer:
         data = self.transform.transform(data)
         X = data[self.x_col].values
         mu, var = self.model.predict_f(X)
-        print(mu, var)
-        pred = np.hstack((mu, mu + 2*np.sqrt(var), mu - 2 * np.sqrt(var)))
+        pred = np.hstack((mu, var))
         pred = self.transform.inverse_transform(pred)
         return pred
