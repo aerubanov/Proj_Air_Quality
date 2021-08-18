@@ -87,7 +87,7 @@ def plot_spatial(trainer, data: pd.DataFrame):
 
     lon_min, lon_max = x[:, 1].min(), x[:, 1].max()
     lat_min, lat_max = x[:, 2].min(), x[:, 2].max()
-    
+
     new_lon, new_lat = np.mgrid[
             lon_min:lon_max:0.025,
             lat_min:lat_max:0.0125,
