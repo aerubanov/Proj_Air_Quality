@@ -18,8 +18,12 @@ with open('params.yaml', 'r') as fd:
 pd.options.mode.chained_assignment = None  # default='warn'
 data_file = params['data']['paths']['dataset_file']
 kernel = get_kernel(params['model']['kernel'])
+<<<<<<< HEAD
 x_col = ['timestamp', 'lon', 'lat', 'wind_speed', 'hum_meteo',
         'temp_meteo', 'pres_meteo']
+=======
+x_col = ['timestamp', 'lon', 'lat', 'wind_speed', 'hum_meteo']
+>>>>>>> cace2a1 (add exponential kernel for wind speed and humidity)
 y_col = 'P1'
 
 
@@ -116,12 +120,17 @@ if __name__ == '__main__':
     data = data.dropna(subset=['P1'])
     data = data[x_col + [y_col, 'sds_sensor']]
     data['hum_meteo'] = data['hum_meteo'].fillna(method='bfill')
+<<<<<<< HEAD
     data['temp_meteo'] = data['temp_meteo'].fillna(method='bfill')
     data['pres_meteo'] = data['pres_meteo'].fillna(method='bfill')
     data.info()
 
     # data['hum_meteo'] = (data['hum_meteo'] - data['hum_meteo'].mean()) / data['hum_meteo'].std()
     # data['wind_speed'] = (data['wind_speed'] - data['wind_speed'].mean()) / data['wind_speed'].std()
+=======
+    data['hum_meteo'] = (data['hum_meteo'] - data['hum_meteo'].mean()) / data['hum_meteo'].std()
+    data['wind_speed'] = (data['wind_speed'] - data['wind_speed'].mean()) / data['wind_speed'].std()
+>>>>>>> cace2a1 (add exponential kernel for wind speed and humidity)
 
     data.loc[data.P1 <= 1, 'P1'] = 1
 
