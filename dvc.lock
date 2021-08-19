@@ -149,11 +149,11 @@ stages:
       md5: a8e63be5672f212eddd987df857bb1f0
       size: 644332935
     - path: experiments/temp_cv.py
-      md5: 50d312513f004bd34de2d43f8e76b609
-      size: 4161
+      md5: 0b9d3711f0de005ad4994f169b778a17
+      size: 4352
     - path: src/gp/
-      md5: 905c88032edff2a35a27ee4b7829df65.dir
-      size: 47384
+      md5: 29b2036bd75782f4ed059cd15024967a.dir
+      size: 47741
       nfiles: 25
     params:
       params.yaml:
@@ -180,7 +180,7 @@ stages:
           start_date: '2021-06-01'
           end_date: '2021-07-01'
           val_split: '2021-06-10'
-          max_iter: 150
+          max_iter: 30
           num_induc: 200
           num_induc_upd: 20
           kernel: meteo
@@ -194,7 +194,8 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/temp_cv.json
-      size: 872
+      md5: 137135f1fd081ea4423938a465565865
+      size: 871
     - path: experiments/results/temp_cv.json
-      md5: 8178e93efe3b54849c22d3a7db5ad73d
-      size: 63
+      md5: 9a6257b8404304943e1d126c59416ff2
+      size: 64
