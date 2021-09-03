@@ -102,6 +102,11 @@ def plot_spatial(trainer, data: pd.DataFrame):
     )
     xx['sds_sensor'] = 1
     xx['P1'] = 1
+
+    for c in df.columns:
+        if c not in xx.columns:
+            xx[c] = df[c].mean()
+    
     pred = trainer.predict(xx)
     mx, var = pred[:, 0], pred[:, 1]
     f, (ax3, ax4) = plt.subplots(1, 2, figsize=(16, 8))
@@ -132,6 +137,9 @@ if __name__ == '__main__':
             & (data['timestamp'] < end_date)]
     data = data.dropna(subset=['P1'])
     data = data[x_col + [y_col, 'sds_sensor']]
+    data['hum_meteo'] = data['hum_meteo'].fillna(method='bfill')
+    data['temp_meteo'] = data['temp_meteo'].fillna(method='bfill')
+    data['pres_meteo'] = data['pres_meteo'].fillna(method='bfill')
 
     data.loc[data.P1 <= 1, 'P1'] = 1
 

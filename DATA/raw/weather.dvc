@@ -1,5 +1,5 @@
 outs:
-- md5: 8afe92c36f3c24ae0ba520eb43b0fc54.dir
+- md5: e73ed14e2a2d790fb478d0551eb596cd.dir
   path: weather
-  size: 4005880
+  size: 3880545
   nfiles: 1

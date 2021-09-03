@@ -1,5 +1,5 @@
 outs:
-- md5: ec64f97b39e0af42d2558353499e1493.dir
+- md5: b846b06ed672e7b5ad85eb4f7553ec4e.dir
   path: sensors
-  size: 8315902765
-  nfiles: 654
+  size: 7874867273
+  nfiles: 644

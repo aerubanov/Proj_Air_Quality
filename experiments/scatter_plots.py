@@ -42,4 +42,6 @@ if __name__ == '__main__':
     data = pd.read_csv('DATA/processed/dataset.csv')
     plot_spat_cor(data, meteo_features)
     plot_spat_scatter(data, meteo_features)
+    plot_spat_cor(data, spat_features)
+    plot_spat_scatter(data, spat_features)
     plt.show()
