@@ -4,12 +4,12 @@ stages:
     cmd: python -m src.data.spatial_data
     deps:
     - path: DATA/raw/sensors/
-      md5: 8e1dff9ea311d134bb026e9c3bb39c88.dir
-      size: 7533252934
-      nfiles: 640
+      md5: b846b06ed672e7b5ad85eb4f7553ec4e.dir
+      size: 7874867273
+      nfiles: 644
     - path: DATA/raw/weather/
-      md5: 6fc1ecee5d5eb450d1d2d77dcfd08dc1.dir
-      size: 3774006
+      md5: e73ed14e2a2d790fb478d0551eb596cd.dir
+      size: 3880545
       nfiles: 1
     - path: requirements.txt
       md5: aa81df9430a7c47b9691bbebe5bdc453
@@ -46,14 +46,14 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
     outs:
     - path: DATA/processed/sensors.csv
-      md5: 98669f2e26c1db6411a4479276d3bb6a
-      size: 28220
+      md5: ba8ffec1de7afc714435c187b1988758
+      size: 28518
   create_dataset:
     cmd: python -m src.data.sensors_data
     deps:
     - path: DATA/processed/sensors.csv
-      md5: 98669f2e26c1db6411a4479276d3bb6a
-      size: 28220
+      md5: ba8ffec1de7afc714435c187b1988758
+      size: 28518
     - path: src/data/sensors_data.py
       md5: 5dc35172562453d51352c8b04cb426dc
       size: 2983
@@ -83,19 +83,19 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
     outs:
     - path: DATA/processed/dataset.csv
-      md5: 34faf888160635dc1b4dfc2a798c4095
-      size: 581221045
+      md5: a317d22b4847897a4baec0d71978d40e
+      size: 607347354
   spat_cv:
     cmd: python -m experiments.spat_cv
     deps:
     - path: DATA/processed/dataset.csv
-      md5: 34faf888160635dc1b4dfc2a798c4095
-      size: 581221045
+      md5: a317d22b4847897a4baec0d71978d40e
+      size: 607347354
     - path: experiments/spat_cv.py
-      md5: 468a4db2f82061c708391d8e010850cd
-      size: 4484
+      md5: 77c7418fe36eae28fa3ba78819086c7b
+      size: 4480
     - path: src/gp/
-      md5: c33db6f758bb08e030133bf523be51de.dir
+      md5: fb81f1541b1d87de3ecaff725112acef.dir
       size: 48077
       nfiles: 26
     params:
@@ -137,22 +137,22 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/spat_cv.json
-      md5: 33ff35fb886a6ee58a52236909f21899
+      md5: eab96f7eadc74b5f3e727eb2dbf616ee
       size: 870
     - path: experiments/results/spat_cv.json
-      md5: d1fa47c5f362bac878bfa5e4b7eea181
+      md5: df333342f8fd0fb7bf7b465d209d952f
       size: 64
   temp_cv:
     cmd: python -m experiments.temp_cv
     deps:
     - path: DATA/processed/dataset.csv
-      md5: 34faf888160635dc1b4dfc2a798c4095
-      size: 581221045
+      md5: a317d22b4847897a4baec0d71978d40e
+      size: 607347354
     - path: experiments/temp_cv.py
       md5: 439cf429c994b8728a08f50575fb46ed
       size: 3871
     - path: src/gp/
-      md5: c33db6f758bb08e030133bf523be51de.dir
+      md5: fb81f1541b1d87de3ecaff725112acef.dir
       size: 48077
       nfiles: 26
     params:
@@ -194,8 +194,8 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/temp_cv.json
-      md5: b6a07c5e7a1fc7466493462da581106b
+      md5: 472908420046c7e52e0a7e5ccc538a44
       size: 873
     - path: experiments/results/temp_cv.json
-      md5: 3122bab21f75b18a7dc555440e09c4e1
+      md5: 63268d73f09000c4c89ca7d69d9a9b6f
       size: 64
