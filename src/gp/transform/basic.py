@@ -32,6 +32,7 @@ class GPTransform(TransformerMixin):
         # self.lat_transform.fit(X['lat'])
         # self.lon_transform.fit(X['lon'])
         self.start_date = X['timestamp'].min()
+        return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         # X = X[['timestamp', 'lat', 'lon', 'P1', 'sds_sensor']]
