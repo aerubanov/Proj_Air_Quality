@@ -14,51 +14,31 @@ pk1 = gpflow.kernels.Periodic(
             lengthscales=12,
             active_dims=[0],
             ),
-        period=6,
+        period=8,
         )
 pk2 = gpflow.kernels.Periodic(
         gpflow.kernels.SquaredExponential(
             lengthscales=12,
             active_dims=[0],
             ),
-        period=12,
+        period=10,
         )
 pk3 = gpflow.kernels.Periodic(
         gpflow.kernels.SquaredExponential(
             lengthscales=12,
             active_dims=[0],
             ),
-        period=24,
+        period=30,
         )
 pk4 = gpflow.kernels.Periodic(
         gpflow.kernels.SquaredExponential(
             lengthscales=12,
             active_dims=[0],
             ),
-        period=48,
+        period=2,
         )
-pk5 = gpflow.kernels.Periodic(
-        gpflow.kernels.SquaredExponential(
-            lengthscales=12,
-            active_dims=[0],
-            ),
-        period=72,
-        )
-pk6 = gpflow.kernels.Periodic(
-        gpflow.kernels.SquaredExponential(
-            lengthscales=12,
-            active_dims=[0],
-            ),
-        period=96,
-        )
-pk7 = gpflow.kernels.Periodic(
-        gpflow.kernels.SquaredExponential(
-            lengthscales=12,
-            active_dims=[0],
-            ),
-        period=120,
-        )
-time_cov = mt + mt1 * (pk1 + pk2 + pk3 + pk4 + pk5 + pk6 + pk7)
+
+time_cov = mt + mt1 * (pk1 + pk2 + pk3 + pk4)
 
 
 def get_kernel(kernel_name: str):
