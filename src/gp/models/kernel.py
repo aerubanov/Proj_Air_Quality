@@ -38,8 +38,7 @@ pk4 = gpflow.kernels.Periodic(
         period=2,
         )
 
-# time_cov = mt + mt1 * (pk1 + pk2 + pk3 + pk4)
-time_cov = mt + mt1 * (pk1 + pk2 + pk3)
+time_cov = mt + mt1 * (pk1 + pk2 + pk3 + pk4)
 
 
 def get_kernel(kernel_name: str):
