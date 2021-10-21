@@ -95,9 +95,9 @@ stages:
       md5: 77c7418fe36eae28fa3ba78819086c7b
       size: 4480
     - path: src/gp/
-      md5: de9c5f2da4f04500881adf0305f614ac.dir
-      size: 48077
-      nfiles: 26
+      md5: 3eae52a0c5649c59cf9ceaa9daa5184c.dir
+      size: 46686
+      nfiles: 25
     params:
       params.yaml:
         data:
@@ -137,10 +137,10 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/spat_cv.json
-      md5: f1dd1d965cdaf029f38ee17910c3be44
-      size: 870
+      md5: bb84f7afe7fc32d95cf9d5607d213eb7
+      size: 867
     - path: experiments/results/spat_cv.json
-      md5: b0cbe05e9208dd0c2bcdb524371f733a
+      md5: eaeced1c6b5ca6493b6f7905983ab7b3
       size: 64
   temp_cv:
     cmd: python -m experiments.temp_cv
@@ -152,9 +152,9 @@ stages:
       md5: 439cf429c994b8728a08f50575fb46ed
       size: 3871
     - path: src/gp/
-      md5: 002186d08ac67270c81c65fc013cc37b.dir
-      size: 47378
-      nfiles: 26
+      md5: 3eae52a0c5649c59cf9ceaa9daa5184c.dir
+      size: 46686
+      nfiles: 25
     params:
       params.yaml:
         data:
@@ -194,8 +194,8 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/temp_cv.json
-      md5: 051d38ebc75e110a007397ce57a2a871
-      size: 871
+      md5: 9310f5adde79d992d8e9427cb332d176
+      size: 868
     - path: experiments/results/temp_cv.json
-      md5: 69dc92d30a121c3f2035911614755b3d
-      size: 65
+      md5: ad61554360a48a3b0f380a41b2546d2e
+      size: 63
