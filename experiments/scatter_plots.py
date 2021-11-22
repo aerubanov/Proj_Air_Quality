@@ -40,6 +40,9 @@ def plot_spat_scatter(df: pd.DataFrame, features: List[str]):
 
 if __name__ == '__main__':
     data = pd.read_csv('DATA/processed/dataset.csv')
+    data[y_col] = np.log(data[y_col])
     plot_spat_cor(data, meteo_features)
+    plot_spat_cor(data, spat_features)
     plot_spat_scatter(data, meteo_features)
+    plot_spat_scatter(data, spat_features)
     plt.show()
