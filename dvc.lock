@@ -149,11 +149,11 @@ stages:
       md5: a8e63be5672f212eddd987df857bb1f0
       size: 644332935
     - path: experiments/temp_cv.py
-      md5: 439cf429c994b8728a08f50575fb46ed
-      size: 3871
+      md5: 030a1735d0b8b63ce0055806db25ddd4
+      size: 4031
     - path: src/gp/
-      md5: 3eae52a0c5649c59cf9ceaa9daa5184c.dir
-      size: 46686
+      md5: 11d24ab4e815b1181a971f848ff34fee.dir
+      size: 47301
       nfiles: 25
     params:
       params.yaml:
@@ -180,7 +180,7 @@ stages:
           start_date: '2021-06-01'
           end_date: '2021-07-01'
           val_split: '2021-06-10'
-          max_iter: 150
+          max_iter: 100
           num_induc: 200
           num_induc_upd: 20
           kernel: basic
@@ -194,8 +194,8 @@ stages:
             prediction: experiments/results/spat_cv.csv
     outs:
     - path: experiments/plots/temp_cv.json
-      md5: 9310f5adde79d992d8e9427cb332d176
-      size: 868
+      md5: 4bed25236a2bd26c45ba6ac83244e797
+      size: 874
     - path: experiments/results/temp_cv.json
-      md5: ad61554360a48a3b0f380a41b2546d2e
+      md5: 3402d2e76cc62a593a130928ee2d225f
       size: 63

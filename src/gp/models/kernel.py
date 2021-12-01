@@ -38,10 +38,13 @@ pk4 = gpflow.kernels.Periodic(
         period=2,
         )
 
+lin = gpflow.kernels.Linear(active_dims=[3, 4, 5, 6, 7, 8, 9])
+
 time_cov = mt + mt1 * (pk1 + pk2 + pk3 + pk4)
 
 
 def get_kernel(kernel_name: str):
     return {'time_cov': time_cov,
             'basic': time_cov * spat_cov,
+            'spat_meteo': time_cov * spat_cov + lin,
             }[kernel_name]

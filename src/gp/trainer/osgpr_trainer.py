@@ -5,6 +5,7 @@ import numpy as np
 from src.gp.models.osgpr import OSGPR
 from sklearn.base import TransformerMixin
 import pandas as pd
+from tensorflow.errors import InvalidArgumentError
 
 
 class OSGPRTrainer:
@@ -101,12 +102,18 @@ class OSGPRTrainer:
             new_model.kernel.trainable_variables[i].assign(item)
         # gpflow.set_trainable(new_model.kernel, False)
         optimizer = gpflow.optimizers.Scipy()
-        optimizer.minimize(
-                new_model.training_loss,
-                new_model.trainable_variables,
-                options={'iprint': iprint, 'maxiter': max_iter},
-                )
-        self.model = new_model
+        for i in range(0, 10):
+            while True:
+                try:
+                    optimizer.minimize(
+                        new_model.training_loss,
+                        new_model.trainable_variables,
+                        options={'iprint': iprint, 'maxiter': max_iter},
+                    )
+                except InvalidArgumentError:
+                    print("Retry")
+                    continue
+                break
 
     def predict(self, data: pd.DataFrame) -> np.ndarray:
         """

@@ -18,6 +18,9 @@ with open('params.yaml', 'r') as fd:
 pd.options.mode.chained_assignment = None  # default='warn'
 data_file = params['data']['paths']['dataset_file']
 kernel = get_kernel(params['model']['kernel'])
+#x_col = ['timestamp', 'lon', 'lat', 'nearest_park', 'nearest_road',
+#        'nearest_indust', 'temp_meteo', 'pres_meteo',
+#        'hum_meteo', 'wind_speed']
 x_col = ['timestamp', 'lon', 'lat']
 y_col = 'P1'
 
