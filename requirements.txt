@@ -2,7 +2,7 @@ numpy== 1.19.4
 requests==2.24.0
 dvc==2.5.0
 beautifulsoup4==4.9.3
-lxml==4.6.3
+lxml==4.6.5
 pytest==6.1.2
 pandas==1.0.5
 requests-mock==1.8.0
