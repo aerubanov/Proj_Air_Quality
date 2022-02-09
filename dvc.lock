@@ -4,15 +4,15 @@ stages:
     cmd: python -m src.data.spatial_data
     deps:
     - path: DATA/raw/sensors/
-      md5: ec64f97b39e0af42d2558353499e1493.dir
-      size: 8315902765
-      nfiles: 654
+      md5: 2ecd01814c0b7f3559b97d567f3c64c8.dir
+      size: 8792894444
+      nfiles: 713
     - path: DATA/raw/weather/
-      md5: 8afe92c36f3c24ae0ba520eb43b0fc54.dir
-      size: 4005880
+      md5: 98dc83b6d2098a6a76c2b9f0e066b977.dir
+      size: 4540132
       nfiles: 1
     - path: requirements.txt
-      md5: aa81df9430a7c47b9691bbebe5bdc453
+      md5: b288c0650afd2681f1bbdd9bf1f06167
       size: 339
     - path: src/data/opentopodata.py
       md5: 09038e1d814fff6bcb998429c2ca5d00
@@ -46,14 +46,14 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
     outs:
     - path: DATA/processed/sensors.csv
-      md5: a2175cb087749a35147d5f09c4555b5c
-      size: 28894
+      md5: 807cf51920e55d32716e43b0bdb5581d
+      size: 31787
   create_dataset:
     cmd: python -m src.data.sensors_data
     deps:
     - path: DATA/processed/sensors.csv
-      md5: a2175cb087749a35147d5f09c4555b5c
-      size: 28894
+      md5: 807cf51920e55d32716e43b0bdb5581d
+      size: 31787
     - path: src/data/sensors_data.py
       md5: 5dc35172562453d51352c8b04cb426dc
       size: 2983
@@ -83,8 +83,8 @@ stages:
             weather2: https://rp5.ru/responses/reFileSynop.php
     outs:
     - path: DATA/processed/dataset.csv
-      md5: a8e63be5672f212eddd987df857bb1f0
-      size: 644332935
+      md5: b73d55f33c00bec054856519f69cb85d
+      size: 773921468
   spat_cv:
     cmd: python -m experiments.spat_cv
     deps:
